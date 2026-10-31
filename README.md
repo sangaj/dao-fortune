@@ -9,6 +9,9 @@ and no random number anywhere in the reading.
 
 ![App icon](docs/store/icon_512.png)
 
+> **Repository:** https://github.com/sangaj/dao-fortune
+> **Privacy policy (hosted):** https://sangaj.github.io/dao-fortune/privacy-policy.html
+
 ---
 
 ## What the app does
@@ -187,10 +190,11 @@ a real phone.
 
 ### Version control
 
-The project is a git repository on `main`. Git is portable here too:
+The project is a git repository on `main`, published at **https://github.com/sangaj/dao-fortune**.
+Git and the GitHub CLI are portable here too:
 
 ```powershell
-$env:PATH = "E:\Minimax\toolchain\git\cmd;$env:PATH"
+$env:PATH = "E:\Minimax\toolchain\git\cmd;E:\Minimax\toolchain\gh\bin;$env:PATH"
 cd E:\Minimax\dao-fortune
 git status
 git add -A
@@ -200,7 +204,11 @@ git push
 
 `keystore.properties`, `*.jks`, `build/` and `dist/` are ignored — the signing key never enters the
 repository, and the release artifacts are rebuilt by `tools/release/package_release.ps1` rather than
-being committed.
+being committed. The release gate also checks that git is not tracking the key.
+
+The remote is an **HTTPS** URL backed by the GitHub CLI's credential helper (`gh auth setup-git`),
+because the SSH key generated for this machine was never registered with the account — see
+`C:\Users\gubin\.ssh\id_ed25519_github.pub` if you want to switch to SSH.
 
 ### Signing
 

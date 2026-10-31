@@ -153,11 +153,23 @@ August 2026 — this build already complies. No action needed, but verify in Con
   python tools\docs\make_privacy_html.py
   ```
 
-  Then publish it. With the project on GitHub, the quickest route is **GitHub Pages**:
-  repository → **Settings → Pages → Source: Deploy from a branch → `main` / `docs`**. The URL is then
-  `https://<your-user>.github.io/<repo>/privacy-policy.html` — put that into Play Console. If the
-  repository is private, either switch Pages on a public repository, or host the file anywhere else
-  that serves it over HTTPS (a static host, a CDN, your own site).
+  Then publish it. **It is already published:**
+
+  | What | Where |
+  |---|---|
+  | Repository | https://github.com/sangaj/dao-fortune (public) |
+  | Privacy policy for Play | **https://sangaj.github.io/dao-fortune/privacy-policy.html** |
+  | Pages source | branch `main`, folder `/docs` |
+
+  Paste the **sangaj.github.io** link into Play Console → App content → Privacy policy. (GitHub also
+  reports `http://gubingjing.com/dao-fortune/` as the canonical address; that one needs its own
+  certificate and DNS to work, so use the `github.io` link unless you have set the domain up.)
+
+  If the policy text changes, regenerate and push:
+  ```powershell
+  python tools\docs\make_privacy_html.py
+  git add -A && git commit -m "policy update" && git push
+  ```
 * **App content → Data safety** — answer:
   * Does your app collect or share any required user data types? → **No**
   * Is all user data encrypted in transit? → *N/A* (there is no user data)
