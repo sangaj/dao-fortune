@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Cloud backup and device transfer carry only the free-reading flag and the
+    unlock flag.
+
+    dao_fortune_profile.xml (the reader's year sign) is deliberately NOT listed:
+    a listed file is uploaded off the device, and the year sign is meant to stay
+    on it. Do not add it.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <include domain="sharedpref" path="dao_fortune_access.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="sharedpref" path="dao_fortune_access.xml" />
+    </device-transfer>
+</data-extraction-rules>

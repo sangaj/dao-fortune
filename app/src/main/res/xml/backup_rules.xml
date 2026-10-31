@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Only the free-reading flag and the unlock flag are backed up, so a device
+    transfer does not ask the reader to pay twice.
+
+    Nothing else in this app's storage may be added here: the year sign lives in
+    dao_fortune_profile.xml and is deliberately left out, because a file in this
+    allow-list is uploaded to Google's backup servers and would therefore leave
+    the device.
+-->
+<full-backup-content>
+    <include domain="sharedpref" path="dao_fortune_access.xml" />
+</full-backup-content>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- outer ring of the twenty-four mountain plate -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M22,54 a32,32 0 1,1 64,0 a32,32 0 1,1 -64,0"
+        android:strokeColor="#D9B36B"
+        android:strokeWidth="2.2" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M33,54 a21,21 0 1,1 42,0 a21,21 0 1,1 -42,0"
+        android:strokeColor="#8E7442"
+        android:strokeWidth="1.1" />
+
+    <!-- cardinal ticks -->
+    <path android:strokeColor="#D9B36B" android:strokeWidth="2" android:fillColor="#00000000"
+        android:pathData="M54,26 L54,18" />
+    <path android:strokeColor="#8E7442" android:strokeWidth="1.6" android:fillColor="#00000000"
+        android:pathData="M82,54 L90,54" />
+    <path android:strokeColor="#8E7442" android:strokeWidth="1.6" android:fillColor="#00000000"
+        android:pathData="M54,82 L54,90" />
+    <path android:strokeColor="#8E7442" android:strokeWidth="1.6" android:fillColor="#00000000"
+        android:pathData="M26,54 L18,54" />
+
+    <!-- intercardinal ticks -->
+    <path android:strokeColor="#8E7442" android:strokeWidth="1.3" android:fillColor="#00000000"
+        android:pathData="M71.4,36.6 L77.2,30.8" />
+    <path android:strokeColor="#8E7442" android:strokeWidth="1.3" android:fillColor="#00000000"
+        android:pathData="M71.4,71.4 L77.2,77.2" />
+    <path android:strokeColor="#8E7442" android:strokeWidth="1.3" android:fillColor="#00000000"
+        android:pathData="M36.6,71.4 L30.8,77.2" />
+    <path android:strokeColor="#8E7442" android:strokeWidth="1.3" android:fillColor="#00000000"
+        android:pathData="M36.6,36.6 L30.8,30.8" />
+
+    <!-- needle pointing north -->
+    <path
+        android:fillColor="#D9B36B"
+        android:pathData="M54,24 L59,56 L54,66 L49,56 Z" />
+    <path
+        android:fillColor="#6FBFA0"
+        android:pathData="M54,66 L59,56 L54,60 L49,56 Z" />
+</vector>

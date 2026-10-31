@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The Compose palette lives in ui/Theme.kt; only the XML theme needs a colour here. -->
+    <color name="ink">#FF0B0E13</color>
+    <color name="ic_launcher_background">#FF0B0E13</color>
+</resources>

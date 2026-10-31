@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy — Dao Fortune</title>
+<meta name="description" content="How Dao Fortune handles data: nothing is collected, the reading is computed on your device.">
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #0b0e13;
+    --card: #141922;
+    --text: #e9e7dc;
+    --muted: #9aa3af;
+    --gold: #d9b36b;
+    --line: #232a35;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f7f5ef;
+      --card: #ffffff;
+      --text: #1a1d23;
+      --muted: #5c6470;
+      --gold: #8a6a24;
+      --line: #e2ded3;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 40px 20px 72px;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  main { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 30px; line-height: 1.25; margin: 0 0 6px; letter-spacing: -0.01em; }
+  h2 { font-size: 19px; margin: 34px 0 10px; color: var(--gold); letter-spacing: 0.02em; }
+  h3 { font-size: 16px; margin: 22px 0 8px; color: var(--text); }
+  p { margin: 0 0 14px; }
+  ul { margin: 0 0 16px; padding-left: 22px; }
+  li { margin-bottom: 8px; }
+  hr { border: 0; border-top: 1px solid var(--line); margin: 26px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 0 0 18px; font-size: 15px; }
+  th, td { text-align: left; vertical-align: top; padding: 9px 10px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 600; font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; }
+  code { background: var(--card); border: 1px solid var(--line); border-radius: 5px; padding: 1px 5px; font-size: 14px; }
+  .meta { color: var(--muted); font-size: 14px; margin-bottom: 22px; }
+  footer { margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Privacy Policy — Dao Fortune</h1>
+<p><strong>Effective date:</strong> 31 October 2026</p>
+<p><strong>Application:</strong> Dao Fortune — Daily Luopan Wisdom (Android)</p>
+<p><strong>Package:</strong> <code>com.laki.daofortune</code></p>
+<p><strong>Developer contact:</strong> gubingjing@hotmail.com</p>
+<h2>1. Summary</h2>
+<p>Dao Fortune collects <strong>no personal data</strong>. The app itself has no account system, no analytics, no advertising SDKs, and no crash-reporting or tracking libraries. Your reading is calculated entirely on your device from your device&#x27;s local clock and time zone.</p>
+<p>The app lets you choose a <strong>year sign</strong> — one of the twelve branches of the Chinese zodiac — so that the plate can be read against your own position. That choice is a single branch stored in a private preferences file on your device. It is never transmitted, never included in an Android backup, and never seen by us or by Google. <strong>The app never asks for your date of birth, your name, your age or any other identifier.</strong> A year sign is not a personal identifier in the sense Play&#x27;s Data safety form uses: it is one choice out of twelve, it identifies nobody, and it is deleted the moment you clear it.</p>
+<p>The only data handled by a third party is the purchase itself: if you unlock the app, the transaction is processed by <strong>Google Play Billing</strong>, and Google Play handles the payment details, your Google account and the receipt. Dao Fortune never sees or stores your card details.</p>
+<p>The app bundles Google&#x27;s Play Billing library, which brings a small number of Google Play services components with it. Those components are Google&#x27;s code, operate under Google&#x27;s own privacy policy, and can transmit technical diagnostics to Google in the ordinary course of talking to the Play Store. The app does not use them for analytics and does not read anything they collect.</p>
+<h2>2. What the app stores on your device</h2>
+<table><thead><tr>
+<th>Data</th>
+<th>Where</th>
+<th>Why</th>
+<th>How long</th>
+</tr></thead><tbody>
+<tr>
+<td>Whether your free reading has been used</td>
+<td>App preferences (private storage)</td>
+<td>To honour the &quot;first reading free, later readings paid&quot; rule</td>
+<td>Until you clear app data or uninstall</td>
+</tr>
+<tr>
+<td>Whether you have purchased the unlock</td>
+<td>App preferences (private storage)</td>
+<td>To avoid asking you to pay twice</td>
+<td>Until you clear app data or uninstall</td>
+</tr>
+<tr>
+<td>Your year sign (one of twelve branches)</td>
+<td>A separate preferences file (private storage)</td>
+<td>To read the plate against your own position</td>
+<td>Until you clear it, clear app data, or uninstall</td>
+</tr>
+</tbody></table>
+<p>These two flags are included in Android&#x27;s device backup so that a phone transfer does not reset your purchase. They are not transmitted anywhere. The year sign is not — see below.</p>
+<h3>Your year sign</h3>
+<p>If you set a year sign, the app stores <strong>one integer</strong> — the ordinal of your branch out of twelve — in a preferences file named <code>dao_fortune_profile.xml</code>. Nothing else about you is recorded:</p>
+<ul>
+<li><strong>No birth date is collected.</strong> The app never asks for your birthday, and it cannot derive one.</li>
+<li><strong>It is kept in a different file from the purchase flags.</strong> The purchase flags live in</li>
+</ul>
+<p><code>dao_fortune_access.xml</code>; the year sign lives in <code>dao_fortune_profile.xml</code>.</p>
+<ul>
+<li><strong>It is excluded from backup.</strong> Android&#x27;s backup rules (<code>backup_rules.xml</code> and</li>
+</ul>
+<p><code>data_extraction_rules.xml</code>) allow-list only <code>dao_fortune_access.xml</code>. Your year sign is left out on purpose, so it never leaves the device — not into cloud backup, not into a device-to-device transfer.</p>
+<ul>
+<li><strong>It is never transmitted.</strong> There is no server behind this app. The year sign is used to compute a</li>
+</ul>
+<p>reading locally and is then forgotten until you change it.</p>
+<ul>
+<li><strong>You can erase it in one tap</strong> — the year-sign sheet in the app has a &quot;clear&quot; action — or by clearing</li>
+</ul>
+<p>the app&#x27;s storage in Android Settings, or by uninstalling.</p>
+<h3>Dates you look at</h3>
+<p>You can move the plate to any day — today, tomorrow, or a date in the next sixty days. The date you are looking at is <strong>not stored at all</strong>: it lives in memory for as long as the app is open and disappears when you close it. The forward scan of the coming sixty days is computed on your device each time the app starts; no result of it is saved or sent anywhere.</p>
+<h2>3. Permissions</h2>
+<p><strong>Dao Fortune itself declares no permissions at all.</strong> The Google Play Billing library that the app bundles adds two at the manifest level:</p>
+<table><thead><tr>
+<th>Permission</th>
+<th>Where it comes from</th>
+<th>Why</th>
+</tr></thead><tbody>
+<tr>
+<td><code>INTERNET</code></td>
+<td>Play Billing library</td>
+<td>To reach the Play Store when you unlock the app or restore a purchase</td>
+</tr>
+<tr>
+<td><code>ACCESS_NETWORK_STATE</code></td>
+<td>Play Billing library</td>
+<td>To check whether the device is online before contacting the Play Store</td>
+</tr>
+</tbody></table>
+<p>Neither is a runtime permission — you are never asked to approve anything. The app does <strong>not</strong> request location, camera, microphone, contacts, storage or any sensor. The Play services components bundled with the billing library include code that could read location, but the app never asks for the location permission, so that code cannot collect anything.</p>
+<h2>4. Network activity</h2>
+<ul>
+<li><strong>Google Play Billing</strong>: used only when you choose to unlock the app or restore a previous purchase.</li>
+</ul>
+<p>Google&#x27;s Play services handle the network traffic for this.</p>
+<ul>
+<li><strong>Google Play services diagnostics</strong>: the components bundled with the billing library may send</li>
+</ul>
+<p>technical diagnostics to Google under Google&#x27;s own privacy policy. The app neither reads that data nor uses it for anything.</p>
+<ul>
+<li><strong>No analytics, no ads, no tracking, no remote logging.</strong> There is no server behind this app, and the</li>
+</ul>
+<p>app itself makes no network requests at all.</p>
+<h2>5. Children</h2>
+<p>Dao Fortune is not directed at children under 13. It contains no user-generated content, no chat, and no data collection. The optional year sign is a preference the reader sets on their own device; it is not transmitted and is excluded from backup.</p>
+<h2>6. Your rights</h2>
+<p>Because we collect no personal data, there is nothing for us to export, correct or delete on request. Everything the app holds is on your device, and you can erase it yourself at any time:</p>
+<ul>
+<li><strong>Your year sign</strong> — clear it inside the app (the year-sign sheet has a clear action), or by clearing the</li>
+</ul>
+<p>app&#x27;s storage in Android Settings, or by uninstalling.</p>
+<ul>
+<li><strong>The free-reading flag and the unlock</strong> — clear the app&#x27;s storage in Android Settings, or uninstall.</li>
+</ul>
+<p>Note that uninstalling also removes your purchase entitlement from this device; you can restore it at any time with the <strong>Restore purchase</strong> button in the app, or through your Google Play purchase history.</p>
+<ul>
+<li><strong>A date you were looking at</strong> — nothing to delete; it is never written to storage.</li>
+</ul>
+<p>We hold no copy of anything, because we receive nothing.</p>
+<h2>7. Third parties</h2>
+<table><thead><tr>
+<th>Third party</th>
+<th>What it does</th>
+<th>Privacy policy</th>
+</tr></thead><tbody>
+<tr>
+<td>Google Play (Google LLC)</td>
+<td>Processes the in-app purchase, and provides the Play services components bundled with the billing library</td>
+<td>https://policies.google.com/privacy</td>
+</tr>
+</tbody></table>
+<h2>8. Disclaimer</h2>
+<p>Dao Fortune is a cultural and entertainment product based on classical Chinese divination (the luopan tradition). Its output is <strong>not</strong> financial, medical, legal, investment or psychological advice, it does not promise any outcome, and it must not be relied upon for financial decisions. See the in-app disclaimer and the Google Play listing for details.</p>
+<h2>9. Changes</h2>
+<p>If this policy changes, the effective date above will be updated and the new version will be published with the app listing before the change takes effect.</p>
+<h2>10. Contact</h2>
+<p>Questions about this policy: <strong>gubingjing@hotmail.com</strong></p>
+<footer>
+  Dao Fortune — Daily Luopan Wisdom · <code>com.laki.daofortune</code><br>
+  This page is generated from <code>docs/PRIVACY_POLICY.md</code> in the project's repository.
+</footer>
+</main>
+</body>
+</html>

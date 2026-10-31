@@ -1,0 +1,265 @@
+{
+  "date": "Saturday, 31 October 2026",
+  "time": "12:00",
+  "dayPlateDate": "Thursday, 12 November 2026",
+  "dayPlateDateShort": "Thu 12 Nov",
+  "plate": {
+    "term": "Frost's Descent",
+    "termChinese": "霜降",
+    "officer": "Stabilise",
+    "officerDeity": "Golden Cabinet",
+    "year": "BingWu",
+    "month": "WuXu",
+    "day": "WuYin",
+    "hour": "WuWu",
+    "sunPalace": "Qian",
+    "sunElement": "Metal",
+    "trigram": "Qian",
+    "wealthElement": "Water",
+    "bestDirection": "Due North — Zi (Water)",
+    "avoidDirection": "South-West — Shen (clashes your day branch)",
+    "strength": "Flourishing",
+    "withHour": true,
+    "modules": [
+      {
+        "title": "Today's Fortune",
+        "blurb": "The overall quality of the day for the one person reading it.",
+        "score": 82,
+        "verdict": "Favorable",
+        "headline": "A day that leans your way.",
+        "summary": "Your day element Earth rules the month — you are at full strength and can carry a load. The day's officer is Stabilise (Ding), watched over by the Golden Cabinet — a configuration that supports beginnings. The sun sits in the Qian mountain (Metal), which sets the day's axis. The strongest window is 23:00 – 01:00 (Zi hour, Golden Cabinet); 01:00 – 03:00 (Chou) also holds.",
+        "insights": ["Solar term: Frost's Descent (霜降), which governs the month pillar WuXu.", "Your element is Earth; the month's is Earth. Your day element Earth rules the month — you are at full strength and can carry a load.", "The day's officer is Stabilise (Ding), watched over by the Golden Cabinet — a configuration that supports beginnings.", "Nothing in the day directly clashes the month branch Xu, so external friction stays low.", "Nothing of consequence falls into the void."],
+        "advice": ["Only 6 of 12 double-hours are favourable — pick one window and protect it.", "You have room to spend. Make the important move early, while the day is still strengthening.", "The one direction to leave alone is South-West (Shen) — it is opposite your day branch and it is where the day rubs against itself.", "Keep records of anything you sign or send today; a void-day signature is the classic thing people regret."],
+        "hours": [{"range": "23:00 – 01:00", "branch": "Zi", "officer": "Golden Cabinet"}, {"range": "01:00 – 03:00", "branch": "Chou", "officer": "Heavenly Virtue"}]
+      },
+      {
+        "title": "Windfall & Wealth",
+        "blurb": "Whether unexpected money is likely to arrive, and how to catch it.",
+        "score": 73,
+        "verdict": "Favorable",
+        "headline": "The door to gain is ajar.",
+        "summary": "Your wealth element is Water, and the sun rests in the Qian mountain (Metal). The day's mountain nourishes your wealth element, so opportunity is fed rather than forced. Gains come gently, and they compound if you take them. The day's officer is Stabilise (Ding), watched over by the Golden Cabinet — a configuration that supports beginnings.",
+        "insights": ["The sun's mountain is Qian (Metal, Qian trigram, Tian yuan). It fixes where the day is pointing.", "Wealth direction: Due North — Zi (Water). Anything you want to receive, meet or accept from, belongs here.", "Unexpected wealth (pian cai) lives in Hai — the 'side' branch of your wealth element, which is exactly what windfall money is.", "You are flourishing enough to hold money. A strong holder is not dragged by it — the classic advice here is to take the larger position.", "The officer 'Stabilise' rules the day. 'Stabilise' is neutral for money — no strong push either way, so your own discipline decides the outcome.", "The strongest window is 23:00 – 01:00 (Zi hour, Golden Cabinet); 01:00 – 03:00 (Chou) also holds."],
+        "advice": ["Face Due North when you make the ask, the call or the hand-off. Dealings turned towards the wealth direction run cleaner.", "Keep away from South-West (Shen) — that is where today's gains get cancelled.", "Only 6 double-hours favour money today. Pick the single best window and let the rest go quiet.", "Windfall favours speed over size: a small, clean gain taken today is worth more than a larger one negotiated over a long delay."],
+        "hours": [{"range": "23:00 – 01:00", "branch": "Zi", "officer": "Golden Cabinet"}, {"range": "01:00 – 03:00", "branch": "Chou", "officer": "Heavenly Virtue"}]
+      },
+      {
+        "title": "Love & Bonds",
+        "blurb": "Affinity, attachment and the emotional weather of the day.",
+        "score": 56,
+        "verdict": "Mildly Favorable",
+        "headline": "Gentle, receptive energy.",
+        "summary": "Your day branch Yin (Wood) meets the hour branch Wu. Neither a strong pull nor a direct push: the day leaves feeling fairly neutral, which puts the outcome in your hands. The day's officer is Stabilise (Ding), watched over by the Golden Cabinet — a configuration that supports beginnings.",
+        "insights": ["Peach Blossom for your day branch Yin falls on Mao — this is the branch that draws attention and interest your way.", "Red Phoenix sits at You, Heaven's Blessing at Mao. They land on a neighbouring day, not today.", "Your stem Wu (Earth) and branch Yin (Wood) pull in different directions: say what you mean rather than implying it.", "This hour is Director of Fate, which sets the tone for anything said right now."],
+        "advice": ["If there is someone you have been meaning to reach, the 23:00 – 01:00 window is the one the plate favours for a first move.", "Use the favourable window for the honest version — today the hour supports plainness rather than diplomacy.", "Make it easy for the other person to say yes: a question beats a statement."],
+        "hours": [{"range": "23:00 – 01:00", "branch": "Zi", "officer": "Golden Cabinet"}, {"range": "01:00 – 03:00", "branch": "Chou", "officer": "Heavenly Virtue"}]
+      },
+      {
+        "title": "Career & Ambition",
+        "blurb": "Whether this is a day to push, pitch, sign, or hold.",
+        "score": 77,
+        "verdict": "Favorable",
+        "headline": "Push while the door is open.",
+        "summary": "The day's officer is 'Stabilise'. 'Stabilise' favours consolidation: locking in what works rather than chasing what is new. Your day element Earth rules the month — you are at full strength and can carry a load.",
+        "insights": ["You are flourishing in a Earth month. You can carry more than you think.", "Opportunity waits in the Water direction — Due North — Zi (Water). Face it when you pitch or ask.", "Nothing of consequence falls into the void."],
+        "advice": ["Put the decisive conversation in 23:00 – 01:00. That is the window where the day actually helps, even if the officer does not.", "Sign the thing, send the thing, put the date on it. 'Stabilise' is wasting daylight if you only prepare.", "Do the outward-facing work facing Due North; keep the internal work anywhere else."],
+        "hours": [{"range": "23:00 – 01:00", "branch": "Zi", "officer": "Golden Cabinet"}, {"range": "01:00 – 03:00", "branch": "Chou", "officer": "Heavenly Virtue"}]
+      },
+      {
+        "title": "Body & Balance",
+        "blurb": "Which element is overworked today — and how to settle it.",
+        "score": 67,
+        "verdict": "Mildly Favorable",
+        "headline": "Mostly settled.",
+        "summary": "The plate today is dominated by Earth, and Water is the thinnest presence. Earth governs spleen and stomach: this is the element of holding and transformation, and when it is loudest it wants regularity and warmth. Your day element Earth rules the month — you are at full strength and can carry a load.",
+        "insights": ["Earth governs spleen and stomach: this is the element of holding and transformation, and when it is loudest it wants regularity and warmth.", "Thinnest element: Water. Water governs kidneys and bladder: this is the element of depth and reserve, and when it is loudest it wants rest, warmth and quiet.", "Your constitution is flourishing. Reserves are good, so training and travel are well supported.", "Useful hours: Zi, Chou, Mao, Wu, Hai."],
+        "advice": ["Earth rules spleen and stomach. Warm, regular meals; skip cold drinks and long gaps between food.", "Support the thin Water element through the Zi (23:00 – 01:00) / Hai (21:00 – 23:00) hours, and keep the day simple.", "Your reserves are good — this is a good day for the effort you have been postponing."],
+        "hours": [{"range": "23:00 – 01:00", "branch": "Zi", "officer": "Golden Cabinet"}, {"range": "01:00 – 03:00", "branch": "Chou", "officer": "Heavenly Virtue"}]
+      }
+    ]
+  },
+  "dayPlate": {
+    "term": "Beginning of Winter",
+    "termChinese": "立冬",
+    "officer": "Level",
+    "officerDeity": "Vermilion Bird",
+    "year": "BingWu",
+    "month": "JiHai",
+    "day": "GengYin",
+    "hour": "RenWu",
+    "sunPalace": "Qian",
+    "sunElement": "Metal",
+    "trigram": "Qian",
+    "wealthElement": "Wood",
+    "bestDirection": "Due East — Mao (Wood)",
+    "avoidDirection": "South-West — Shen (clashes your day branch)",
+    "strength": "Supported",
+    "withHour": false,
+    "modules": [
+      {
+        "title": "Today's Fortune",
+        "blurb": "The overall quality of the day for the one person reading it.",
+        "score": 55,
+        "verdict": "Mixed",
+        "headline": "Half the sky is clear.",
+        "summary": "Your Metal is nourished by the month's Water — you are supported rather than strained. The day's officer is Level (Ping), watched over by the Vermilion Bird — a configuration that warns against forcing outcomes. The sun sits in the Qian mountain (Metal), which sets the day's axis. The strongest window is 05:00 – 07:00 (Mao hour, Golden Cabinet); 07:00 – 09:00 (Chen) also holds.",
+        "insights": ["Solar term: Beginning of Winter (立冬), which governs the month pillar JiHai.", "Your element is Metal; the month's is Water. Your Metal is nourished by the month's Water — you are supported rather than strained.", "The day's officer is Level (Ping), watched over by the Vermilion Bird — a configuration that warns against forcing outcomes.", "The day branch Yin combines with the month branch Hai — cooperation is easier that day than usual.", "Nothing of consequence falls into the void."],
+        "advice": ["Only 6 of 12 double-hours are favourable — pick one window and protect it.", "You have room to spend. Make the important move early, while the day is still strengthening.", "The one direction to leave alone is South-West (Shen) — it is opposite your day branch and it is where the day rubs against itself.", "Keep records of anything you sign or send that day; a void-day signature is the classic thing people regret."],
+        "hours": [{"range": "05:00 – 07:00", "branch": "Mao", "officer": "Golden Cabinet"}, {"range": "07:00 – 09:00", "branch": "Chen", "officer": "Heavenly Virtue"}]
+      },
+      {
+        "title": "Windfall & Wealth",
+        "blurb": "Whether unexpected money is likely to arrive, and how to catch it.",
+        "score": 46,
+        "verdict": "Mixed",
+        "headline": "The trail is cold for money.",
+        "summary": "Your wealth element is Wood, and the sun rests in the Qian mountain (Metal). The day's mountain cuts across your wealth element: money will be visible and contested. Approach with care and do not fight for what is being trimmed. The day's officer is Level (Ping), watched over by the Vermilion Bird — a configuration that warns against forcing outcomes.",
+        "insights": ["The sun's mountain is Qian (Metal, Qian trigram, Tian yuan). It fixes where the day is pointing.", "Wealth direction: Due East — Mao (Wood). Anything you want to receive, meet or accept from, belongs here.", "Unexpected wealth (pian cai) lives in Mao — the 'side' branch of your wealth element, which is exactly what windfall money is.", "You are supported enough to hold money. A strong holder is not dragged by it — the classic advice here is to take the larger position.", "The officer 'Level' rules the day. 'Level' is neutral for money — no strong push either way, so your own discipline decides the outcome.", "The strongest window is 05:00 – 07:00 (Mao hour, Golden Cabinet); 07:00 – 09:00 (Chen) also holds."],
+        "advice": ["Face Due East when you make the ask, the call or the hand-off. Dealings turned towards the wealth direction run cleaner.", "Keep away from South-West (Shen) — that is where that day's gains get cancelled.", "Only 6 double-hours favour money that day. Pick the single best window and let the rest go quiet.", "Windfall favours speed over size: a small, clean gain taken that day is worth more than a larger one negotiated over a long delay."],
+        "hours": [{"range": "05:00 – 07:00", "branch": "Mao", "officer": "Golden Cabinet"}, {"range": "07:00 – 09:00", "branch": "Chen", "officer": "Heavenly Virtue"}]
+      },
+      {
+        "title": "Love & Bonds",
+        "blurb": "Affinity, attachment and the emotional weather of the day.",
+        "score": 44,
+        "verdict": "Mixed",
+        "headline": "Half-expressed, half-guarded.",
+        "summary": "Your day branch Yin (Wood) stands at the centre of this day. It joins the month's three-harmony frame, so the day moves with the season rather than against it. The day's officer is Level (Ping), watched over by the Vermilion Bird — a configuration that warns against forcing outcomes.",
+        "insights": ["Peach Blossom for your day branch Yin falls on Mao — this is the branch that draws attention and interest your way.", "Red Phoenix sits at You, Heaven's Blessing at Mao. They land on a neighbouring day, not this one.", "Your stem Geng (Metal) and branch Yin (Wood) pull in different directions: say what you mean rather than implying it.", "Of the twelve double-hours on this day, 6 carry an auspicious officer — the rest are better left to rest."],
+        "advice": ["If there is someone you have been meaning to reach, the 05:00 – 07:00 window is the one the plate favours for a first move.", "Use the favourable window for the honest version — the day favours plainness rather than diplomacy.", "Make it easy for the other person to say yes: a question beats a statement."],
+        "hours": [{"range": "05:00 – 07:00", "branch": "Mao", "officer": "Golden Cabinet"}, {"range": "07:00 – 09:00", "branch": "Chen", "officer": "Heavenly Virtue"}]
+      },
+      {
+        "title": "Career & Ambition",
+        "blurb": "Whether this is a day to push, pitch, sign, or hold.",
+        "score": 58,
+        "verdict": "Mildly Favorable",
+        "headline": "A workable day for steady progress.",
+        "summary": "The day's officer is 'Level'. 'Level' is a middling officer for business: nothing decisive, nothing dangerous. Your Metal is nourished by the month's Water — you are supported rather than strained.",
+        "insights": ["You are supported in a Water month. You can carry more than you think.", "Opportunity waits in the Wood direction — Due East — Mao (Wood). Face it when you pitch or ask.", "Nothing of consequence falls into the void."],
+        "advice": ["Put the decisive conversation in 05:00 – 07:00. That is the window where the day actually helps, even if the officer does not.", "Sign the thing, send the thing, put the date on it. 'Level' is wasting daylight if you only prepare.", "Do the outward-facing work facing Due East; keep the internal work anywhere else."],
+        "hours": [{"range": "05:00 – 07:00", "branch": "Mao", "officer": "Golden Cabinet"}, {"range": "07:00 – 09:00", "branch": "Chen", "officer": "Heavenly Virtue"}]
+      },
+      {
+        "title": "Body & Balance",
+        "blurb": "Which element is overworked today — and how to settle it.",
+        "score": 53,
+        "verdict": "Mixed",
+        "headline": "One system is doing the work.",
+        "summary": "The plate that day is dominated by Metal, and Fire is the thinnest presence. Metal governs lungs and large intestine: this is the element of refinement and release, and when it is loudest it wants air, breathing space and less clutter. Your Metal is nourished by the month's Water — you are supported rather than strained.",
+        "insights": ["Metal governs lungs and large intestine: this is the element of refinement and release, and when it is loudest it wants air, breathing space and less clutter.", "Thinnest element: Fire. Fire governs heart and small intestine: this is the element of warmth and clarity, and when it is loudest it wants rest, light and calm.", "Your constitution is supported. Reserves are good, so training and travel are well supported.", "Useful hours: Yin, Mao, Chen, You, Hai."],
+        "advice": ["Metal rules lungs and large intestine. Air, humidity and slow breathing matter more than training.", "Support the thin Fire element through the Si (09:00 – 11:00) / Wu (11:00 – 13:00) hours, and keep the day simple.", "Your reserves are good — this is a good day for the effort you have been postponing."],
+        "hours": [{"range": "05:00 – 07:00", "branch": "Mao", "officer": "Golden Cabinet"}, {"range": "07:00 – 09:00", "branch": "Chen", "officer": "Heavenly Virtue"}]
+      }
+    ]
+  },
+  "favourableDays": [
+    {
+      "date": "Sun 22 Nov",
+      "fullDate": "Sunday, 22 November 2026",
+      "score": 92,
+      "verdict": "Exceptional",
+      "headline": "Money has a way in.",
+      "dayPillar": "GengZi",
+      "term": "Beginning of Winter",
+      "isToday": false
+    },
+    {
+      "date": "Sat 12 Dec",
+      "fullDate": "Saturday, 12 December 2026",
+      "score": 92,
+      "verdict": "Exceptional",
+      "headline": "Money has a way in.",
+      "dayPillar": "GengShen",
+      "term": "Major Snow",
+      "isToday": false
+    },
+    {
+      "date": "Sun 13 Dec",
+      "fullDate": "Sunday, 13 December 2026",
+      "score": 92,
+      "verdict": "Exceptional",
+      "headline": "Money has a way in.",
+      "dayPillar": "XinYou",
+      "term": "Major Snow",
+      "isToday": false
+    },
+    {
+      "date": "Mon 21 Dec",
+      "fullDate": "Monday, 21 December 2026",
+      "score": 91,
+      "verdict": "Exceptional",
+      "headline": "Money has a way in.",
+      "dayPillar": "JiSi",
+      "term": "Major Snow",
+      "isToday": false
+    },
+    {
+      "date": "Sat 21 Nov",
+      "fullDate": "Saturday, 21 November 2026",
+      "score": 81,
+      "verdict": "Favorable",
+      "headline": "The door to gain is ajar.",
+      "dayPillar": "JiHai",
+      "term": "Beginning of Winter",
+      "isToday": false
+    }
+  ],
+  "modules": [
+    {
+      "title": "Today's Fortune",
+      "blurb": "The overall quality of the day for the one person reading it.",
+      "score": 82,
+      "verdict": "Favorable",
+      "headline": "A day that leans your way.",
+      "summary": "Your day element Earth rules the month — you are at full strength and can carry a load. The day's officer is Stabilise (Ding), watched over by the Golden Cabinet — a configuration that supports beginnings. The sun sits in the Qian mountain (Metal), which sets the day's axis. The strongest window is 23:00 – 01:00 (Zi hour, Golden Cabinet); 01:00 – 03:00 (Chou) also holds.",
+      "insights": ["Solar term: Frost's Descent (霜降), which governs the month pillar WuXu.", "Your element is Earth; the month's is Earth. Your day element Earth rules the month — you are at full strength and can carry a load.", "The day's officer is Stabilise (Ding), watched over by the Golden Cabinet — a configuration that supports beginnings.", "Nothing in the day directly clashes the month branch Xu, so external friction stays low.", "Nothing of consequence falls into the void."],
+      "advice": ["Only 6 of 12 double-hours are favourable — pick one window and protect it.", "You have room to spend. Make the important move early, while the day is still strengthening.", "The one direction to leave alone is South-West (Shen) — it is opposite your day branch and it is where the day rubs against itself.", "Keep records of anything you sign or send today; a void-day signature is the classic thing people regret."],
+      "hours": [{"range": "23:00 – 01:00", "branch": "Zi", "officer": "Golden Cabinet"}, {"range": "01:00 – 03:00", "branch": "Chou", "officer": "Heavenly Virtue"}]
+    },
+    {
+      "title": "Windfall & Wealth",
+      "blurb": "Whether unexpected money is likely to arrive, and how to catch it.",
+      "score": 73,
+      "verdict": "Favorable",
+      "headline": "The door to gain is ajar.",
+      "summary": "Your wealth element is Water, and the sun rests in the Qian mountain (Metal). The day's mountain nourishes your wealth element, so opportunity is fed rather than forced. Gains come gently, and they compound if you take them. The day's officer is Stabilise (Ding), watched over by the Golden Cabinet — a configuration that supports beginnings.",
+      "insights": ["The sun's mountain is Qian (Metal, Qian trigram, Tian yuan). It fixes where the day is pointing.", "Wealth direction: Due North — Zi (Water). Anything you want to receive, meet or accept from, belongs here.", "Unexpected wealth (pian cai) lives in Hai — the 'side' branch of your wealth element, which is exactly what windfall money is.", "You are flourishing enough to hold money. A strong holder is not dragged by it — the classic advice here is to take the larger position.", "The officer 'Stabilise' rules the day. 'Stabilise' is neutral for money — no strong push either way, so your own discipline decides the outcome.", "The strongest window is 23:00 – 01:00 (Zi hour, Golden Cabinet); 01:00 – 03:00 (Chou) also holds."],
+      "advice": ["Face Due North when you make the ask, the call or the hand-off. Dealings turned towards the wealth direction run cleaner.", "Keep away from South-West (Shen) — that is where today's gains get cancelled.", "Only 6 double-hours favour money today. Pick the single best window and let the rest go quiet.", "Windfall favours speed over size: a small, clean gain taken today is worth more than a larger one negotiated over a long delay."],
+      "hours": [{"range": "23:00 – 01:00", "branch": "Zi", "officer": "Golden Cabinet"}, {"range": "01:00 – 03:00", "branch": "Chou", "officer": "Heavenly Virtue"}]
+    },
+    {
+      "title": "Love & Bonds",
+      "blurb": "Affinity, attachment and the emotional weather of the day.",
+      "score": 56,
+      "verdict": "Mildly Favorable",
+      "headline": "Gentle, receptive energy.",
+      "summary": "Your day branch Yin (Wood) meets the hour branch Wu. Neither a strong pull nor a direct push: the day leaves feeling fairly neutral, which puts the outcome in your hands. The day's officer is Stabilise (Ding), watched over by the Golden Cabinet — a configuration that supports beginnings.",
+      "insights": ["Peach Blossom for your day branch Yin falls on Mao — this is the branch that draws attention and interest your way.", "Red Phoenix sits at You, Heaven's Blessing at Mao. They land on a neighbouring day, not today.", "Your stem Wu (Earth) and branch Yin (Wood) pull in different directions: say what you mean rather than implying it.", "This hour is Director of Fate, which sets the tone for anything said right now."],
+      "advice": ["If there is someone you have been meaning to reach, the 23:00 – 01:00 window is the one the plate favours for a first move.", "Use the favourable window for the honest version — today the hour supports plainness rather than diplomacy.", "Make it easy for the other person to say yes: a question beats a statement."],
+      "hours": [{"range": "23:00 – 01:00", "branch": "Zi", "officer": "Golden Cabinet"}, {"range": "01:00 – 03:00", "branch": "Chou", "officer": "Heavenly Virtue"}]
+    },
+    {
+      "title": "Career & Ambition",
+      "blurb": "Whether this is a day to push, pitch, sign, or hold.",
+      "score": 77,
+      "verdict": "Favorable",
+      "headline": "Push while the door is open.",
+      "summary": "The day's officer is 'Stabilise'. 'Stabilise' favours consolidation: locking in what works rather than chasing what is new. Your day element Earth rules the month — you are at full strength and can carry a load.",
+      "insights": ["You are flourishing in a Earth month. You can carry more than you think.", "Opportunity waits in the Water direction — Due North — Zi (Water). Face it when you pitch or ask.", "Nothing of consequence falls into the void."],
+      "advice": ["Put the decisive conversation in 23:00 – 01:00. That is the window where the day actually helps, even if the officer does not.", "Sign the thing, send the thing, put the date on it. 'Stabilise' is wasting daylight if you only prepare.", "Do the outward-facing work facing Due North; keep the internal work anywhere else."],
+      "hours": [{"range": "23:00 – 01:00", "branch": "Zi", "officer": "Golden Cabinet"}, {"range": "01:00 – 03:00", "branch": "Chou", "officer": "Heavenly Virtue"}]
+    },
+    {
+      "title": "Body & Balance",
+      "blurb": "Which element is overworked today — and how to settle it.",
+      "score": 67,
+      "verdict": "Mildly Favorable",
+      "headline": "Mostly settled.",
+      "summary": "The plate today is dominated by Earth, and Water is the thinnest presence. Earth governs spleen and stomach: this is the element of holding and transformation, and when it is loudest it wants regularity and warmth. Your day element Earth rules the month — you are at full strength and can carry a load.",
+      "insights": ["Earth governs spleen and stomach: this is the element of holding and transformation, and when it is loudest it wants regularity and warmth.", "Thinnest element: Water. Water governs kidneys and bladder: this is the element of depth and reserve, and when it is loudest it wants rest, warmth and quiet.", "Your constitution is flourishing. Reserves are good, so training and travel are well supported.", "Useful hours: Zi, Chou, Mao, Wu, Hai."],
+      "advice": ["Earth rules spleen and stomach. Warm, regular meals; skip cold drinks and long gaps between food.", "Support the thin Water element through the Zi (23:00 – 01:00) / Hai (21:00 – 23:00) hours, and keep the day simple.", "Your reserves are good — this is a good day for the effort you have been postponing."],
+      "hours": [{"range": "23:00 – 01:00", "branch": "Zi", "officer": "Golden Cabinet"}, {"range": "01:00 – 03:00", "branch": "Chou", "officer": "Heavenly Virtue"}]
+    }
+  ]
+}

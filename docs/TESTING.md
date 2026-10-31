@@ -1,0 +1,238 @@
+# Testing plan — Dao Fortune
+
+Three layers, in order. Layer 1 is fully automated and runs on this machine. Layer 2 needs a phone.
+Layer 3 is Play itself.
+
+The rule: **nothing goes to Play until Layer 1 is green and Layer 2 has been walked through on real
+hardware.** Layer 3 then re-runs the purchase path against the real Play Store, which is the only
+place the billing flow can be proven end to end.
+
+### One command for Layer 1
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\qa\verify_release.ps1
+```
+
+It runs the Python self-check, the unit tests, lint, `bundletool validate`, the manifest assertions,
+the signature check and the store-folder / source-zip checks, then prints `ALL CHECKS PASSED` or the
+list of what failed. The individual commands it runs are below, so you can also run them one at a
+time while diagnosing a failure.
+
+---
+
+## Layer 1 — On this machine (no device required)
+
+### 1.1 Engine parity
+
+The engine is pure Kotlin with no Android dependencies, so it is tested on the JVM. A second,
+independently written Python implementation produces the golden data; if the two ever disagree, one
+of them has drifted.
+
+```powershell
+Set-Location E:\Minimax\dao-fortune
+python tools\reference\luopan_reference.py       # SELF-CHECK: ALL PASS, rewrites the golden TSVs
+.\gradlew.bat :app:testDebugUnitTest             # 31 tests
+```
+
+`SampleReadingDump` also writes `docs/store/reading_sample.json` — the real output the store
+screenshots are rendered from. Run the tests before regenerating the screenshots, never edit that file
+by hand.
+
+**Expected:** `EngineTest` 25, `SampleReadingDump` 1, `ScreenshotTest` 5, zero failures.
+
+### 1.2 Lint
+
+```powershell
+.\gradlew.bat :app:lintRelease
+```
+
+Read `app/build/reports/lint-results-release.txt`.
+
+> `lint { abortOnError = false }` is set in `app/build.gradle.kts`, so **a green Gradle build does not
+> mean lint is clean.** Errors must be treated as release blockers.
+
+This check has already earned its keep — it found 56 `NewApi` errors (the engine uses `java.time`,
+which is API 26+, while `minSdk` was 24 → the app would have crashed on launch on Android 7.x) and two
+`ByteOrderMark` errors in the signing config.
+
+### 1.3 Bundle structure and signature
+
+`bundletool` lives in the Gradle cache (no download needed):
+
+```powershell
+$bt = 'E:\Minimax\toolchain\gradle-home\caches\modules-2\files-2.1\com.android.tools.build\bundletool\1.18.0\e84038fddca7582ddf5c98568f517cae401172d9\bundletool-1.18.0.jar'
+java -cp $bt com.android.tools.build.bundletool.BundleToolMain validate --bundle=dist\app-release.aab
+java -cp $bt com.android.tools.build.bundletool.BundleToolMain dump manifest --bundle=dist\app-release.aab --module=base
+```
+
+The cache jar has no `Main-Class`, so it is launched by class name. Its dependencies come from the
+same cache; a helper that assembles the classpath lives at `tools/qa/bundletool_cp.py`.
+
+**What to read in the manifest:**
+
+| Field | Expected |
+|---|---|
+| `package` | `com.laki.daofortune` |
+| `versionCode` / `versionName` | `1` / `1.0.0` — **versionCode must increase on every upload** |
+| `minSdkVersion` | `26` |
+| `targetSdkVersion` | `36` (Play requires 36 for new listings since Aug 2026) |
+| `uses-permission` | only `INTERNET`, `ACCESS_NETWORK_STATE` (both from the billing library), `com.android.vending.BILLING` |
+| `uses-permission` location | **must be absent** |
+
+### 1.4 Signature
+
+```powershell
+& 'E:\Minimax\toolchain\jdk17\bin\keytool.exe' -printcert -jarfile dist\app-release.aab
+```
+
+`META-INF/DAO-FORT.SF`, `META-INF/DAO-FORT.RSA` and `META-INF/MANIFEST.MF` must be present in the zip,
+and the certificate must be `CN=Dao Fortune` and valid past **22 October 2033** (Play's requirement).
+
+### 1.5 Deliverable packaging
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\release\package_release.ps1
+```
+
+Produces `dist/app-release.aab` and `dist/dao-fortune-source-v1.0.0.zip`. The source zip must contain
+**no** `keystore.properties`, no `.jks` and no `__pycache__`.
+
+---
+
+## Layer 2 — On a real phone
+
+This machine has no emulator (the CPU has no hardware virtualisation) and no device, so Layer 2 is a
+human pass. Install from Play (internal testing track) rather than sideloading — the Play build is
+the artifact that matters.
+
+### 2.1 Install and first run
+
+```powershell
+adb install -r <path-to.apk-from-internal-testing>
+adb shell am start -n com.laki.daofortune/.MainActivity
+adb logcat -c            # clear the log before the run
+```
+
+| # | Check | Expected |
+|---|---|---|
+| 1 | App launches | No crash in logcat; the plate renders |
+| 2 | Date and time line | Today's real date, local time, correct time zone |
+| 3 | Solar term | Matches an independent source for today |
+| 4 | Four pillars | Year / month / day / hour, non-empty, sensible |
+| 5 | Dial | Sun marker, wealth marker and "avoid" marker on the right mountains |
+
+### 2.2 The paywall path — the part that cannot be skipped
+
+| # | Action | Expected |
+|---|---|---|
+| 6 | Open any module | The **first** reading opens free, full detail |
+| 7 | Open a second module | The paywall sheet appears |
+| 8 | Look at the price | Your **local currency**, converted by Play — never a hard-coded `$9.99` |
+| 9 | Buy | Purchase completes, sheet closes, the module you wanted opens |
+| 10 | Open every module | No paywall anywhere |
+| 11 | Restore purchase | After uninstalling and reinstalling, **Restore purchase** brings the unlock back |
+
+For step 11, reinstalling does **not** reset the unlock: Play owns the entitlement. The local
+"free reading" flag is a separate thing and *does* reset when app data is cleared — that is by
+design and documented in `docs/RELEASE_CHECKLIST.md`.
+
+Use a licensed tester account on a real device; the Play billing test companion is not available in
+production.
+
+### 2.3 The free-preview mechanic
+
+| # | Action | Expected |
+|---|---|---|
+| 12 | Fresh install, before paying | All five cards show a verdict line and a `PREVIEW` tag |
+| 13 | Locked cards | Lock icon, no score |
+| 14 | After unlocking | Scores appear on every card, `PREVIEW` tag gone |
+
+### 2.4 Looking ahead — the date selector and the forward scan
+
+| # | Action | Expected |
+|---|---|---|
+| 23 | Tap the ▶ chevron | The plate moves to tomorrow; the header shows the new date, and the reading says "that day", never "today" |
+| 24 | Tap ◀ repeatedly | The plate walks back day by day; a past date is read the same way as a future one |
+| 25 | Open the calendar | A date picker opens; picking any date loads that day's plate |
+| 26 | Tap a day in **Favourable Days** | That date is selected and its plate is drawn |
+| 27 | Check the list itself | Five days, ranked best first, each with its day pillar, solar term, score and one-line verdict |
+| 28 | Pick the top day | The date selector jumps to it; the windfall score on the plate matches the list |
+| 29 | Check the hour | On a chosen date the reading has **no hour** — no hour pillar, no hour-officers, no hour windows |
+
+### 2.5 The year sign
+
+| # | Action | Expected |
+|---|---|---|
+| 30 | Open the year-sign sheet | Twelve zodiac branches, one tap each; no date of birth is asked for anywhere |
+| 31 | Pick one | The plate draws your sign as a hollow ring; the readings gain the harmony / triad / clash / harm note |
+| 32 | Change it | The readings change immediately; the ring moves to the new mountain |
+| 33 | Clear it | The ring disappears and the readings return to the unpersonalised form |
+| 34 | Check what was stored | One integer in `dao_fortune_profile.xml`; nothing in `dao_fortune_access.xml` |
+| 35 | Check the backup | The year sign is **not** in the allow-list: after a device-to-device transfer it is gone, while the purchase unlock survives |
+
+### 2.6 Edge cases
+
+| # | Check | How |
+|---|---|---|
+| 36 | Airplane mode | App opens and reads the plate; only the purchase needs the network |
+| 37 | Another time zone | `adb shell service call alarm 3 s16 Asia/Tokyo` or change it in Settings; the pillars must follow |
+| 38 | 12-hour clock | Change the system clock format; the header must still read correctly |
+| 39 | Wrong clock | Set the clock forward a day; the plate must follow the device clock (the app does not use a server time) |
+| 40 | Dark / light mode | Both themes render; the dial stays readable |
+| 41 | Clear app data | The free reading comes back — expected and documented |
+| 42 | Font scale | Set the system font size to the largest; nothing must be clipped |
+| 43 | Tablet / foldable | Resize the window; the layout must not break |
+
+---
+
+## Layer 3 — Google Play internal testing
+
+1. Console → **Release → Testing → Internal testing → Create new release**
+2. Upload `dist/app-release.aab`
+3. The "signed with a new key" warning is expected for a first upload
+4. Roll out to internal testers, then **install from Play on a real phone**
+5. Repeat Layer 2 against the Play-installed build
+6. Promote to production only when the purchase path is proven
+
+**Play's own pre-flight checks** (all of these must pass before you hit publish):
+
+- Target API level 36 ✓
+- AAB signed with a key Play accepts (the upload key, matching `keystore.properties`)
+- `versionCode` higher than any previous upload — `1` for the first one
+- Privacy policy hosted on a public URL and linked in Play Console → App content
+- Data safety form filled in (see `docs/PLAY_STORE_LISTING.md`)
+- Content rating questionnaire completed
+- An in-app product with the id `dao_fortune_full_access`, priced once and left to Play's automatic
+  currency conversion
+
+---
+
+## Pre-release gate
+
+Everything below must be true before an upload. If any line is unchecked, stop.
+
+| Gate | How to verify | Status |
+|---|---|---|
+| Engine parity green | `python tools\reference\luopan_reference.py` → ALL PASS | ☐ |
+| Unit tests green | `:app:testDebugUnitTest` → 31/31 | ☐ |
+| Lint has zero errors | `:app:lintRelease` → `app/build/reports/lint-results-release.txt` | ☐ |
+| Bundle validates | `bundletool validate` → exit 0 | ☐ |
+| Manifest correct | package / versionCode / minSdk 26 / targetSdk 36 / no location permission | ☐ |
+| Signature present and valid | `keytool -printcert` | ☐ |
+| Source zip has no secrets | no `keystore.properties`, no `.jks` | ☐ |
+| Store folder is clean | `docs/store/screenshots/` holds exactly 5 PNGs | ☐ |
+| Copy matches the app | free previews / first free reading / one-off unlock / year sign described the same way in the listing, the privacy policy and in-app | ☐ |
+| Real-device pass done | Layer 2 complete, including the purchase | ☐ |
+| Keystore safe | `dao-fortune-release.jks` + `keystore.properties` backed up somewhere private | ☐ |
+
+---
+
+## What is still unverified, and why
+
+| Item | Why it cannot be closed here |
+|---|---|
+| The purchase flow | Needs a device with a Play account and a licensed tester |
+| Real-device rendering | The store screenshots are rendered from real engine output by the same design code, but they are not a device capture |
+| Play's own validation | Only runs after upload |
+| The Data safety form wording | The form's exact options and their labels change; the answer is "no data collected, no data shared", but read the form itself before submitting |
+| Behaviour on Android 7.x | The app now requires API 26; Android 8.0 (2017) is the floor |
