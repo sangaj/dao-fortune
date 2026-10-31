@@ -31,14 +31,14 @@ of them has drifted.
 ```powershell
 Set-Location E:\Minimax\dao-fortune
 python tools\reference\luopan_reference.py       # SELF-CHECK: ALL PASS, rewrites the golden TSVs
-.\gradlew.bat :app:testDebugUnitTest             # 50 tests
+.\gradlew.bat :app:testDebugUnitTest             # 51 tests
 ```
 
 `SampleReadingDump` also writes `docs/store/reading_sample.json` — the real output the store
 screenshots are rendered from. Run the tests before regenerating the screenshots, never edit that file
 by hand.
 
-**Expected:** `EngineTest` 25, `DreamTest` 12, `ScreenshotTest` 6, `ReconnectPolicyTest` 6,
+**Expected:** `EngineTest` 26, `DreamTest` 12, `ScreenshotTest` 6, `ReconnectPolicyTest` 6,
 `SampleReadingDump` 1, zero failures.
 
 ### 1.2 Lint
@@ -256,7 +256,7 @@ Everything below must be true before an upload. If any line is unchecked, stop.
 | Gate | How to verify | Status |
 |---|---|---|
 | Engine parity green | `python tools\reference\luopan_reference.py` → ALL PASS | ☐ |
-| Unit tests green | `:app:testDebugUnitTest` → 50/50 | ☐ |
+| Unit tests green | `:app:testDebugUnitTest` → 51/51 | ☐ |
 | Lint has zero errors | `:app:lintRelease` → `app/build/reports/lint-results-release.txt` | ☐ |
 | Bundle validates | `bundletool validate` → exit 0 | ☐ |
 | 16 KB page size | `python tools\qa\check_16kb_pages.py dist\app-release.aab` → PASSED | ☐ |

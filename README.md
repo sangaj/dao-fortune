@@ -184,7 +184,7 @@ equinox, and the void branches.
 Three golden files come out of it: `golden_pillars.tsv` (742 rows — two years of daily samples),
 `golden_natal.tsv` (360 rows — the year-sign relations and element tones) and `golden_dream.tsv`
 (96 rows — twelve dreams read against eight days, with the tokens, the omen, the score and every
-factor delta). The Kotlin suite is **50 tests**: `EngineTest` (25), `DreamTest` (12), `ScreenshotTest`
+factor delta). The Kotlin suite is **51 tests**: `EngineTest` (26), `DreamTest` (12), `ScreenshotTest`
 (6), `ReconnectPolicyTest` (6) and `SampleReadingDump` (1).
 
 ---
