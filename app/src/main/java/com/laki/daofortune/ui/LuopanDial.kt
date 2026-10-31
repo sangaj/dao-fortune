@@ -11,6 +11,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
@@ -34,8 +35,8 @@ import kotlin.math.sin
 @Composable
 fun LuopanDial(
     snapshot: LuopanSnapshot,
-    yearSign: YearSign? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    yearSign: YearSign? = null
 ) {
     val measurer = rememberTextMeasurer()
     Box(modifier = modifier.fillMaxWidth().aspectRatio(1f)) {
@@ -62,18 +63,24 @@ private fun DrawScope.drawPlate(
     drawCircle(color = gold.copy(alpha = 0.10f), radius = radius * 0.22f, center = center, style = Stroke(1.dp.toPx()))
 
     // Wealth sector: the four mountains ruled by the wealth element.
-    val wealthBearings = snapshot.wealthPalaces.map { it.bearing }.sorted()
-    if (wealthBearings.isNotEmpty()) {
-        val start = wealthBearings.first() - 7.5
-        val sweep = (wealthBearings.last() - wealthBearings.first()) + 15.0
+    //
+    // These are four mountains, not always one continuous stretch: water sits
+    // on the north side (Hai, Ren, Zi, Gui), but earth takes the four corners
+    // (Chou, Chen, Wei, Xu). Each mountain therefore gets its own fifteen
+    // degrees, and the band reads as continuous where it truly is.
+    //
+    // (Taking the smallest and the largest bearing and sweeping between them
+    // is wrong: for a water day the set straddles north and the sweep closes
+    // into a full circle; for an earth day it would cover most of the dial.)
+    snapshot.wealthPalaces.forEach { palace ->
         drawArc(
             color = Jade.copy(alpha = 0.22f),
-            startAngle = (start - 90).toFloat(),
-            sweepAngle = sweep.toFloat(),
+            startAngle = (palace.bearing - 7.5 - 90).toFloat(),
+            sweepAngle = 15f,
             useCenter = false,
             topLeft = Offset(center.x - radius, center.y - radius),
             size = Size(radius * 2, radius * 2),
-            style = Stroke(width = 14.dp.toPx())
+            style = Stroke(width = 14.dp.toPx(), cap = StrokeCap.Round)
         )
     }
 

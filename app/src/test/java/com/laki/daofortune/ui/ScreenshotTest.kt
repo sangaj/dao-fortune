@@ -69,6 +69,7 @@ class ScreenshotTest {
                         unlocked = false,
                         notice = null,
                         onOpen = {},
+                        onOpenDream = {},
                         onSelectDate = {},
                         onSetYearSign = {},
                         onDismissNotice = {},
@@ -102,6 +103,7 @@ class ScreenshotTest {
                         unlocked = false,
                         notice = null,
                         onOpen = {},
+                        onOpenDream = {},
                         onSelectDate = {},
                         onSetYearSign = {},
                         onDismissNotice = {},
@@ -151,6 +153,35 @@ class ScreenshotTest {
         }
         compose.waitForIdle()
         capture("04_unlock.png")
+    }
+
+    @Test
+    fun dreamSheetComposesAndCaptures() {
+        val plate = LuopanEngine.dayPlate(date, zone)
+        val text = "A black snake by a river in the south, at dawn."
+        val image = com.laki.daofortune.core.DreamEngine.extract(text)
+        val reading = com.laki.daofortune.core.DreamEngine.reading(plate, image)
+        compose.setContent {
+            DaoFortuneTheme {
+                Box(Modifier.fillMaxSize().testTag(TAG)) {
+                    DreamSheet(
+                        text = text,
+                        wokeAt = "5:30",
+                        reading = reading,
+                        snapshot = plate,
+                        yearSign = com.laki.daofortune.core.YearSign.RAT,
+                        onTextChange = {},
+                        onWokeAtChange = {},
+                        onRead = {},
+                        onDismiss = {}
+                    )
+                }
+            }
+        }
+        compose.waitForIdle()
+        assertTrue("dream sheet rendered", reading.headline.isNotBlank())
+        assertTrue("the dream must have found an omen", image.principal != null)
+        capture("05_dream_sheet.png")
     }
 
     /** A reading is filed under its day; this keeps the key type honest. */

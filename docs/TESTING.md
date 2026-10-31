@@ -31,14 +31,15 @@ of them has drifted.
 ```powershell
 Set-Location E:\Minimax\dao-fortune
 python tools\reference\luopan_reference.py       # SELF-CHECK: ALL PASS, rewrites the golden TSVs
-.\gradlew.bat :app:testDebugUnitTest             # 37 tests
+.\gradlew.bat :app:testDebugUnitTest             # 50 tests
 ```
 
 `SampleReadingDump` also writes `docs/store/reading_sample.json` — the real output the store
 screenshots are rendered from. Run the tests before regenerating the screenshots, never edit that file
 by hand.
 
-**Expected:** `EngineTest` 25, `SampleReadingDump` 1, `ScreenshotTest` 5, `ReconnectPolicyTest` 6, zero failures.
+**Expected:** `EngineTest` 25, `DreamTest` 12, `ScreenshotTest` 6, `ReconnectPolicyTest` 6,
+`SampleReadingDump` 1, zero failures.
 
 ### 1.2 Lint
 
@@ -182,35 +183,47 @@ production.
 | 26 | Check what was stored | One integer in `dao_fortune_profile.xml`; nothing in `dao_fortune_access.xml` |
 | 27 | Check the backup | The year sign is **not** in the allow-list: after a device-to-device transfer it is gone, while the purchase unlock survives |
 
-### 2.6 Edge cases
+### 2.6 Dream & Omens (梦占)
+
+| # | Action | Expected |
+|---|---|---|
+| 28 | Tap the Dream & Omens card | The sheet opens empty; the card is labelled "Dream & Omens / 梦占" |
+| 29 | Write a dream with a direction, an animal and a colour, then tap **Read the dream** | A reading appears: score, headline, the ink-wash plate, the insights, the advice and the factors behind the score |
+| 30 | Look at the plate | The images you wrote sit on the mountains they belong to; the sun of the day is marked; your year sign is ringed if you set one |
+| 31 | Read the same dream again | The plate is **identical** — the drawing is seeded by the text, not random |
+| 32 | Write something the vocabulary cannot read ("a grey feeling of dread") | The reading says the dream held no image the plate could use — it must not invent an interpretation |
+| 33 | Check the privacy | Nothing was written: the text is in no file under the app's storage, and closing the sheet erases it |
+| 34 | After the free reading is spent | Reading a dream opens the paywall; buying it unlocks the app and the dream is read straight away, with your words still there |
+
+### 2.7 Edge cases
 
 | # | Check | How |
 |---|---|---|
-| 28 | Airplane mode | App opens and reads the plate; only the purchase needs the network |
-| 29 | Another time zone | `adb shell service call alarm 3 s16 Asia/Tokyo` or change it in Settings; the pillars must follow |
-| 30 | 12-hour clock | Change the system clock format; the header must still read correctly |
-| 31 | Wrong clock | Set the clock forward a day; the plate must follow the device clock (the app does not use a server time) |
-| 32 | Dark / light mode | Both themes render; the dial stays readable |
-| 33 | Clear app data | The free reading comes back — expected and documented |
-| 34 | Font scale | Set the system font size to the largest; nothing must be clipped |
-| 35 | Tablet / foldable | Resize the window; the layout must not break |
+| 35 | Airplane mode | App opens and reads the plate; only the purchase needs the network |
+| 36 | Another time zone | `adb shell service call alarm 3 s16 Asia/Tokyo` or change it in Settings; the pillars must follow |
+| 37 | 12-hour clock | Change the system clock format; the header must still read correctly |
+| 38 | Wrong clock | Set the clock forward a day; the plate must follow the device clock (the app does not use a server time) |
+| 39 | Dark / light mode | Both themes render; the dial stays readable |
+| 40 | Clear app data | The free reading comes back — expected and documented |
+| 41 | Font scale | Set the system font size to the largest; nothing must be clipped |
+| 42 | Tablet / foldable | Resize the window; the layout must not break |
 
-### 2.7 Billing under a bad connection
+### 2.8 Billing under a bad connection
 
 This is the part that cannot be proven on this machine at all, and it is where the reconnector earns
 its keep.
 
 | # | Action | Expected |
 |---|---|---|
-| 36 | Open the paywall in airplane mode | The sheet says Play could not be reached — it must **not** pretend there is no purchase |
-| 37 | Turn the network back on | The app reconnects on its own (backoff of 2s, 4s, 8s, 16s, then 30s) and the price appears without a restart |
-| 38 | Watch the paywall during the retry | "Play connection lost — retrying in Ns (attempt N)" — the reader can see it is working |
-| 39 | Tap **Restore purchase** with no network | A clear error, not silence |
-| 40 | Tap **Restore purchase** on an account that bought nothing | "No previous purchase found on this Google account" — and no crash |
-| 41 | Buy, then force-stop the app, then reopen | The app is still unlocked: the ownership check runs on every connection |
-| 42 | Buy on one device, install on another | The second device unlocks on first launch, from Play's record |
-| 43 | Read the first free reading | A banner appears on the home screen saying the free reading has been used — and it can be dismissed |
-| 44 | Airplane mode, then try to buy | The purchase sheet does not open; the failure is reported |
+| 43 | Open the paywall in airplane mode | The sheet says Play could not be reached — it must **not** pretend there is no purchase |
+| 44 | Turn the network back on | The app reconnects on its own (backoff of 2s, 4s, 8s, 16s, then 30s) and the price appears without a restart |
+| 45 | Watch the paywall during the retry | "Play connection lost — retrying in Ns (attempt N)" — the reader can see it is working |
+| 46 | Tap **Restore purchase** with no network | A clear error, not silence |
+| 47 | Tap **Restore purchase** on an account that bought nothing | "No previous purchase found on this Google account" — and no crash |
+| 48 | Buy, then force-stop the app, then reopen | The app is still unlocked: the ownership check runs on every connection |
+| 49 | Buy on one device, install on another | The second device unlocks on first launch, from Play's record |
+| 50 | Read the first free reading | A banner appears on the home screen saying the free reading has been used — and it can be dismissed |
+| 51 | Airplane mode, then try to buy | The purchase sheet does not open; the failure is reported |
 
 ---
 
@@ -243,16 +256,16 @@ Everything below must be true before an upload. If any line is unchecked, stop.
 | Gate | How to verify | Status |
 |---|---|---|
 | Engine parity green | `python tools\reference\luopan_reference.py` → ALL PASS | ☐ |
-| Unit tests green | `:app:testDebugUnitTest` → 37/37 | ☐ |
+| Unit tests green | `:app:testDebugUnitTest` → 50/50 | ☐ |
 | Lint has zero errors | `:app:lintRelease` → `app/build/reports/lint-results-release.txt` | ☐ |
 | Bundle validates | `bundletool validate` → exit 0 | ☐ |
 | 16 KB page size | `python tools\qa\check_16kb_pages.py dist\app-release.aab` → PASSED | ☐ |
 | Manifest correct | package / versionCode / minSdk 26 / targetSdk 36 / no location permission | ☐ |
 | Signature present and valid | `keytool -printcert` | ☐ |
 | Source zip has no secrets | no `keystore.properties`, no `.jks` | ☐ |
-| Store folder is clean | `docs/store/screenshots/` holds exactly 5 PNGs | ☐ |
+| Store folder is clean | `docs/store/screenshots/` holds exactly 6 PNGs | ☐ |
 | Privacy policy page is current | `python tools\docs\make_privacy_html.py --check` | ☐ |
-| Copy matches the app | free previews / first free reading / one-off unlock / year sign described the same way in the listing, the privacy policy and in-app | ☐ |
+| Copy matches the app | free previews / first free reading / one-off unlock / year sign / dream described the same way in the listing, the privacy policy and in-app | ☐ |
 | Real-device pass done | Layer 2 complete, including the purchase | ☐ |
 | Keystore safe | `dao-fortune-release.jks` + `keystore.properties` backed up **off this machine** | ☐ |
 | Play App Signing | enrolled in Play Console → App integrity | ☐ |

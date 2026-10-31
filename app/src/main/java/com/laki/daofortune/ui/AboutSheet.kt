@@ -121,14 +121,33 @@ fun AboutSheet(onDismiss: () -> Unit) {
             )
 
             Spacer(Modifier.height(16.dp))
+            Text("DREAM & OMENS (梦占)", style = MaterialTheme.typography.labelSmall, color = Gold)
+            Spacer(Modifier.height(6.dp))
+            Text(
+                "A dream is not read on its own in this tradition — it is read against the day. Write " +
+                    "what you remember and the app looks for the classical images in your own words: " +
+                    "the direction you walked, the animal that followed you, the number, the colour, " +
+                    "the element, the hour you woke in. Those images are then measured against the " +
+                    "plate of that night by the same rules as the other readings: does the omen answer " +
+                    "the day's branch or clash with it, does its element feed the day or cut across " +
+                    "it, does the direction point at the sun's mountain or away from it. " +
+                    "The picture is drawn on this device from the dream itself, so the same dream always " +
+                    "draws the same plate.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Spacer(Modifier.height(16.dp))
             Text("PRIVACY", style = MaterialTheme.typography.labelSmall, color = Gold)
             Spacer(Modifier.height(6.dp))
             Text(
                 "The app has no account, no analytics and no network calls of its own. Your reading is " +
                     "computed on your device. Your year sign is stored on this device only — it is " +
                     "excluded from Android's backup and is never transmitted, and you can clear it from " +
-                    "the home screen at any time. The only purchase data ever handled is what Google Play " +
-                    "Billing processes for the unlock.",
+                    "the home screen at any time. The dream you write is read on this device, drawn on " +
+                    "this device and erased when you close the sheet: it is never stored, never " +
+                    "transmitted and never seen by anyone. The only purchase data ever handled is what " +
+                    "Google Play Billing processes for the unlock.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )

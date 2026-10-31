@@ -146,6 +146,30 @@ class EngineTest {
     }
 
     @Test
+    fun `the wealth sector is four mountains, either a quadrant or the four corners`() {
+        // The dial draws one fifteen-degree arc per mountain of the wealth
+        // element. That only works because the four mountains of one element
+        // either sit together (water on the north side) or take the four
+        // corners (earth). A set that spread over the dial would be drawn as a
+        // band that wraps the whole circle - which is what the dial used to do.
+        WuXing.entries.forEach { element ->
+            val palaces = LuopanEngine.sectorFor(element)
+            assertEquals("four mountains for $element", 4, palaces.size)
+            val bearings = palaces.map { it.bearing }.toSet()
+            assertEquals("four distinct mountains for $element", 4, bearings.size)
+
+            val consecutive = (0 until 360 step 15).any { base ->
+                bearings == setOf(base, (base + 15) % 360, (base + 30) % 360, (base + 45) % 360)
+            }
+            val corners = bearings == setOf(30, 120, 210, 300)
+            assertTrue(
+                "the mountains of $element must be a quadrant or the four corners, not $bearings",
+                consecutive || corners
+            )
+        }
+    }
+
+    @Test
     fun `every module produces a bounded score and a verdict`() {
         val snapshot = LuopanEngine.snapshot(LocalDateTime.of(2026, 10, 31, 12, 0), zone)
         FortuneModule.entries.forEach { module ->

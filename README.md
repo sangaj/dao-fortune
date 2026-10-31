@@ -33,11 +33,31 @@ Every reading shows **the factors that produced its score**, so the number is ne
 | **Favourable Days** | The next sixty days are scored on the same day-plate rules and ranked by the windfall reading, so you can see *when* to move, not just whether today is good. |
 | **Any date** | Step day by day or open the calendar. A day that is not today is read as a **day plate** — no hour is involved, because a day that has not happened yet has no hour. |
 | **Your year sign** | Choose your zodiac branch once and every reading is measured against your own position on the plate: harmony, three-harmony, clash or harm against the day's branch, and the element tone between your branch and the day's. |
+| **Dream & Omens (梦占)** | Write what you remember of a dream. The app finds the classical images in your own words and reads them against the plate of the night they belong to. |
 
 The year sign is **not** a birth date, a birth chart or a BaZi reading. The app never asks for your
 birthday, your name or your age — it asks which of the twelve branches you were born under, which is
 how the *nian ming* works in this tradition. That single choice is stored on your device in its own
 preferences file, is excluded from Android's backup, and is never transmitted.
+
+### Dream & Omens
+
+A dream is not read on its own in this tradition — it is read against the day. The app takes the images
+out of your own words (the direction you walked, the animal that followed you, the number, the colour,
+the element, the hour you woke in) and asks the same questions the other modules ask: does the omen
+answer the day's branch or clash with it, does its element feed the day or cut across it, does the
+direction point at the sun's mountain, the direction to avoid, or the wealth direction, and does your
+own year sign combine with the omen?
+
+The picture is **drawn on the device** — an ink wash of the twenty-four mountains with the dream's
+images laid on the mountains they belong to, the sun of the day marked, your year branch ringed. It is
+procedural and seeded by the dream's own text, so the same dream always draws the same plate.
+
+Nothing about the dream leaves the phone: the text is not written to storage, not logged and not sent
+anywhere, no AI service is involved, and closing the sheet erases it. The module follows the same rule
+as the other five — the first reading is free, later readings need the one-off unlock.
+
+![The dream sheet, with the ink-wash plate](docs/store/screenshots/06_dream.png)
 
 ---
 
@@ -121,6 +141,20 @@ Sixty day plates are scored off the main thread and ranked by the windfall readi
 the date, the day pillar, the solar term, the score and a one-line verdict. Tapping a day selects that
 date's plate.
 
+### 8. The dream layer (`Dream.kt`, `DreamEngine.kt`)
+
+The dream supplies the image (象), the day's own pillar supplies the field (局), and the reader's year
+branch supplies the person (人). There is no model and no random element.
+
+* **The vocabulary is bounded on purpose** — directions, the twelve animals, the five phases, colours,
+  numbers, hours and the sign of money. English words match on word boundaries, so "rat" never fires
+  inside "grateful"; compound directions are claimed whole, so "north-east" is not split by "north".
+* **A bare number is an omen, not an hour.** "Three cats" is about three; "woke at 3:30" is an hour.
+* **The reading is scored by the same relations the rest of the app uses**: the omen against the day's
+  branch, the omen's element against the day's element, the direction against the sun's mountain, the
+  clash mountain and the wealth bearing, the hour of waking against the day and the hour-officer, the
+  day's triad against the opposing triad, and the reader's year sign against the omen.
+
 ### Two kinds of plate
 
 * **Now plate** — today, with the hour: the hour pillar, the hour-officers and the twelve double-hours
@@ -147,9 +181,11 @@ the day turning at 23:00, the five Wu Shu Dun hour-stem cases, the hour-officer 
 dates and times against published equinox and solstice instants, the sun's palace at each solstice and
 equinox, and the void branches.
 
-Two golden files come out of it: `golden_pillars.tsv` (742 rows — two years of daily samples) and
-`golden_natal.tsv` (360 rows — the year-sign relations and element tones). The Kotlin suite is **31
-tests**: `EngineTest` (25), `SampleReadingDump` (1) and the Robolectric `ScreenshotTest` (5).
+Three golden files come out of it: `golden_pillars.tsv` (742 rows — two years of daily samples),
+`golden_natal.tsv` (360 rows — the year-sign relations and element tones) and `golden_dream.tsv`
+(96 rows — twelve dreams read against eight days, with the tokens, the omen, the score and every
+factor delta). The Kotlin suite is **50 tests**: `EngineTest` (25), `DreamTest` (12), `ScreenshotTest`
+(6), `ReconnectPolicyTest` (6) and `SampleReadingDump` (1).
 
 ---
 
@@ -295,6 +331,10 @@ local model, and it is noted here so you are not surprised.
 * **One local flag** guards the free reading; it is not tied to a Play account.
 * The windfall module deliberately does **not** forecast amounts. It reports whether the classical
   configuration supports an unexpected gain and where to look — it never promises money.
+* **The dream vocabulary is deliberately narrow.** It reads directions, animals, elements, colours,
+  numbers, hours and the sign of money — the images a classical reading can actually work with. A dream
+  written in words the lexicon does not hold is reported as a dream with no usable image rather than
+  being interpreted anyway.
 * The app is explicitly **not** financial, medical, legal or psychological advice, and the listing and
   the in-app copy both say so, because Google Play's deceptive-behaviour policy applies to fortune
   telling that promises outcomes.
@@ -306,10 +346,10 @@ local model, and it is noted here so you are not surprised.
 ```
 app/src/main/java/com/laki/daofortune/
   core/         engine: Model, SolarTerms, CalendarEngine, Luopan, FortuneEngine, Narrative,
-                Natal (year sign), FavourableDates (the forward scan)
+                Natal (year sign), FavourableDates (the forward scan), Dream + DreamEngine (梦占)
   billing/      Play Billing wrapper (com.android.billingclient:billing:9.1.0)
   data/         AccessState — free reading counter and unlock flag; ProfileState — the year sign
-  ui/           Compose UI: theme, luopan dial, screens, date selector and year-sign sheet
+  ui/           Compose UI: theme, luopan dial, screens, date selector, year-sign sheet, dream sheet
   vm/           MainViewModel
 tools/
   reference/    independent Python implementation + golden data generator

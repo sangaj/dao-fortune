@@ -32,9 +32,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\qa\verify_release.ps1 
   repo is in the store screenshot generator and the screenshot test.
 - **The engine must stay in parity with `tools/reference/luopan_reference.py`.** The Python
   reference is a second, independent implementation of the same classical rules and emits
-  `app/src/test/resources/golden_pillars.tsv` (742 rows — two years of daily samples) and
-  `app/src/test/resources/golden_natal.tsv` (360 rows — the year-sign relations and element tones);
-  `EngineTest` asserts the Kotlin engine against both.
+  `app/src/test/resources/golden_pillars.tsv` (742 rows — two years of daily samples),
+  `app/src/test/resources/golden_natal.tsv` (360 rows — the year-sign relations and element tones) and
+  `app/src/test/resources/golden_dream.tsv` (96 rows — twelve dreams read against eight days);
+  `EngineTest` and `DreamTest` assert the Kotlin engine against all three.
   If you change a rule, change the Python too and regenerate:
   ```bash
   python tools\reference\luopan_reference.py
@@ -73,6 +74,24 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\qa\verify_release.ps1 
 - **The forward scan is free.** The Favourable Days list (date, score, one-line verdict) costs
   nothing; opening the full reading of any day still goes through the normal free-reading-then-paywall
   path.
+- **The dream text is never stored, never logged and never transmitted.** It lives in `UiState` while
+  the dream sheet is open and is dropped by `MainViewModel.closeDream()`. Do not add a preference, a
+  file, a database, a log line or a network call for it. The ink-wash plate is drawn procedurally on
+  the device from the dream's own text (`DreamPlate` in `ui/DreamSheet.kt`), seeded by
+  `DreamImage.seed` so the same dream always draws the same plate — there is deliberately **no cloud
+  AI image generation**, because a dream is sensitive personal data and uploading it would break the
+  "no data collected" promise that the whole app's Play Data safety form rests on.
+- **The dream module obeys the same product rule as the other five.** First reading free, later
+  readings behind the one-off unlock (`readDream()` → paywall → `produceDream()` after the purchase).
+  It is not a `FortuneModule`: it needs the reader's own words, so it has its own entry card and sheet.
+- **A dream is read against a *day plate*, never a now-plate** — it is a past event and has no hour of
+  its own. The double-hour of waking is a separate input (`DreamEngine.branchOfHour`), and the day a
+  dream belongs to is the previous day when the reader woke before 03:00 (`MainViewModel.dreamDay`).
+- **The dream vocabulary is bounded on purpose** — directions, the twelve animals, the five phases,
+  colours, numbers, hours and the sign of money. English words match on word boundaries, compound
+  directions are claimed whole before cardinals, and numbers are matched last so "eleven" is never read
+  as "one". Do not widen the lexicon to cover everything a dream can contain; a dream the lexicon cannot
+  read is reported as having no usable image.
 - **Billing must never fail silently.** Every Play call has to check its response code, and a dropped
   connection has to be retried with the backoff in `billing/ReconnectPolicy.kt` (2s, 4s, 8s, 16s,
   then 30s, six attempts). `ReconnectPolicy` is pure Kotlin on purpose — it is unit tested
@@ -99,10 +118,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\store_assets\build_scr
 Screenshots read `docs/store/reading_sample.json`, which the `SampleReadingDump` test writes from
 real engine output — regenerate it by running the tests, not by editing it.
 
-`docs/store/screenshots/` must hold exactly the five final PNGs (`01_home`, `02_home_unlocked`,
-`03_favourable_days`, `04_windfall_reading`, `05_unlock`) — that is the folder you upload to Play.
-Robolectric captures go to `build/screenshots/` instead, so a test run can never leave stray files in
-the upload folder.
+`docs/store/screenshots/` must hold exactly the final PNGs — `01_home`, `02_home_unlocked`,
+`03_favourable_days`, `04_windfall_reading`, `05_unlock` and `06_dream` — that is the folder you upload
+to Play. Robolectric captures go to `build/screenshots/` instead, so a test run can never leave stray
+files in the upload folder.
 
 ## What the bundle actually contains
 

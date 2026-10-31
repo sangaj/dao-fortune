@@ -59,6 +59,7 @@
 <h2>1. Summary</h2>
 <p>Dao Fortune collects <strong>no personal data</strong>. The app itself has no account system, no analytics, no advertising SDKs, and no crash-reporting or tracking libraries. Your reading is calculated entirely on your device from your device&#x27;s local clock and time zone.</p>
 <p>The app lets you choose a <strong>year sign</strong> — one of the twelve branches of the Chinese zodiac — so that the plate can be read against your own position. That choice is a single branch stored in a private preferences file on your device. It is never transmitted, never included in an Android backup, and never seen by us or by Google. <strong>The app never asks for your date of birth, your name, your age or any other identifier.</strong> A year sign is not a personal identifier in the sense Play&#x27;s Data safety form uses: it is one choice out of twelve, it identifies nobody, and it is deleted the moment you clear it.</p>
+<p>The app can also read a dream you write yourself (梦占). <strong>The words of your dream are read on your device and are never written to storage, never transmitted and never seen by us.</strong> The picture that accompanies the reading is drawn on the device by the app itself — it is not uploaded, and no cloud service or AI model is involved. Closing the dream sheet erases the text; there is nothing left behind to delete.</p>
 <p>The only data handled by a third party is the purchase itself: if you unlock the app, the transaction is processed by <strong>Google Play Billing</strong>, and Google Play handles the payment details, your Google account and the receipt. Dao Fortune never sees or stores your card details.</p>
 <p>The app bundles Google&#x27;s Play Billing library, which brings a small number of Google Play services components with it. Those components are Google&#x27;s code, operate under Google&#x27;s own privacy policy, and can transmit technical diagnostics to Google in the ordinary course of talking to the Play Store. The app does not use them for analytics and does not read anything they collect.</p>
 <h2>2. What the app stores on your device</h2>
@@ -109,6 +110,28 @@
 <p>the app&#x27;s storage in Android Settings, or by uninstalling.</p>
 <h3>Dates you look at</h3>
 <p>You can move the plate to any day — today, tomorrow, or a date in the next sixty days. The date you are looking at is <strong>not stored at all</strong>: it lives in memory for as long as the app is open and disappears when you close it. The forward scan of the coming sixty days is computed on your device each time the app starts; no result of it is saved or sent anywhere.</p>
+<h3>The dream you write</h3>
+<p>The Dream &amp; Omens module (梦占) lets you type what you remember of a dream, and reads it against the plate of the night it belongs to.</p>
+<ul>
+<li><strong>It is never written to disk.</strong> The text lives in the app&#x27;s memory while the dream sheet is open and</li>
+</ul>
+<p>nowhere else. There is no file, no database, no log entry, and no cache copy.</p>
+<ul>
+<li><strong>It is never transmitted.</strong> The app makes no network request of any kind while reading a dream. There</li>
+</ul>
+<p>is no server, no model, no image service behind it.</p>
+<ul>
+<li><strong>The picture is drawn locally.</strong> The ink-wash plate you see is generated on your device from the dream</li>
+</ul>
+<p>itself, using a fixed set of classical images. Nothing is uploaded to be drawn &quot;in the cloud&quot;.</p>
+<ul>
+<li><strong>Closing the sheet erases it.</strong> Leave the dream sheet — by the button or by swiping it away — and the</li>
+</ul>
+<p>text, the wake-up time and the reading are all dropped from memory.</p>
+<ul>
+<li><strong>The only thing that survives</strong> is the reading you were shown, and even that is not stored: it is</li>
+</ul>
+<p>re-created if you read the same dream again.</p>
 <h2>3. Permissions</h2>
 <p><strong>Dao Fortune itself declares no permissions at all.</strong> The Google Play Billing library that the app bundles adds two at the manifest level:</p>
 <table><thead><tr>
@@ -142,13 +165,17 @@
 </ul>
 <p>app itself makes no network requests at all.</p>
 <h2>5. Children</h2>
-<p>Dao Fortune is not directed at children under 13. It contains no user-generated content, no chat, and no data collection. The optional year sign is a preference the reader sets on their own device; it is not transmitted and is excluded from backup.</p>
+<p>Dao Fortune is not directed at children under 13. It contains no chat, no accounts, no user accounts visible to anyone else, and no data collection. The optional year sign is a preference the reader sets on their own device; it is not transmitted and is excluded from backup. A dream written in the Dream &amp; Omens module is read privately on the device and is never shared with anybody, published, or transmitted — it is not user-generated content in the sense Play&#x27;s policies mean, because no other person can ever see it.</p>
 <h2>6. Your rights</h2>
 <p>Because we collect no personal data, there is nothing for us to export, correct or delete on request. Everything the app holds is on your device, and you can erase it yourself at any time:</p>
 <ul>
 <li><strong>Your year sign</strong> — clear it inside the app (the year-sign sheet has a clear action), or by clearing the</li>
 </ul>
 <p>app&#x27;s storage in Android Settings, or by uninstalling.</p>
+<ul>
+<li><strong>A dream you wrote</strong> — nothing to delete: it is never written to storage. Closing the dream sheet</li>
+</ul>
+<p>erases it from memory.</p>
 <ul>
 <li><strong>The free-reading flag and the unlock</strong> — clear the app&#x27;s storage in Android Settings, or uninstall.</li>
 </ul>

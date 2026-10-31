@@ -61,6 +61,7 @@ fun HomeScreen(
     unlocked: Boolean,
     notice: String?,
     onOpen: (FortuneModule) -> Unit,
+    onOpenDream: () -> Unit,
     onSelectDate: (LocalDate) -> Unit,
     onSetYearSign: (YearSign?) -> Unit,
     onDismissNotice: () -> Unit,
@@ -228,6 +229,10 @@ fun HomeScreen(
             }
 
             item {
+                DreamEntryCard(onClick = onOpenDream)
+            }
+
+            item {
                 FavourableDaysSection(
                     days = favourableDays,
                     selectedDate = selectedDate,
@@ -258,8 +263,7 @@ fun HomeScreen(
 }
 
 @Composable
-private fun LegendRow(snapshot: LuopanSnapshot, yearSign: YearSign?) {
-    Row(
+private fun LegendRow(snapshot: LuopanSnapshot, yearSign: YearSign?) {    Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(14.dp)
     ) {
@@ -295,8 +299,7 @@ private fun ModuleCard(
     preview: String?,
     locked: Boolean,
     onClick: () -> Unit
-) {
-    val accent = reading?.let { verdictColor(it.verdict) } ?: MaterialTheme.colorScheme.primary
+) {    val accent = reading?.let { verdictColor(it.verdict) } ?: MaterialTheme.colorScheme.primary
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -401,5 +404,52 @@ private fun NoticeBanner(text: String, onDismiss: () -> Unit) {
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+    }
+}
+
+/**
+ * The entry to the dream reading.
+ *
+ * It is not one of the five modules, because it needs something the others do
+ * not: the reader's own words. The same rule applies to it — the first reading
+ * is free, later readings need the one-off unlock.
+ */
+@Composable
+private fun DreamEntryCard(onClick: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(18.dp))
+            .border(
+                1.dp,
+                Gold.copy(alpha = 0.30f),
+                RoundedCornerShape(18.dp)
+            )
+            .clickable(onClick = onClick)
+            .padding(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                "Dream & Omens",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Text(
+                "梦占",
+                style = MaterialTheme.typography.labelSmall,
+                color = Gold
+            )
+        }
+        Spacer(Modifier.height(3.dp))
+        Text(
+            "Write what you remember and the plate will read it against the day. " +
+                "Read on this phone; never sent anywhere.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }

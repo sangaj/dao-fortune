@@ -4,6 +4,7 @@ import org.junit.Test
 import java.io.File
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -57,6 +58,7 @@ class SampleReadingDump {
             sb.append("    }").append(if (index == favourable.lastIndex) "" else ",").append("\n")
         }
         sb.append("  ],\n")
+        sb.append("  \"dream\": ").append(dreamJson(zone, moment)).append(",\n")
         sb.append("  \"modules\": [\n")
 
         val readings = FortuneModule.entries.map { FortuneEngine.reading(LuopanEngine.snapshot(moment, zone), it) }
@@ -97,6 +99,73 @@ class SampleReadingDump {
         out.parentFile.mkdirs()
         out.writeText(sb.toString(), Charsets.UTF_8)
         println("Wrote ${out.absolutePath}")
+    }
+
+    /**
+     * A real dream reading, so the dream screenshot is rendered from engine
+     * output rather than from invented text.
+     *
+     * The dream belongs to the night of 31 October: the reader woke at 05:30,
+     * and a dream woken after three in the morning is read against the day it
+     * woke in.
+     */
+    private fun dreamJson(zone: ZoneId, moment: LocalDateTime): String {
+        val text = "Money on a table, a tiger in the north."
+        val wokeAt = LocalTime.of(5, 30)
+        val plate = LuopanEngine.dayPlate(moment.toLocalDate(), zone)
+        val image = DreamEngine.extract(text, wokeAt)
+        val natal = Branch.ZI
+        val reading = DreamEngine.reading(plate, image, natal)
+
+        val sb = StringBuilder()
+        sb.append("{\n")
+        sb.append("    \"text\": \"").append(esc(text)).append("\",\n")
+        sb.append("    \"wokeAt\": \"")
+            .append(wokeAt.format(DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH)))
+            .append("\",\n")
+        sb.append("    \"contextLabel\": \"").append(esc(reading.contextLabel)).append("\",\n")
+        sb.append("    \"day\": \"").append(plate.day).append("\",\n")
+        sb.append("    \"seed\": ").append(image.seed).append(",\n")
+        sb.append("    \"score\": ").append(reading.score).append(",\n")
+        sb.append("    \"verdict\": \"").append(reading.verdict.label).append("\",\n")
+        sb.append("    \"headline\": \"").append(esc(reading.headline)).append("\",\n")
+        sb.append("    \"summary\": \"").append(esc(reading.summary)).append("\",\n")
+        sb.append("    \"sunPalace\": \"").append(plate.sunPalace.pinyin).append("\",\n")
+        sb.append("    \"wealthElement\": \"").append(plate.wealthElement.en).append("\",\n")
+        sb.append("    \"natalPalace\": \"").append(Branch.palaceOf(natal).pinyin).append("\",\n")
+        sb.append("    \"insights\": [")
+        reading.insights.forEachIndexed { i, line ->
+            if (i > 0) sb.append(", ")
+            sb.append("\"").append(esc(line)).append("\"")
+        }
+        sb.append("],\n")
+        sb.append("    \"advice\": [")
+        reading.advice.forEachIndexed { i, line ->
+            if (i > 0) sb.append(", ")
+            sb.append("\"").append(esc(line)).append("\"")
+        }
+        sb.append("],\n")
+        sb.append("    \"factors\": [")
+        reading.factors.forEachIndexed { i, factor ->
+            if (i > 0) sb.append(", ")
+            sb.append("{\"label\": \"").append(esc(factor.label))
+                .append("\", \"delta\": ").append(factor.delta).append("}")
+        }
+        sb.append("],\n")
+        sb.append("    \"tokens\": [\n")
+        image.tokens.forEachIndexed { index, token ->
+            sb.append("      {\n")
+            sb.append("        \"term\": \"").append(esc(token.term)).append("\",\n")
+            sb.append("        \"chinese\": \"").append(token.chinese).append("\",\n")
+            sb.append("        \"kind\": \"").append(token.kind.name).append("\",\n")
+            sb.append("        \"palace\": \"").append(token.palace?.pinyin ?: "").append("\",\n")
+            sb.append("        \"bearing\": ").append(token.palace?.bearing ?: 0).append(",\n")
+            sb.append("        \"principal\": ").append(token == image.principal).append("\n")
+            sb.append("      }").append(if (index == image.tokens.lastIndex) "" else ",").append("\n")
+        }
+        sb.append("    ]\n")
+        sb.append("  }")
+        return sb.toString()
     }
 
     /** One plate as a JSON object, with its own module readings. */

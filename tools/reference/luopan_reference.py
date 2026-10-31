@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import json
 import math
+import re
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -540,7 +541,430 @@ def run_self_checks() -> bool:
     ok &= check("Wood year element against a Wood day", element_tone("Wood", "Wood"), 4)
     ok &= check("Metal year element against a Wood day", element_tone("Metal", "Wood"), 3)
 
+    print("Dream vocabulary")
+    snake = dream_extract("A black snake by a river")
+    ok &= check("the animal in the dream is found", snake["principal"]["branch"], "Si")
+    ok &= check("a snake carries the Flying Snake", snake["principal"]["spirit"], "TENG_SHE")
+    ok &= check("the river is read as Water", any(
+        t["kind"] == "NATURE" and t["element"] == "Water" for t in snake["tokens"]), True)
+    ok &= check("'rat' is not found inside 'grateful'",
+                dream_extract("I was grateful for the day")["tokens"], [])
+    ok &= check("a direction is read as a branch",
+                dream_extract("I walked south")["principal"]["branch"], "Wu")
+    ok &= check("the north-east corner belongs to Chou",
+                dream_extract("I walked north-east")["principal"]["branch"], "Chou")
+    ok &= check("money in a dream is the sign of wealth",
+                dream_extract("I found a pile of money")["tokens"][0]["wealth"], True)
+    ok &= check("eleven is not read as one",
+                dream_extract("eleven birds")["principal"]["branch"], "Xu")
+    ok &= check("a bare number is a number, not an hour",
+                dream_extract("three cats")["tokens"][0]["kind"], "NUMBER")
+    ok &= check("a clock time is an hour",
+                dream_extract("woke at 3:30")["hourBranch"], "Yin")
+    ok &= check("a dream with no image has no omen",
+                dream_extract("nothing happened at all")["principal"], None)
+
+    print("Dream reading")
+    probe = datetime(2026, 1, 5, 12, 0)
+    _, probe_branch = day_pillar(probe)
+    clash_image = dream_extract(f"A dog in the north")     # Xu against the day's branch
+    ok &= check("the reading is bounded", 0 <= dream_reading(probe, clash_image)["score"] <= 100, True)
+    empty = dream_reading(probe, dream_extract("nothing at all"))
+    ok &= check("an empty dream is marked down", empty["score"] < 50, True)
+    ok &= check("the hour follows the double-hour", dream_branch_of_hour(23), "Zi")
+    ok &= check("one minute past midnight is still Zi", dream_branch_of_hour(0), "Zi")
+    ok &= check("one in the morning is Chou", dream_branch_of_hour(1), "Chou")
+
     return ok
+
+
+# ------------------------------------------------------------------------ dream
+#
+# Dream reading (meng zhan). The dream supplies the image, the day's pillar
+# supplies the field and the reader's year branch supplies the person. These are
+# the same rules as the Kotlin engine in core/DreamEngine.kt - the two
+# implementations must agree, which is what the golden file checks.
+
+DREAM_SPIRITS = {
+    "QING_LONG": ("Azure Dragon", "青龙", "Wood"),
+    "ZHU_QUE": ("Vermilion Bird", "朱雀", "Fire"),
+    "BAI_HU": ("White Tiger", "白虎", "Metal"),
+    "XUAN_WU": ("Dark Warrior", "玄武", "Water"),
+    "TENG_SHE": ("Flying Snake", "螣蛇", "Fire"),
+}
+
+# The order the vocabulary is searched in, and the order that decides which
+# image is the main omen.
+DREAM_KIND_ORDER = ["CREATURE", "WEALTH", "DIRECTION", "NUMBER", "HOUR", "COLOUR", "NATURE"]
+
+NUMBER_WORDS = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+                "eleven", "twelve"]
+
+
+def dream_spirit_of(branch: str) -> str:
+    """The beast that holds a branch, by the four divisions."""
+    if branch in ("Yin", "Mao", "Chen"):
+        return "QING_LONG"
+    if branch in ("Si", "Wu", "Wei"):
+        return "ZHU_QUE"
+    if branch in ("Shen", "You", "Xu"):
+        return "BAI_HU"
+    if branch in ("Hai", "Zi", "Chou"):
+        return "XUAN_WU"
+    return "QING_LONG"
+
+
+def palace_of_branch(branch: str) -> str:
+    """The mountain a branch sits on (two mountains share each branch)."""
+    return PALACES[BRANCHES.index(branch) * 2][0]
+
+
+def branch_of_palace(palace: str) -> str:
+    """The branch that shares a mountain."""
+    return BRANCHES[[p[0] for p in PALACES].index(palace) // 2]
+
+
+def palace_element(palace: str) -> str:
+    return next(p[1] for p in PALACES if p[0] == palace)
+
+
+def palace_bearing(palace: str) -> int:
+    return next(p[5] for p in PALACES if p[0] == palace)
+
+
+def _animal(words, chinese, branch, spirit=None):
+    return {
+        "words": words, "kind": "CREATURE", "term": words[0].capitalize(), "chinese": chinese,
+        "branch": branch, "element": BRANCH_ELEMENT[branch], "palace": palace_of_branch(branch),
+        "spirit": spirit or dream_spirit_of(branch), "wealth": False,
+    }
+
+
+def _element(words, element, chinese):
+    palace = {"Wood": "Mao", "Fire": "Wu", "Metal": "You", "Water": "Zi", "Earth": "Chen"}[element]
+    return {
+        "words": words, "kind": "NATURE", "term": element, "chinese": chinese, "branch": None,
+        "element": element, "palace": palace, "spirit": None, "wealth": False,
+    }
+
+
+def _colour(words, element, chinese):
+    palace = {"Wood": "Mao", "Fire": "Wu", "Metal": "You", "Water": "Zi", "Earth": "Chen"}[element]
+    return {
+        "words": words, "kind": "COLOUR", "term": words[0].capitalize(), "chinese": chinese,
+        "branch": None, "element": element, "palace": palace, "spirit": None, "wealth": False,
+    }
+
+
+def _direction(words, palace, term):
+    return {
+        "words": words, "kind": "DIRECTION", "term": term, "chinese": palace,
+        "branch": branch_of_palace(palace), "element": palace_element(palace), "palace": palace,
+        "spirit": None, "wealth": False,
+    }
+
+
+def _number(words, branch):
+    return {
+        "words": words, "kind": "NUMBER", "term": words[0], "chinese": branch, "branch": branch,
+        "element": BRANCH_ELEMENT[branch], "palace": palace_of_branch(branch), "spirit": None,
+        "wealth": False,
+    }
+
+
+def dream_lexicon() -> list[dict]:
+    """The whole vocabulary of the dream."""
+    entries = []
+    # the twelve animals
+    entries.append(_animal(["rat", "mouse"], "鼠", "Zi"))
+    entries.append(_animal(["ox", "bull", "cow"], "牛", "Chou"))
+    entries.append(_animal(["tiger"], "虎", "Yin"))
+    entries.append(_animal(["rabbit", "hare"], "兔", "Mao"))
+    entries.append(_animal(["dragon"], "龙", "Chen"))
+    entries.append(_animal(["snake", "serpent"], "蛇", "Si", "TENG_SHE"))
+    entries.append(_animal(["horse"], "马", "Wu"))
+    entries.append(_animal(["goat", "sheep"], "羊", "Wei"))
+    entries.append(_animal(["monkey", "ape"], "猴", "Shen"))
+    entries.append(_animal(["rooster", "cock", "chicken", "hen"], "鸡", "You"))
+    entries.append(_animal(["dog"], "狗", "Xu"))
+    entries.append(_animal(["pig", "boar"], "猪", "Hai"))
+    # direction - the compound directions come first, so that "north-east" is
+    # claimed as a whole and not split by the plain "north"
+    entries.append(_direction(["north-east", "northeast", "north east"], "Gen", "North-East"))
+    entries.append(_direction(["south-east", "southeast", "south east"], "Xun", "South-East"))
+    entries.append(_direction(["south-west", "southwest", "south west"], "Kun", "South-West"))
+    entries.append(_direction(["north-west", "northwest", "north west"], "Qian", "North-West"))
+    entries.append(_direction(["north", "northern"], "Zi", "Due North"))
+    entries.append(_direction(["south", "southern"], "Wu", "Due South"))
+    entries.append(_direction(["east", "eastern"], "Mao", "Due East"))
+    entries.append(_direction(["west", "western"], "You", "Due West"))
+    entries.append(_direction(["up", "upward", "above", "sky", "ceiling", "heaven", "high"], "Qian", "Upward"))
+    entries.append(_direction(["down", "downward", "below", "underground", "beneath", "buried"], "Kun", "Downward"))
+    # the five phases
+    entries.append(_element([
+        "water", "river", "sea", "ocean", "lake", "rain", "flood", "wave", "waves", "ice", "snow",
+        "drowning", "swimming", "pond", "puddle", "rainwater"], "Water", "水"))
+    entries.append(_element([
+        "fire", "flame", "flames", "blaze", "burning", "burnt", "torch", "candle", "lamp", "bonfire",
+        "volcano", "furnace", "inferno", "lava"], "Fire", "火"))
+    entries.append(_element([
+        "tree", "trees", "forest", "wood", "wooden", "bamboo", "leaf", "leaves", "branch", "bush",
+        "grass", "plant", "flower", "flowers", "garden", "park", "vine", "plank"], "Wood", "木"))
+    entries.append(_element([
+        "metal", "iron", "steel", "knife", "sword", "bell", "coin", "coins", "key", "car", "train",
+        "bus", "machine", "engine", "phone", "computer", "mirror", "needle", "nails", "screw"], "Metal", "金"))
+    entries.append(_element([
+        "earth", "soil", "mud", "wall", "walls", "mountain", "hill", "stone", "rock", "sand", "ground",
+        "house", "home", "room", "door", "city", "street", "road", "field", "farm", "food", "rice",
+        "bread", "meat", "egg", "eggs", "cake", "fruit", "vegetable", "table", "bed", "chair", "box",
+        "brick", "clay", "pottery", "cemetery", "grave", "graveyard", "coffin"], "Earth", "土"))
+    # colours
+    entries.append(_colour(["green", "emerald", "olive"], "Wood", "青"))
+    entries.append(_colour(["red", "crimson", "scarlet"], "Fire", "赤"))
+    entries.append(_colour(["yellow", "brown", "ochre"], "Earth", "黄"))
+    entries.append(_colour(["white", "silver", "grey", "gray"], "Metal", "白"))
+    entries.append(_colour(["black", "dark"], "Water", "黑"))
+    # the sign of money
+    entries.append({
+        "words": ["money", "coin", "coins", "cash", "gold", "gold coins", "fortune", "wealth", "salary"],
+        "kind": "WEALTH", "term": "Money", "chinese": "财", "branch": None, "element": "Metal",
+        "palace": "You", "spirit": None, "wealth": True,
+    })
+    # numbers
+    for index, word in enumerate(NUMBER_WORDS):
+        entries.append(_number([word, str(index + 1)], BRANCHES[index]))
+    return entries
+
+
+def dream_pattern(word: str) -> re.Pattern:
+    """English words match on word boundaries; Chinese terms as substrings."""
+    if any(ord(ch) > 0x2E80 for ch in word):
+        return re.compile(re.escape(word))
+    return re.compile(r"\b" + re.escape(word) + r"(s|es)?\b", re.IGNORECASE)
+
+
+def dream_hour_words() -> list[tuple[str, int]]:
+    return [
+        ("midnight", 0), ("子时", 0),
+        ("dawn", 5), ("sunrise", 5), ("daybreak", 5), ("early morning", 5), ("寅时", 3),
+        ("morning", 7), ("辰时", 7),
+        ("noon", 11), ("midday", 11), ("午时", 11),
+        ("afternoon", 13), ("未时", 13),
+        ("evening", 19), ("dusk", 17), ("sunset", 17), ("酉时", 17),
+        ("night", 21), ("tonight", 21), ("亥时", 21),
+    ]
+
+
+def dream_branch_of_hour(hour: int) -> str:
+    """The branch that holds a double-hour."""
+    table = {23: "Zi", 0: "Zi", 1: "Chou", 2: "Chou", 3: "Yin", 4: "Yin", 5: "Mao", 6: "Mao",
+             7: "Chen", 8: "Chen", 9: "Si", 10: "Si", 11: "Wu", 12: "Wu", 13: "Wei", 14: "Wei",
+             15: "Shen", 16: "Shen", 17: "You", 18: "You", 19: "Xu", 20: "Xu", 21: "Hai", 22: "Hai"}
+    return table[hour]
+
+
+def dream_find_hour(text: str):
+    """The hour the text names, if it names one."""
+    clock = re.search(r"\b(\d{1,2}):(\d{2})\b", text)
+    if clock:
+        return int(clock.group(1)) % 24, clock.span()
+    meridiem = re.search(r"\b(\d{1,2})\s*(am|pm)\b", text, re.IGNORECASE)
+    if meridiem:
+        hour = int(meridiem.group(1)) % 24
+        if meridiem.group(2).lower() == "pm" and hour < 12:
+            hour += 12
+        if meridiem.group(2).lower() == "am" and hour == 12:
+            hour = 0
+        return hour, meridiem.span()
+    lowered = text.lower()
+    for word, hour in dream_hour_words():
+        index = lowered.find(word)
+        if index >= 0:
+            return hour, (index, index + len(word))
+    return None
+
+
+def dream_extract(text: str, woke_hour=None) -> dict:
+    """Take the images out of the dream text."""
+    tokens = []
+    used = []
+
+    def is_free(span):
+        return all(not (span[0] <= other[1] - 1 and other[0] <= span[1] - 1) for other in used)
+
+    hour_hit = dream_find_hour(text)
+    masked = list(text)
+    if hour_hit:
+        start, end = hour_hit[1]
+        for i in range(start, end):
+            masked[i] = " "
+        used.append((start, end))
+    masked = "".join(masked)
+
+    lexicon = dream_lexicon()
+    patterns = [(entry, [dream_pattern(w) for w in entry["words"]]) for entry in lexicon]
+
+    def claim(entry, hit):
+        token = dict(entry)
+        token["term"] = hit.group(0).strip().capitalize() or entry["term"]
+        tokens.append(token)
+        used.append(hit.span())
+
+    # everything except the numbers
+    for entry, pats in patterns:
+        if entry["kind"] == "NUMBER":
+            continue
+        for pat in pats:
+            hit = pat.search(masked)
+            if hit and is_free(hit.span()):
+                claim(entry, hit)
+                break
+
+    # then the numbers, longest word first so "eleven" is not read as "one"
+    number_entries = [(e, p) for e, p in patterns if e["kind"] == "NUMBER"]
+    number_entries.sort(key=lambda pair: -max(len(w) for w in pair[0]["words"]))
+    number_entries.sort(key=lambda pair: 0 if all(w in NUMBER_WORDS for w in pair[0]["words"]) else 1)
+    for entry, pats in number_entries:
+        for pat in pats:
+            hit = pat.search(masked)
+            if hit and is_free(hit.span()):
+                claim(entry, hit)
+                break
+
+    hour_branch = dream_branch_of_hour(woke_hour if woke_hour is not None else (hour_hit[0] if hour_hit else 0)) \
+        if (woke_hour is not None or hour_hit) else None
+
+    principal = None
+    for kind in DREAM_KIND_ORDER:
+        for token in tokens:
+            if token["kind"] == kind:
+                principal = token
+                break
+        if principal:
+            break
+
+    element = principal["element"] if principal else None
+    if element is None and tokens:
+        counts = {}
+        for token in tokens:
+            if token["element"]:
+                counts[token["element"]] = counts.get(token["element"], 0) + 1
+        if counts:
+            element = max(counts.items(), key=lambda kv: kv[1])[0]
+
+    return {
+        "tokens": tokens,
+        "principal": principal,
+        "hourBranch": hour_branch,
+        "element": element,
+        "seed": len(text),
+    }
+
+
+def dream_hour_officer(day_stem: str, hour_branch: str) -> str:
+    """The hour-officer for any double-hour of any day."""
+    offset = {0: 0, 5: 0, 1: 1, 6: 1, 2: 2, 7: 2, 3: 3, 8: 3}.get(STEMS.index(day_stem), 4)
+    return HOUR_OFFICERS[(BRANCHES.index(hour_branch) + offset) % 12]
+
+
+def dream_reading(moment: datetime, image: dict, natal=None) -> dict:
+    """Read the dream against the day's plate."""
+    factors = []
+    score = 50
+
+    def add(label, delta, note=""):
+        nonlocal score
+        if delta != 0:
+            factors.append({"label": label, "delta": delta, "note": note})
+            score += delta
+
+    day_stem, day_branch = day_pillar(moment)
+    day_element = STEM_ELEMENT[day_stem]
+    sun = sun_palace(moment)[0]
+    clash = PALACES[((BRANCHES.index(day_branch) + 6) * 2) % 24][0]
+    wealth_element = CONTROLS[day_element]
+    wealth_bearing = {"Wood": 90, "Fire": 180, "Metal": 270, "Water": 0, "Earth": 120}[wealth_element]
+
+    omen = image["principal"]
+
+    if omen and omen["branch"]:
+        relation = natal_relation(omen["branch"], day_branch)
+        tones = {"HARMONY": 8, "TRIAD": 5, "CLASH": -9, "HARM": -4, "NEUTRAL": 0}
+        labels = {
+            "HARMONY": "The omen and the day's branch combine",
+            "TRIAD": "The omen joins the day's own frame",
+            "CLASH": "The omen clashes the day's branch",
+            "HARM": "The omen harms the day's branch",
+            "NEUTRAL": "The omen stands apart from the day's branch",
+        }
+        if tones[relation] != 0:
+            add(labels[relation], tones[relation],
+                f"Omen branch {omen['branch']} against day branch {day_branch}.")
+        day_triad = triad_of(day_branch)
+        opposite = triad_of(clash_of(day_branch))
+        if omen["branch"] in day_triad and omen["branch"] != day_branch:
+            add("The omen carries the day's frame", 5,
+                f"{omen['branch']} is one of the day's own three.")
+        elif omen["branch"] in opposite:
+            add("The omen carries the opposing frame", -4,
+                f"{omen['branch']} belongs to the frame that opposes the day.")
+
+    if omen and omen["element"]:
+        tone = element_tone(omen["element"], day_element)
+        if tone != 0:
+            add(f"The omen {element_phrase(omen['element'], day_element)} the day", tone,
+                f"Omen element {omen['element']}; day element {day_element}.")
+
+    direction = next((t for t in image["tokens"] if t["kind"] == "DIRECTION"), None)
+    if direction:
+        palace = direction["palace"]
+        if palace == sun:
+            add("The dream points where the sun stands", 5,
+                f"The sun rests on the {palace} mountain.")
+        elif palace == clash:
+            add("The dream points at the direction to avoid", -6,
+                f"The {palace} mountain clashes the day branch.")
+        diff = abs(palace_bearing(palace) - wealth_bearing) % 360
+        diff = min(diff, 360 - diff)
+        if diff == 0:
+            add("The dream points at the wealth direction", 4,
+                f"The {palace} mountain faces where gain waits.")
+        elif diff == 180:
+            add("The dream points away from the wealth direction", -3)
+
+    hour = image["hourBranch"]
+    if hour:
+        if hour == day_branch:
+            add("The hour of waking is the day's own branch", 3, f"{hour} hour.")
+        elif harmony_of(hour) == day_branch:
+            add("The hour of waking combines with the day", 5)
+        elif hour == clash_of(day_branch):
+            add("The hour of waking clashes the day", -4)
+        officer = dream_hour_officer(day_stem, hour)
+        add(f"The hour is under {officer}", 3 if officer in (
+            "QING_LONG", "MING_TANG", "JIN_GUI", "TIAN_DE", "YU_TANG", "SI_MING") else -3)
+
+    if natal and omen and omen["branch"]:
+        relation = natal_relation(natal, omen["branch"])
+        tones = {"HARMONY": 8, "TRIAD": 5, "CLASH": -9, "HARM": -4, "NEUTRAL": 0}
+        if tones[relation] != 0:
+            add(f"Your year sign {relation.lower()} the omen", tones[relation],
+                f"Year branch {natal} against omen branch {omen['branch']}.")
+
+    if any(t["wealth"] for t in image["tokens"]):
+        add("The dream shows the sign of money", 6,
+            "Money in a dream is the one omen that is never ambiguous.")
+
+    count = len(image["tokens"])
+    if count == 0:
+        add("The dream held no image the plate could use", -12)
+    elif count <= 2:
+        add("A short, concrete dream", 4, "One or two images - the message is plain.")
+    elif count > 5:
+        add("A crowded dream", -4, "So many images that the message scatters.")
+
+    clamped = max(0, min(100, score))
+    return {"score": clamped, "factors": factors, "image": image}
 
 
 # ------------------------------------------------------------------ golden export
@@ -629,12 +1053,65 @@ def export_golden_natal(path: Path) -> None:
     print(f"Wrote {len(rows)} natal golden rows -> {path}")
 
 
+def export_golden_dream(path: Path) -> None:
+    """Write the golden values for the dream layer.
+
+    The same twelve dreams are read against eight days. Each row carries the
+    images the vocabulary found, the main omen and the score with the factor
+    deltas that produced it - so the Kotlin engine is checked on the whole
+    chain, not only on the extraction.
+    """
+    dreams = [
+        "A black snake by a river in the south, at dawn.",
+        "I dreamt of a tiger in a northern forest.",
+        "Money on a table, and the smell of smoke.",
+        "Falling from a great height into water.",
+        "A house of stone with a red door.",
+        "Three white horses running east.",
+        "I was late for work and the road was uphill.",
+        "A green dragon over the sea at midnight.",
+        "Nothing happened. Just a grey room.",
+        "An old dog followed me to the west.",
+        "A yellow bird, coins, and a long climb.",
+        "I walked through a bamboo grove under a bright moon.",
+    ]
+    dates = ["2026-01-05", "2026-03-21", "2026-06-15", "2026-09-01",
+             "2026-11-11", "2027-02-04", "2027-05-20", "2027-08-08"]
+    rows = []
+    for date_text in dates:
+        day = datetime.fromisoformat(date_text + "T12:00:00")
+        for index, text in enumerate(dreams):
+            image = dream_extract(text)
+            reading = dream_reading(day, image)
+            principal = image["principal"]
+            rows.append({
+                "date": date_text,
+                "text": text.replace("\t", " "),
+                "tokens": "|".join(
+                    f"{t['kind']}:{t['term']}:{t['branch'] or ''}" for t in image["tokens"]),
+                "omen": principal["term"] if principal else "",
+                "omenBranch": principal["branch"] if principal and principal["branch"] else "",
+                "hour": image["hourBranch"] or "",
+                "score": reading["score"],
+                "deltas": "|".join(str(f["delta"]) for f in reading["factors"]),
+            })
+
+    keys = ["date", "text", "tokens", "omen", "omenBranch", "hour", "score", "deltas"]
+    lines = ["\t".join(keys)]
+    for r in rows:
+        lines.append("\t".join(str(r[k]) for k in keys))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(f"Wrote {len(rows)} dream golden rows -> {path}")
+
+
 if __name__ == "__main__":
     print("=== Dao Fortune reference engine ===")
     passed = run_self_checks()
     resources = Path(__file__).resolve().parents[2] / "app" / "src" / "test" / "resources"
     export_golden(resources / "golden_pillars.tsv")
     export_golden_natal(resources / "golden_natal.tsv")
+    export_golden_dream(resources / "golden_dream.tsv")
     print("\nSELF-CHECK:", "ALL PASS" if passed else "FAILURES PRESENT")
     raise SystemExit(0 if passed else 1)
 

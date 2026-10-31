@@ -405,4 +405,117 @@ object Narrative {
         WuXing.METAL -> "Metal governs lungs and large intestine: this is the element of refinement and release, and when it is loudest it wants air, breathing space and less clutter."
         WuXing.WATER -> "Water governs kidneys and bladder: this is the element of depth and reserve, and when it is loudest it wants rest, warmth and quiet."
     }
+
+    // ------------------------------------------------------------------- dream
+
+    /**
+     * The prose for a dream reading.
+     *
+     * A dream is read as an image against a day, never as a prediction of what
+     * will happen. The wording keeps to that: "the plate points at", "the omen
+     * answers the day" — the same discipline the other modules use.
+     */
+    fun dream(
+        s: LuopanSnapshot,
+        image: DreamImage,
+        score: Int,
+        verdict: Verdict,
+        factors: List<Factor>
+    ): Text {
+        val omen = image.principal
+        val headline = when (verdict) {
+            Verdict.EXCEPTIONAL -> "The dream answers the day."
+            Verdict.FAVORABLE -> "The omen leans your way."
+            Verdict.MILDLY_GOOD -> "A quiet sign, a quiet yes."
+            Verdict.MIXED -> "Half a message, half a mist."
+            Verdict.CAUTIOUS -> "The dream warns without naming it."
+            Verdict.UNFAVORABLE -> "Something in the dream pushes back."
+        }
+
+        val summary = buildString {
+            if (omen == null) {
+                append("The dream held no image the plate could read: no direction, no animal, no number. ")
+                append("That is not nothing — an empty dream is the one omen the tradition treats as a silence rather than a message. ")
+                append("The day itself is ${s.day} under ${s.officer.en}, and that is the field the dream sat in.")
+            } else {
+                val where = omen.palace?.let { " on the ${it.pinyin} mountain" } ?: ""
+                val nature = omen.element?.let { " — ${it.en}" } ?: ""
+                val branch = omen.branch?.let { " (${it.pinyin})" } ?: ""
+                val spirit = omen.spirit?.let { " under the ${it.en}" } ?: ""
+                append("The dream showed ${omen.term} (${omen.chinese})$where$branch$spirit$nature. ")
+                val relation = omen.branch?.let { Natal.DayRelation.of(it, s.day.branch) }
+                append(
+                    when (relation) {
+                        Natal.DayRelation.HARMONY ->
+                            "The omen combines with the day's own branch ${s.day.branch.pinyin}, so the image answers the day rather than arguing with it."
+
+                        Natal.DayRelation.TRIAD ->
+                            "The omen joins the frame the day ${s.day.branch.pinyin} already carries, which is why it feels familiar rather than strange."
+
+                        Natal.DayRelation.CLASH ->
+                            "The omen stands opposite the day's branch ${s.day.branch.pinyin}: the image and the day are pulling in opposite directions, and that tension is the reading."
+
+                        Natal.DayRelation.HARM ->
+                            "The omen and the day's branch ${s.day.branch.pinyin} harm each other — a quiet friction rather than an open row."
+
+                        else ->
+                            "The omen stands apart from the day's branch ${s.day.branch.pinyin}, so it carries its own meaning rather than the day's."
+                    }
+                )
+                append(" ")
+                val hour = image.hourBranch
+                if (hour != null) {
+                    val officer = CalendarEngine.hourOfficer(s.day, hour)
+                    append(
+                        "You woke in the ${hour.pinyin} hour, which stands under ${officer.en} — " +
+                            if (officer.auspicious) "a gentle hour to carry the rest of the day."
+                            else "an uneasy hour, and the dream inherits some of that weight."
+                    )
+                } else {
+                    append("The hour of waking was not given, and the reading leans on the image alone.")
+                }
+            }
+        }
+
+        val insights = buildList {
+            add(
+                "The day's own plate: ${s.day} in ${s.month}, under ${s.officer.en}, with the sun in the " +
+                    "${s.sunPalace.pinyin} mountain (${s.sunPalace.element.en})."
+            )
+            if (omen != null) {
+                add(
+                    "The main omen is ${omen.term} (${omen.chinese})" +
+                        (omen.branch?.let { ", branch ${it.pinyin}" } ?: "") +
+                        (omen.element?.let { ", element ${it.en}" } ?: "") +
+                        ". A dream's image is read as a sign, not as a thing that will happen."
+                )
+            }
+            val other = image.tokens.filter { it != omen }
+            if (other.isNotEmpty()) {
+                add(
+                    "Also in the dream: " +
+                        other.joinToString { it.term.lowercase() } +
+                        ". Each one sits on its own mountain; the reading follows the main one."
+                )
+            }
+            if (image.tokens.any { it.wealth }) {
+                add("Money in a dream is the one omen the tradition never hedges: it points at the wealth element, and at what the day is doing to it.")
+            }
+            add(
+                "The score is ${score} out of 100 — ${verdict.label.lowercase()}. " +
+                    "It comes from the factors below, not from the dream's feeling."
+            )
+        }
+
+        val advice = buildList {
+            add("Read the omen as the day's weather, not as a forecast. The plate says what kind of day it is; it does not say what will happen to you.")
+            if (omen?.palace != null) {
+                add("If the dream pointed somewhere, that direction is the useful part: ${Palace.directionName(omen.palace.bearing)} is where this day leans.")
+            }
+            add("Write the dream down while it is fresh. The images fade within a day, and the plate needs the image, not the mood.")
+            add("Your year sign is measured against the omen as well — set it on the home screen and the reading sharpens.")
+        }
+
+        return Text(headline, summary, insights, advice)
+    }
 }

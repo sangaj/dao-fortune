@@ -161,6 +161,16 @@ enum class Palace(
         /** Mountain whose 15-degree sector contains the given compass bearing. */
         fun ofBearing(bearing: Double): Palace = of(Math.floorMod(Math.round(bearing / 15.0).toInt(), 24))
 
+        /**
+         * The branch that shares this mountain.
+         *
+         * The twenty-four mountains pair with the twelve branches two to one —
+         * Zi and Gui belong to Zi, Chou and Gen to Chou, and so on around the
+         * dial. This is the classical 二十四山配十二支, and it is what lets a
+         * direction in a dream be turned into a branch.
+         */
+        fun branchOf(palace: Palace): Branch = Branch.of(palace.ordinal / 2)
+
         /** Traditional compass name of the bearing. */
         fun directionName(bearing: Int): String = when {
             bearing == 0 -> "Due North"

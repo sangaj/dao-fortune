@@ -18,6 +18,12 @@ seen by us or by Google. **The app never asks for your date of birth, your name,
 identifier.** A year sign is not a personal identifier in the sense Play's Data safety form uses: it is
 one choice out of twelve, it identifies nobody, and it is deleted the moment you clear it.
 
+The app can also read a dream you write yourself (梦占). **The words of your dream are read on your
+device and are never written to storage, never transmitted and never seen by us.** The picture that
+accompanies the reading is drawn on the device by the app itself — it is not uploaded, and no cloud
+service or AI model is involved. Closing the dream sheet erases the text; there is nothing left behind
+to delete.
+
 The only data handled by a third party is the purchase itself: if you unlock the app, the transaction is
 processed by **Google Play Billing**, and Google Play handles the payment details, your Google account
 and the receipt. Dao Fortune never sees or stores your card details.
@@ -60,6 +66,22 @@ looking at is **not stored at all**: it lives in memory for as long as the app i
 when you close it. The forward scan of the coming sixty days is computed on your device each time the
 app starts; no result of it is saved or sent anywhere.
 
+### The dream you write
+
+The Dream & Omens module (梦占) lets you type what you remember of a dream, and reads it against the
+plate of the night it belongs to.
+
+* **It is never written to disk.** The text lives in the app's memory while the dream sheet is open and
+  nowhere else. There is no file, no database, no log entry, and no cache copy.
+* **It is never transmitted.** The app makes no network request of any kind while reading a dream. There
+  is no server, no model, no image service behind it.
+* **The picture is drawn locally.** The ink-wash plate you see is generated on your device from the dream
+  itself, using a fixed set of classical images. Nothing is uploaded to be drawn "in the cloud".
+* **Closing the sheet erases it.** Leave the dream sheet — by the button or by swiping it away — and the
+  text, the wake-up time and the reading are all dropped from memory.
+* **The only thing that survives** is the reading you were shown, and even that is not stored: it is
+  re-created if you read the same dream again.
+
 ## 3. Permissions
 
 **Dao Fortune itself declares no permissions at all.** The Google Play Billing library that the app
@@ -87,7 +109,7 @@ permission, so that code cannot collect anything.
 
 ## 5. Children
 
-Dao Fortune is not directed at children under 13. It contains no user-generated content, no chat, and no data collection. The optional year sign is a preference the reader sets on their own device; it is not transmitted and is excluded from backup.
+Dao Fortune is not directed at children under 13. It contains no chat, no accounts, no user accounts visible to anyone else, and no data collection. The optional year sign is a preference the reader sets on their own device; it is not transmitted and is excluded from backup. A dream written in the Dream & Omens module is read privately on the device and is never shared with anybody, published, or transmitted — it is not user-generated content in the sense Play's policies mean, because no other person can ever see it.
 
 ## 6. Your rights
 
@@ -95,6 +117,8 @@ Because we collect no personal data, there is nothing for us to export, correct 
 
 * **Your year sign** — clear it inside the app (the year-sign sheet has a clear action), or by clearing the
   app's storage in Android Settings, or by uninstalling.
+* **A dream you wrote** — nothing to delete: it is never written to storage. Closing the dream sheet
+  erases it from memory.
 * **The free-reading flag and the unlock** — clear the app's storage in Android Settings, or uninstall.
   Note that uninstalling also removes your purchase entitlement from this device; you can restore it at
   any time with the **Restore purchase** button in the app, or through your Google Play purchase history.

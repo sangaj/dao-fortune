@@ -100,6 +100,19 @@ function Wrap($g, [string]$text, $font, $brush, [single]$x, [single]$y, [single]
     return $size.Height
 }
 
+function Wealth-Bearings([string]$element) {
+    # The four mountains ruled by each element. Water sits on the north side,
+    # fire on the south, metal on the west and wood on the east; earth takes
+    # the four corners, because the earth is everywhere.
+    switch ($element) {
+        'Wood'  { return @(60, 75, 90, 105) }
+        'Fire'  { return @(150, 165, 180, 195) }
+        'Metal' { return @(240, 255, 270, 285) }
+        'Water' { return @(330, 345, 0, 15) }
+        default { return @(30, 120, 210, 300) }
+    }
+}
+
 function Draw-Dial($g, [single]$cx, [single]$cy, [single]$r, [string]$sunPalace, [string]$wealthElement, [string]$natalPalace) {
     $outer = New-Object System.Drawing.Pen($Gold, ($r * 0.026))
     $inner = New-Object System.Drawing.Pen([System.Drawing.Color]::FromArgb(110, 217, 179, 107), ($r * 0.011))
@@ -121,17 +134,14 @@ function Draw-Dial($g, [single]$cx, [single]$cy, [single]$r, [string]$sunPalace,
         $g.DrawLine($pen, $x1, $y1, $x2, $y2)
     }
 
-    # wealth sector
-    $wealthStart = switch ($wealthElement) {
-        'Wood'  { 60 }
-        'Fire'  { 150 }
-        'Metal' { 240 }
-        'Water' { 330 }
-        default { 30 }
-    }
+    # wealth sector: one fifteen-degree arc per mountain of the wealth element.
+    # The mountains of one element either sit together or take the four corners,
+    # so they are drawn one by one rather than as one sweep between the
+    # smallest and the largest bearing.
     $sector = New-Object System.Drawing.Pen($Jade, ($r * 0.032))
-    $g.DrawArc($sector, ($cx - $r * 0.86), ($cy - $r * 0.86), ($r * 1.72), ($r * 1.72),
-               ($wealthStart - 90 - 22.5), 60.0)
+    foreach ($wb in (Wealth-Bearings $wealthElement)) {
+        $g.DrawArc($sector, ($cx - $r * 0.86), ($cy - $r * 0.86), ($r * 1.72), ($r * 1.72), ($wb - 7.5 - 90), 15.0)
+    }
 
     # the reader's own year branch: a hollow ring, never confused with the sun
     if ($natalPalace) {
@@ -575,5 +585,263 @@ $usedHeight = Wrap $g 'Dao Fortune is a cultural and entertainment product. It i
 
 $bigFont.Dispose(); $btnFont.Dispose(); $smallFont.Dispose(); $fine.Dispose(); $benefitFont.Dispose()
 Save-Png $bmp $g '05_unlock.png'
+
+# ---------------------------------------------------------- screenshot 6: dream
+#
+# The dream sheet with its ink-wash plate. The ink is seeded by the dream's own
+# text with the same forty-eight bit generator the app uses in
+# ui/DreamSheet.kt, so this is the picture the reader would really see.
+
+$script:InkMask = [System.Numerics.BigInteger]::Pow(2, 48) - 1
+$script:InkMul  = [System.Numerics.BigInteger]25214903917   # 0x5DEECE66D
+$script:InkAdd  = [System.Numerics.BigInteger]11             # 0xB
+
+function New-InkRandom([int]$seed) {
+    # The app sign-extends the thirty-two bit seed before the xor.
+    $signed = [long]$seed
+    $xored = $signed -bxor 25214903917L
+    $state = [System.Numerics.BigInteger]$xored
+    $state = $state -band $script:InkMask
+    return [pscustomobject]@{ State = $state }
+}
+
+function Get-InkNext($rng) {
+    # Every step is its own statement: in PowerShell the bitwise operators bind
+    # tighter than the arithmetic ones, so a one-liner would mask the wrong
+    # value.
+    $next = $rng.State * $script:InkMul
+    $next = $next + $script:InkAdd
+    $next = $next -band $script:InkMask
+    $rng.State = $next
+    $value = $rng.State -shr 16
+    $value = $value -band 2147483647
+    return [double]$value / 2147483647.0
+}
+
+function Has-Cjk([string]$text) {
+    foreach ($ch in $text.ToCharArray()) {
+        if ([int][char]$ch -gt 0x2E80) { return $true }
+    }
+    return $false
+}
+
+function Draw-DreamPlate($g, [single]$cx, [single]$cy, [single]$r, $dream, [string]$sunPalace, [string]$wealthElement, [string]$natalPalace) {
+    $rng = New-InkRandom ([int]$dream.seed)
+
+    # --- the ink wash: seven soft fields, in the order the app draws them
+    for ($i = 0; $i -lt 7; $i++) {
+        $angle = (Get-InkNext $rng) * 6.2831853
+        $distance = $r * (0.18 + (Get-InkNext $rng) * 0.62)
+        $washAlpha = 0.018 + (Get-InkNext $rng) * 0.03
+        $washRadius = $r * (0.22 + (Get-InkNext $rng) * 0.38)
+        $bx = $cx + $distance * [Math]::Cos($angle)
+        $by = $cy + $distance * [Math]::Sin($angle)
+        $wash = [System.Drawing.Color]::FromArgb([int](255 * $washAlpha), 236, 231, 220)
+        # A wash that fades out at its edge, the way the app draws it.
+        $washPath = New-Object System.Drawing.Drawing2D.GraphicsPath
+        $washPath.AddEllipse(($bx - $washRadius), ($by - $washRadius), ($washRadius * 2), ($washRadius * 2))
+        $washBrush = New-Object System.Drawing.Drawing2D.PathGradientBrush($washPath)
+        $washBrush.CenterPoint = New-Object System.Drawing.PointF($bx, $by)
+        $washBrush.CenterColor = $wash
+        $washBrush.SurroundColors = @([System.Drawing.Color]::FromArgb(0, 236, 231, 220))
+        $g.FillEllipse($washBrush, ($bx - $washRadius), ($by - $washRadius), ($washRadius * 2), ($washRadius * 2))
+        $washBrush.Dispose(); $washPath.Dispose()
+    }
+
+    # --- the wealth sector of the day
+    $sector = New-Object System.Drawing.Pen([System.Drawing.Color]::FromArgb(46, 111, 191, 160), ($r * 0.033))
+    foreach ($wb in (Wealth-Bearings $wealthElement)) {
+        $g.DrawArc($sector, ($cx - $r * 0.86), ($cy - $r * 0.86), ($r * 1.72), ($r * 1.72), ($wb - 7.5 - 90), 15.0)
+    }
+    $sector.Dispose()
+
+    # --- the rings
+    $ring = New-Object System.Drawing.Pen([System.Drawing.Color]::FromArgb(51, 217, 179, 107), 3)
+    $g.DrawEllipse($ring, ($cx - $r), ($cy - $r), ($r * 2), ($r * 2))
+    $inner = New-Object System.Drawing.Pen([System.Drawing.Color]::FromArgb(31, 217, 179, 107), 2)
+    $g.DrawEllipse($inner, ($cx - $r * 0.60), ($cy - $r * 0.60), ($r * 1.20), ($r * 1.20))
+    $ring.Dispose(); $inner.Dispose()
+
+    # --- the ticks and the mountain names
+    $tick = New-Object System.Drawing.Pen([System.Drawing.Color]::FromArgb(77, 217, 179, 107), 2)
+    $nameFont = F 'Segoe UI' 19
+    $nameBrush = Brush ([System.Drawing.Color]::FromArgb(179, 154, 163, 175))
+    $centerFmt = New-Object System.Drawing.StringFormat
+    $centerFmt.Alignment = [System.Drawing.StringAlignment]::Center
+    $centerFmt.LineAlignment = [System.Drawing.StringAlignment]::Center
+    for ($i = 0; $i -lt 24; $i++) {
+        $deg = $i * 15.0
+        $a = ($deg - 90) * [Math]::PI / 180.0
+        $x1 = $cx + ($r - 9) * [Math]::Cos($a)
+        $y1 = $cy + ($r - 9) * [Math]::Sin($a)
+        $x2 = $cx + ($r - 20) * [Math]::Cos($a)
+        $y2 = $cy + ($r - 20) * [Math]::Sin($a)
+        $g.DrawLine($tick, $x1, $y1, $x2, $y2)
+        $lr = $r * 0.80
+        $lx = $cx + $lr * [Math]::Cos($a)
+        $ly = $cy + $lr * [Math]::Sin($a)
+        $g.DrawString($Mountains[$i], $nameFont, $nameBrush, $lx, $ly, $centerFmt)
+    }
+    $tick.Dispose(); $nameFont.Dispose(); $nameBrush.Dispose(); $centerFmt.Dispose()
+
+    # --- the images of the dream, laid on the mountains they belong to
+    $cjkFont = F 'Microsoft YaHei UI' 34
+    $termFont = F 'Segoe UI' 18
+    $byPalace = @{}
+    foreach ($tok in $dream.tokens) {
+        if (-not $tok.palace) { continue }
+        $key = [string]$tok.palace
+        if (-not $byPalace.ContainsKey($key)) { $byPalace[$key] = @() }
+        $byPalace[$key] += $tok
+    }
+    foreach ($palaceName in $byPalace.Keys) {
+        $group = $byPalace[$palaceName]
+        $bearing = [double]$group[0].bearing
+        $a = ($bearing - 90) * [Math]::PI / 180.0
+        for ($i = 0; $i -lt $group.Count; $i++) {
+            $tok = $group[$i]
+            $isPrincipal = [bool]$tok.principal
+            $step = ($i - (($group.Count - 1) / 2.0)) * 40
+            $px = $cx + ($r + 46) * [Math]::Cos($a) - $step * [Math]::Sin($a)
+            $py = $cy + ($r + 46) * [Math]::Sin($a) + $step * [Math]::Cos($a)
+
+            # the brush mark
+            $markPen = New-Object System.Drawing.Pen($Parchment, 3)
+            $g.DrawCurve($markPen, @(
+                (New-Object System.Drawing.PointF(($px - 20), ($py + 14))),
+                (New-Object System.Drawing.PointF(($px - 5), ($py - 14))),
+                (New-Object System.Drawing.PointF(($px + 9), ($py + 8))),
+                (New-Object System.Drawing.PointF(($px + 22), ($py - 13)))
+            ))
+            $markPen.Dispose()
+
+            # the original term, and the word the reader wrote
+            if (Has-Cjk $tok.chinese) {
+                $cjkBrush = Brush $Parchment
+                $g.DrawString($tok.chinese, $cjkFont, $cjkBrush, ($px - 18), ($py - 64))
+                $cjkBrush.Dispose()
+            }
+            $termBrush = Brush ([System.Drawing.Color]::FromArgb(150, 154, 163, 175))
+            $g.DrawString($tok.term, $termFont, $termBrush, ($px - 24), ($py + 18))
+            $termBrush.Dispose()
+        }
+    }
+    $cjkFont.Dispose(); $termFont.Dispose()
+
+    # --- the sun of the day: a gold diamond
+    $sunIndex = [Array]::IndexOf($Mountains, $sunPalace)
+    if ($sunIndex -ge 0) {
+        $a = ($sunIndex * 15.0 - 90) * [Math]::PI / 180.0
+        $sx = $cx + ($r + 46) * [Math]::Cos($a)
+        $sy = $cy + ($r + 46) * [Math]::Sin($a)
+        $diamond = @(
+            (New-Object System.Drawing.PointF($sx, ($sy - 11))),
+            (New-Object System.Drawing.PointF(($sx + 8), $sy)),
+            (New-Object System.Drawing.PointF($sx, ($sy + 11))),
+            (New-Object System.Drawing.PointF(($sx - 8), $sy))
+        )
+        $g.FillPolygon((Brush $Gold), $diamond)
+    }
+
+    # --- the reader's own year branch: a hollow ring
+    if ($natalPalace) {
+        $natalIndex = [Array]::IndexOf($Mountains, $natalPalace)
+        if ($natalIndex -ge 0) {
+            $a = ($natalIndex * 15.0 - 90) * [Math]::PI / 180.0
+            $nx = $cx + ($r + 46) * [Math]::Cos($a)
+            $ny = $cy + ($r + 46) * [Math]::Sin($a)
+            $natalPen = New-Object System.Drawing.Pen($Parchment, 3)
+            $g.DrawEllipse($natalPen, ($nx - 11), ($ny - 11), 22, 22)
+            $natalPen.Dispose()
+        }
+    }
+
+    # --- the centre: the day's own pillar
+    $pillarFont = F 'Georgia' 40 ([System.Drawing.FontStyle]::Bold)
+    $g.DrawString($dream.day, $pillarFont, (Brush $Parchment), ($cx - 62), ($cy - 34))
+    $subFont = F 'Segoe UI' 20
+    $g.DrawString("Wealth $Dot $wealthElement", $subFont, (Brush $Muted), ($cx - 66), ($cy + 14))
+    $pillarFont.Dispose(); $subFont.Dispose()
+}
+
+$dream = $sample.dream
+$canvas = New-Canvas
+$bmp = $canvas[0]; $g = $canvas[1]
+$y = 84
+
+# the header of the sheet
+$g.DrawString('DREAM & OMENS', $chipFont, (Brush $Gold), $Margin, $y)
+$mengZhan = [string][char]0x68A6 + [string][char]0x5360
+$cjkTitle = F 'Microsoft YaHei UI' 26
+$g.DrawString($mengZhan, $cjkTitle, (Brush $Gold), ($W - $Margin - 56), ($y - 4))
+$cjkTitle.Dispose()
+$y += 46
+
+$dreamTitle = F 'Georgia' 46 ([System.Drawing.FontStyle]::Bold)
+$g.DrawString('Your dream, read against the day', $dreamTitle, (Brush $Parchment), $Margin, $y)
+$dreamTitle.Dispose()
+$y += 72
+
+# what the reader wrote
+$dreamCardH = 120
+RoundRect $g $Margin $y ($W - 2 * $Margin) $dreamCardH 22 $Card $Outline
+$dreamFont = F 'Segoe UI' 31
+$dreamBrush = Brush $Parchment
+$usedHeight = Wrap $g $dream.text $dreamFont $dreamBrush ($Margin + 28) ($y + 24) ($W - 2 * $Margin - 56)
+$dreamFont.Dispose()
+$y += $dreamCardH + 16
+
+# when the reader woke
+$wokeFont = F 'Segoe UI' 23
+$g.DrawString("You woke at $($dream.wokeAt)  $Dot  $($dream.contextLabel)", $wokeFont, (Brush $Muted), $Margin, $y)
+$wokeFont.Dispose()
+$y += 52
+
+# the score and the headline
+$dreamVerdict = $dream.verdict
+Draw-Gauge $g ($Margin + 98) ($y + 88) 88 ([int]$dream.score) (Verdict-Color $dreamVerdict)
+$dreamScoreBig = F 'Georgia' 64 ([System.Drawing.FontStyle]::Bold)
+$g.DrawString([string]$dream.score, $dreamScoreBig, (Brush (Verdict-Color $dreamVerdict)), ($Margin + 56), ($y + 48))
+$dreamScoreBig.Dispose()
+$g.DrawString($dreamVerdict.ToUpper(), (F 'Segoe UI' 19), (Brush $Muted), ($Margin + 48), ($y + 130))
+$dreamHead = F 'Georgia' 42 ([System.Drawing.FontStyle]::Bold)
+Wrap $g $dream.headline $dreamHead (Brush (Verdict-Color $dreamVerdict)) ($Margin + 230) ($y + 22) 760 | Out-Null
+$dreamHead.Dispose()
+$y += 200
+
+# what the dream said
+$summaryFont = F 'Segoe UI' 25
+$usedHeight = Wrap $g $dream.summary $summaryFont $body $Margin $y ($W - 2 * $Margin)
+$summaryFont.Dispose()
+$y += $usedHeight + 90
+
+# the plate. The images sit outside the ring, so the plate needs room above it.
+$plateSize = 720
+$plateCx = $W / 2
+$plateCy = $y + ($plateSize / 2)
+Draw-DreamPlate $g $plateCx $plateCy ($plateSize / 2 - 30) $dream $dream.sunPalace $dream.wealthElement $dream.natalPalace
+$y += $plateSize + 26
+
+# what the plate says
+$g.DrawString('WHAT THE PLATE SAYS', $chipFont, (Brush $Gold), $Margin, $y)
+$y += 36
+$dreamBullet = F 'Segoe UI' 24
+$shown = 0
+foreach ($line in $dream.insights) {
+    if ($shown -ge 2) { break }
+    $g.FillEllipse((Brush $Gold), ($Margin + 2), ($y + 11), 10, 10)
+    $usedHeight = Wrap $g $line $dreamBullet $body ($Margin + 30) $y ($W - 2 * $Margin - 30)
+    $y += $usedHeight + 14
+    $shown++
+}
+$dreamBullet.Dispose()
+
+# the privacy line the app shows at the foot of the sheet
+$privacyFont = F 'Segoe UI' 20
+$privacy = 'Your words are read on this phone and never leave it. Nothing is stored, nothing is uploaded, and closing this sheet erases the dream.'
+$usedHeight = Wrap $g $privacy $privacyFont $mutedB $Margin ($y + 16) ($W - 2 * $Margin)
+$privacyFont.Dispose()
+
+Save-Png $bmp $g '06_dream.png'
 
 Write-Output "done"

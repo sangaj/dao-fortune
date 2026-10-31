@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.laki.daofortune.ui.AboutSheet
 import com.laki.daofortune.ui.DaoFortuneTheme
+import com.laki.daofortune.ui.DreamSheet
 import com.laki.daofortune.ui.HomeScreen
 import com.laki.daofortune.ui.PaywallSheet
 import com.laki.daofortune.ui.ReadingSheet
@@ -45,6 +46,7 @@ class MainActivity : ComponentActivity() {
                         unlocked = state.unlocked,
                         notice = state.notice,
                         onOpen = viewModel::open,
+                        onOpenDream = viewModel::showDream,
                         onSelectDate = viewModel::selectDate,
                         onSetYearSign = viewModel::setYearSign,
                         onDismissNotice = viewModel::dismissNotice,
@@ -55,6 +57,20 @@ class MainActivity : ComponentActivity() {
                     val reading = selected?.let { state.readings[it] }
                     if (reading != null) {
                         ReadingSheet(reading = reading, onClose = viewModel::closeReading)
+                    }
+
+                    if (state.showDream) {
+                        DreamSheet(
+                            text = state.dreamText,
+                            wokeAt = state.dreamWokeAt,
+                            reading = state.dreamReading,
+                            snapshot = state.dreamPlate,
+                            yearSign = state.yearSign,
+                            onTextChange = viewModel::setDreamText,
+                            onWokeAtChange = viewModel::setDreamWokeAt,
+                            onRead = viewModel::readDream,
+                            onDismiss = viewModel::closeDream
+                        )
                     }
 
                     if (state.showPaywall) {

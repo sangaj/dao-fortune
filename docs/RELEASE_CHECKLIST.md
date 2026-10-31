@@ -179,6 +179,9 @@ August 2026 — this build already complies. No action needed, but verify in Con
 * **The optional year sign** is a preference on the device, excluded from Android's backup and never
   transmitted — so it is not collected data and the form stays empty. It is described in the privacy
   policy and in the listing anyway, so the form, the policy and the app all tell the same story.
+* **The dream you write in Dream & Omens** is read on the device, drawn on the device and erased when
+  the sheet closes. It is never written to storage and never transmitted, so it is not collected data
+  either — the privacy policy says so in its own section.
 * **The developer contact** in the policy is `gubingjing@hotmail.com`. Make sure that mailbox accepts
   mail from `@play.google.com` — Play reviewers use it if they need to reach you.
 
@@ -222,8 +225,9 @@ not a health feature, and the app explicitly disclaims medical advice.
 | Phone screenshot — looking ahead | `docs/store/screenshots/03_favourable_days.png` | 16:9, the Favourable Days list and the disclaimer |
 | Phone screenshot — reading | `docs/store/screenshots/04_windfall_reading.png` | 16:9, full reading sheet |
 | Phone screenshot — paywall | `docs/store/screenshots/05_unlock.png` | 16:9, one-off unlock sheet |
+| Phone screenshot — dream | `docs/store/screenshots/06_dream.png` | 16:9, the dream sheet with its ink-wash plate |
 
-Upload the five phone screenshots in that order. Nothing else belongs in `docs/store/screenshots/` —
+Upload the six phone screenshots in that order. Nothing else belongs in `docs/store/screenshots/` —
 the Robolectric capture folder writes to `build/screenshots/` on purpose, so a test run can never
 leave stray files in the folder you upload from.
 
@@ -239,15 +243,16 @@ by the unit tests), so the text in them is genuine app output for 31 October 202
 
 **They are code-rendered, not a device capture.** Play does not forbid that, and the layout is the
 app's own layout — but a real phone capture converts better and looks more trustworthy in the store
-listing. When you have the phone in your hand, take the five shots on the device instead:
+listing. When you have the phone in your hand, take the six shots on the device instead:
 
 ```powershell
 adb shell screencap -p /sdcard/shot.png
 adb pull /sdcard/shot.png docs\store\screenshots\01_home.png
 ```
 
-Shoot the same five states (first run, unlocked, Favourable Days, a full reading, the paywall), at
-1080×1920 or higher, and keep the file names — the upload order below is the order Play shows them.
+Shoot the same six states (first run, unlocked, Favourable Days, a full reading, the paywall, the
+dream), at 1080×1920 or higher, and keep the file names — the upload order below is the order Play
+shows them.
 
 ---
 
@@ -290,6 +295,10 @@ So: nothing to install. Watch Vitals after each release instead.
    * the Favourable Days list shows five ranked days, and tapping one selects that date
    * the year sign sheet offers the twelve zodiac branches and never asks for a date of birth
    * setting a year sign changes the readings and draws the sign on the dial
+   * the dream sheet reads a written dream, draws its images on the plate, and keeps the text on the
+     device only — nothing about the dream appears in any file
+   * the dream obeys the same rule as the modules: first reading free, later readings behind the
+     one-off unlock
 6. Promote to production when the internal test looks right.
 
 ---
@@ -329,6 +338,11 @@ the following still need a human pass:
 * **The app never forecasts an amount.** It reports whether the classical configuration supports an
   unexpected gain and where to look — deliberately, because Play's deceptive-behaviour policy
   restricts fortune telling that promises outcomes. Keep the disclaimer wording intact.
+* **The dream vocabulary is deliberately narrow.** It reads directions, the twelve animals, the five
+  phases, colours, numbers, hours and the sign of money. A dream written in words it does not hold is
+  reported as having no usable image rather than interpreted anyway. Do not widen it to cover
+  everything — the classical 梦占 lessons that cannot be verified from a source were left out rather
+  than guessed.
 * **Native code is present after all — but it is compliant.** The app is written in Kotlin and has no
   native code of its own, yet the bundle carries `libandroidx.graphics.path.so` (from Compose's path
   library) for four ABIs. Android 15+ requires 16 KB page size support, so this is checked rather than

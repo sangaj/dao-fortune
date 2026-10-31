@@ -105,8 +105,8 @@ Check 'META-INF/MANIFEST.MF'  ($names -contains 'META-INF/MANIFEST.MF')
 Write-Output ''
 Write-Output '=== 5. Store assets and source package ==='
 $shots = Get-ChildItem 'docs\store\screenshots' -Filter '*.png' -File -ErrorAction SilentlyContinue
-Check 'exactly 5 store screenshots' ($shots.Count -eq 5) "$($shots.Count) png"
-$expected = @('01_home.png', '02_home_unlocked.png', '03_favourable_days.png', '04_windfall_reading.png', '05_unlock.png')
+Check 'exactly 6 store screenshots' ($shots.Count -eq 6) "$($shots.Count) png"
+$expected = @('01_home.png', '02_home_unlocked.png', '03_favourable_days.png', '04_windfall_reading.png', '05_unlock.png', '06_dream.png')
 foreach ($name in $expected) {
     Check "screenshot $name" ($shots.Name -contains $name)
 }
@@ -133,6 +133,7 @@ if (Test-Path $srcZip) {
     Check 'source zip: no __pycache__'        (-not ($entries -match '__pycache__'))
     Check 'source zip: has golden data'       ($entries -match 'golden_pillars\.tsv$')
     Check 'source zip: has golden natal data' ($entries -match 'golden_natal\.tsv$')
+    Check 'source zip: has golden dream data' ($entries -match 'golden_dream\.tsv$')
 } else {
     Check 'source zip exists' $false $srcZip
 }

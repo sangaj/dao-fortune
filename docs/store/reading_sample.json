@@ -205,6 +205,57 @@
       "isToday": false
     }
   ],
+  "dream": {
+    "text": "Money on a table, a tiger in the north.",
+    "wokeAt": "05:30",
+    "contextLabel": "Saturday 31 October · Mao hour",
+    "day": "WuYin",
+    "seed": -416692719,
+    "score": 71,
+    "verdict": "Favorable",
+    "headline": "The omen leans your way.",
+    "summary": "The dream showed Tiger (虎) on the Yin mountain (Yin) under the Azure Dragon — Wood. The omen joins the frame the day Yin already carries, which is why it feels familiar rather than strange. You woke in the Mao hour, which stands under Jade Hall — a gentle hour to carry the rest of the day.",
+    "sunPalace": "Qian",
+    "wealthElement": "Water",
+    "natalPalace": "Zi",
+    "insights": ["The day's own plate: WuYin in WuXu, under Stabilise, with the sun in the Qian mountain (Metal).", "The main omen is Tiger (虎), branch Yin, element Wood. A dream's image is read as a sign, not as a thing that will happen.", "Also in the dream: north, table, money. Each one sits on its own mountain; the reading follows the main one.", "Money in a dream is the one omen the tradition never hedges: it points at the wealth element, and at what the day is doing to it.", "The score is 71 out of 100 — favorable. It comes from the factors below, not from the dream's feeling."],
+    "advice": ["Read the omen as the day's weather, not as a forecast. The plate says what kind of day it is; it does not say what will happen to you.", "If the dream pointed somewhere, that direction is the useful part: North-East is where this day leans.", "Write the dream down while it is fresh. The images fade within a day, and the plate needs the image, not the mood.", "Your year sign is measured against the omen as well — set it on the home screen and the reading sharpens."],
+    "factors": [{"label": "The omen joins the day's own frame", "delta": 5}, {"label": "The omen has the edge over the day", "delta": 3}, {"label": "The dream points at the wealth direction", "delta": 4}, {"label": "The hour is under Jade Hall", "delta": 3}, {"label": "The dream shows the sign of money", "delta": 6}],
+    "tokens": [
+      {
+        "term": "Tiger",
+        "chinese": "虎",
+        "kind": "CREATURE",
+        "palace": "Yin",
+        "bearing": 60,
+        "principal": true
+      },
+      {
+        "term": "North",
+        "chinese": "Zi",
+        "kind": "DIRECTION",
+        "palace": "Zi",
+        "bearing": 0,
+        "principal": false
+      },
+      {
+        "term": "Table",
+        "chinese": "土",
+        "kind": "NATURE",
+        "palace": "Chen",
+        "bearing": 120,
+        "principal": false
+      },
+      {
+        "term": "Money",
+        "chinese": "财",
+        "kind": "WEALTH",
+        "palace": "You",
+        "bearing": 270,
+        "principal": false
+      }
+    ]
+  },
   "modules": [
     {
       "title": "Today's Fortune",

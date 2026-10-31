@@ -1,0 +1,97 @@
+date	text	tokens	omen	omenBranch	hour	score	deltas
+2026-01-05	A black snake by a river in the south, at dawn.	CREATURE:Snake:Si|DIRECTION:South:Wu|NATURE:River:|COLOUR:Black:	Snake	Si	Mao	50	3|-3|3|-3
+2026-01-05	I dreamt of a tiger in a northern forest.	CREATURE:Tiger:Yin|DIRECTION:Northern:Zi|NATURE:Forest:	Tiger	Yin		67	5|5|3|4
+2026-01-05	Money on a table, and the smell of smoke.	NATURE:Table:|WEALTH:Money:	Money			65	5|6|4
+2026-01-05	Falling from a great height into water.	NATURE:Water:	Water			49	-5|4
+2026-01-05	A house of stone with a red door.	NATURE:Stone:|COLOUR:Red:	Red			57	3|4
+2026-01-05	Three white horses running east.	CREATURE:Horses:Wu|DIRECTION:East:Mao|COLOUR:White:|NUMBER:Three:Yin	Horses	Wu		53	3
+2026-01-05	I was late for work and the road was uphill.	NATURE:Road:	Road			58	4|4
+2026-01-05	A green dragon over the sea at midnight.	CREATURE:Dragon:Chen|NATURE:Sea:|COLOUR:Green:	Dragon	Chen	Zi	49	-4|-4|4|3
+2026-01-05	Nothing happened. Just a grey room.	NATURE:Room:|COLOUR:Grey:	Grey			59	5|4
+2026-01-05	An old dog followed me to the west.	CREATURE:Dog:Xu|DIRECTION:West:You	Dog	Xu		60	8|4|-6|4
+2026-01-05	A yellow bird, coins, and a long climb.	NATURE:Coins:|COLOUR:Yellow:	Yellow			58	4|4
+2026-01-05	I walked through a bamboo grove under a bright moon.	NATURE:Bamboo:	Bamboo			57	3|4
+2026-03-21	A black snake by a river in the south, at dawn.	CREATURE:Snake:Si|DIRECTION:South:Wu|NATURE:River:|COLOUR:Black:	Snake	Si	Mao	62	5|5|5|-3
+2026-03-21	I dreamt of a tiger in a northern forest.	CREATURE:Tiger:Yin|DIRECTION:Northern:Zi|NATURE:Forest:	Tiger	Yin		48	4|-6
+2026-03-21	Money on a table, and the smell of smoke.	NATURE:Table:|WEALTH:Money:	Money			63	3|6|4
+2026-03-21	Falling from a great height into water.	NATURE:Water:	Water			57	3|4
+2026-03-21	A house of stone with a red door.	NATURE:Stone:|COLOUR:Red:	Red			59	5|4
+2026-03-21	Three white horses running east.	CREATURE:Horses:Wu|DIRECTION:East:Mao|COLOUR:White:|NUMBER:Three:Yin	Horses	Wu		65	5|5|5
+2026-03-21	I was late for work and the road was uphill.	NATURE:Road:	Road			49	-5|4
+2026-03-21	A green dragon over the sea at midnight.	CREATURE:Dragon:Chen|NATURE:Sea:|COLOUR:Green:	Dragon	Chen	Zi	44	-5|-4|3
+2026-03-21	Nothing happened. Just a grey room.	NATURE:Room:|COLOUR:Grey:	Grey			57	3|4
+2026-03-21	An old dog followed me to the west.	CREATURE:Dog:Xu|DIRECTION:West:You	Dog	Xu		59	5|5|-5|4
+2026-03-21	A yellow bird, coins, and a long climb.	NATURE:Coins:|COLOUR:Yellow:	Yellow			49	-5|4
+2026-03-21	I walked through a bamboo grove under a bright moon.	NATURE:Bamboo:	Bamboo			58	4|4
+2026-06-15	A black snake by a river in the south, at dawn.	CREATURE:Snake:Si|DIRECTION:South:Wu|NATURE:River:|COLOUR:Black:	Snake	Si	Mao	69	8|3|5|3
+2026-06-15	I dreamt of a tiger in a northern forest.	CREATURE:Tiger:Yin|DIRECTION:Northern:Zi|NATURE:Forest:	Tiger	Yin		32	-9|-4|-5
+2026-06-15	Money on a table, and the smell of smoke.	NATURE:Table:|WEALTH:Money:	Money			64	4|6|4
+2026-06-15	Falling from a great height into water.	NATURE:Water:	Water			59	5|4
+2026-06-15	A house of stone with a red door.	NATURE:Stone:|COLOUR:Red:	Red			57	3|4
+2026-06-15	Three white horses running east.	CREATURE:Horses:Wu|DIRECTION:East:Mao|COLOUR:White:|NUMBER:Three:Yin	Horses	Wu		57	3|4
+2026-06-15	I was late for work and the road was uphill.	NATURE:Road:	Road			57	3|4
+2026-06-15	A green dragon over the sea at midnight.	CREATURE:Dragon:Chen|NATURE:Sea:|COLOUR:Green:	Dragon	Chen	Zi	56	3|3
+2026-06-15	Nothing happened. Just a grey room.	NATURE:Room:|COLOUR:Grey:	Grey			58	4|4
+2026-06-15	An old dog followed me to the west.	CREATURE:Dog:Xu|DIRECTION:West:You	Dog	Xu		54	3|-3|4
+2026-06-15	A yellow bird, coins, and a long climb.	NATURE:Coins:|COLOUR:Yellow:	Yellow			57	3|4
+2026-06-15	I walked through a bamboo grove under a bright moon.	NATURE:Bamboo:	Bamboo			49	-5|4
+2026-09-01	A black snake by a river in the south, at dawn.	CREATURE:Snake:Si|DIRECTION:South:Wu|NATURE:River:|COLOUR:Black:	Snake	Si	Mao	49	-4|3|-3|3
+2026-09-01	I dreamt of a tiger in a northern forest.	CREATURE:Tiger:Yin|DIRECTION:Northern:Zi|NATURE:Forest:	Tiger	Yin		62	5|3|4
+2026-09-01	Money on a table, and the smell of smoke.	NATURE:Table:|WEALTH:Money:	Money			65	5|6|4
+2026-09-01	Falling from a great height into water.	NATURE:Water:	Water			49	-5|4
+2026-09-01	A house of stone with a red door.	NATURE:Stone:|COLOUR:Red:	Red			57	3|4
+2026-09-01	Three white horses running east.	CREATURE:Horses:Wu|DIRECTION:East:Mao|COLOUR:White:|NUMBER:Three:Yin	Horses	Wu		53	3
+2026-09-01	I was late for work and the road was uphill.	NATURE:Road:	Road			58	4|4
+2026-09-01	A green dragon over the sea at midnight.	CREATURE:Dragon:Chen|NATURE:Sea:|COLOUR:Green:	Dragon	Chen	Zi	57	4|3
+2026-09-01	Nothing happened. Just a grey room.	NATURE:Room:|COLOUR:Grey:	Grey			59	5|4
+2026-09-01	An old dog followed me to the west.	CREATURE:Dog:Xu|DIRECTION:West:You	Dog	Xu		58	4|4
+2026-09-01	A yellow bird, coins, and a long climb.	NATURE:Coins:|COLOUR:Yellow:	Yellow			58	4|4
+2026-09-01	I walked through a bamboo grove under a bright moon.	NATURE:Bamboo:	Bamboo			57	3|4
+2026-11-11	A black snake by a river in the south, at dawn.	CREATURE:Snake:Si|DIRECTION:South:Wu|NATURE:River:|COLOUR:Black:	Snake	Si	Mao	47	3|-3|-3
+2026-11-11	I dreamt of a tiger in a northern forest.	CREATURE:Tiger:Yin|DIRECTION:Northern:Zi|NATURE:Forest:	Tiger	Yin		57	3|4
+2026-11-11	Money on a table, and the smell of smoke.	NATURE:Table:|WEALTH:Money:	Money			65	5|6|4
+2026-11-11	Falling from a great height into water.	NATURE:Water:	Water			49	-5|4
+2026-11-11	A house of stone with a red door.	NATURE:Stone:|COLOUR:Red:	Red			57	3|4
+2026-11-11	Three white horses running east.	CREATURE:Horses:Wu|DIRECTION:East:Mao|COLOUR:White:|NUMBER:Three:Yin	Horses	Wu		49	-4|3
+2026-11-11	I was late for work and the road was uphill.	NATURE:Road:	Road			58	4|4
+2026-11-11	A green dragon over the sea at midnight.	CREATURE:Dragon:Chen|NATURE:Sea:|COLOUR:Green:	Dragon	Chen	Zi	72	5|5|4|5|3
+2026-11-11	Nothing happened. Just a grey room.	NATURE:Room:|COLOUR:Grey:	Grey			59	5|4
+2026-11-11	An old dog followed me to the west.	CREATURE:Dog:Xu|DIRECTION:West:You	Dog	Xu		58	4|4
+2026-11-11	A yellow bird, coins, and a long climb.	NATURE:Coins:|COLOUR:Yellow:	Yellow			58	4|4
+2026-11-11	I walked through a bamboo grove under a bright moon.	NATURE:Bamboo:	Bamboo			57	3|4
+2027-02-04	A black snake by a river in the south, at dawn.	CREATURE:Snake:Si|DIRECTION:South:Wu|NATURE:River:|COLOUR:Black:	Snake	Si	Mao	48	-4|5|-3
+2027-02-04	I dreamt of a tiger in a northern forest.	CREATURE:Tiger:Yin|DIRECTION:Northern:Zi|NATURE:Forest:	Tiger	Yin		59	5|4
+2027-02-04	Money on a table, and the smell of smoke.	NATURE:Table:|WEALTH:Money:	Money			63	3|6|4
+2027-02-04	Falling from a great height into water.	NATURE:Water:	Water			57	3|4
+2027-02-04	A house of stone with a red door.	NATURE:Stone:|COLOUR:Red:	Red			59	5|4
+2027-02-04	Three white horses running east.	CREATURE:Horses:Wu|DIRECTION:East:Mao|COLOUR:White:|NUMBER:Three:Yin	Horses	Wu		55	5
+2027-02-04	I was late for work and the road was uphill.	NATURE:Road:	Road			49	-5|4
+2027-02-04	A green dragon over the sea at midnight.	CREATURE:Dragon:Chen|NATURE:Sea:|COLOUR:Green:	Dragon	Chen	Zi	48	-5|3
+2027-02-04	Nothing happened. Just a grey room.	NATURE:Room:|COLOUR:Grey:	Grey			57	3|4
+2027-02-04	An old dog followed me to the west.	CREATURE:Dog:Xu|DIRECTION:West:You	Dog	Xu		49	-5|4
+2027-02-04	A yellow bird, coins, and a long climb.	NATURE:Coins:|COLOUR:Yellow:	Yellow			49	-5|4
+2027-02-04	I walked through a bamboo grove under a bright moon.	NATURE:Bamboo:	Bamboo			58	4|4
+2027-05-20	A black snake by a river in the south, at dawn.	CREATURE:Snake:Si|DIRECTION:South:Wu|NATURE:River:|COLOUR:Black:	Snake	Si	Mao	34	-9|-4|3|-3|-3
+2027-05-20	I dreamt of a tiger in a northern forest.	CREATURE:Tiger:Yin|DIRECTION:Northern:Zi|NATURE:Forest:	Tiger	Yin		70	8|5|3|4
+2027-05-20	Money on a table, and the smell of smoke.	NATURE:Table:|WEALTH:Money:	Money			65	5|6|4
+2027-05-20	Falling from a great height into water.	NATURE:Water:	Water			49	-5|4
+2027-05-20	A house of stone with a red door.	NATURE:Stone:|COLOUR:Red:	Red			57	3|4
+2027-05-20	Three white horses running east.	CREATURE:Horses:Wu|DIRECTION:East:Mao|COLOUR:White:|NUMBER:Three:Yin	Horses	Wu		49	-4|3
+2027-05-20	I was late for work and the road was uphill.	NATURE:Road:	Road			58	4|4
+2027-05-20	A green dragon over the sea at midnight.	CREATURE:Dragon:Chen|NATURE:Sea:|COLOUR:Green:	Dragon	Chen	Zi	57	4|3
+2027-05-20	Nothing happened. Just a grey room.	NATURE:Room:|COLOUR:Grey:	Grey			59	5|4
+2027-05-20	An old dog followed me to the west.	CREATURE:Dog:Xu|DIRECTION:West:You	Dog	Xu		54	-4|4|4
+2027-05-20	A yellow bird, coins, and a long climb.	NATURE:Coins:|COLOUR:Yellow:	Yellow			58	4|4
+2027-05-20	I walked through a bamboo grove under a bright moon.	NATURE:Bamboo:	Bamboo			57	3|4
+2027-08-08	A black snake by a river in the south, at dawn.	CREATURE:Snake:Si|DIRECTION:South:Wu|NATURE:River:|COLOUR:Black:	Snake	Si	Mao	47	3|-3|-3
+2027-08-08	I dreamt of a tiger in a northern forest.	CREATURE:Tiger:Yin|DIRECTION:Northern:Zi|NATURE:Forest:	Tiger	Yin		57	3|4
+2027-08-08	Money on a table, and the smell of smoke.	NATURE:Table:|WEALTH:Money:	Money			65	5|6|4
+2027-08-08	Falling from a great height into water.	NATURE:Water:	Water			49	-5|4
+2027-08-08	A house of stone with a red door.	NATURE:Stone:|COLOUR:Red:	Red			57	3|4
+2027-08-08	Three white horses running east.	CREATURE:Horses:Wu|DIRECTION:East:Mao|COLOUR:White:|NUMBER:Three:Yin	Horses	Wu		61	8|3
+2027-08-08	I was late for work and the road was uphill.	NATURE:Road:	Road			58	4|4
+2027-08-08	A green dragon over the sea at midnight.	CREATURE:Dragon:Chen|NATURE:Sea:|COLOUR:Green:	Dragon	Chen	Zi	53	-4|4|3
+2027-08-08	Nothing happened. Just a grey room.	NATURE:Room:|COLOUR:Grey:	Grey			59	5|4
+2027-08-08	An old dog followed me to the west.	CREATURE:Dog:Xu|DIRECTION:West:You	Dog	Xu		58	4|4
+2027-08-08	A yellow bird, coins, and a long climb.	NATURE:Coins:|COLOUR:Yellow:	Yellow			58	4|4
+2027-08-08	I walked through a bamboo grove under a bright moon.	NATURE:Bamboo:	Bamboo			57	3|4
