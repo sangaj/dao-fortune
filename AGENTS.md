@@ -73,6 +73,19 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\qa\verify_release.ps1 
 - **The forward scan is free.** The Favourable Days list (date, score, one-line verdict) costs
   nothing; opening the full reading of any day still goes through the normal free-reading-then-paywall
   path.
+- **Billing must never fail silently.** Every Play call has to check its response code, and a dropped
+  connection has to be retried with the backoff in `billing/ReconnectPolicy.kt` (2s, 4s, 8s, 16s,
+  then 30s, six attempts). `ReconnectPolicy` is pure Kotlin on purpose — it is unit tested
+  (`ReconnectPolicyTest`). Do not put Play types into it.
+- **The ownership check runs on every connection.** `BillingManager.checkOwnership()` is what makes a
+  purchase that completed while the app was closed still unlock the app. Do not remove it as
+  "redundant" — it is the only path that catches a settled pending purchase.
+- **The privacy policy has two forms and they must agree.** `docs/PRIVACY_POLICY.md` is the source;
+  `docs/privacy-policy.html` is what gets hosted. After editing the Markdown run
+  `python tools/docs/make_privacy_html.py`; the release gate fails if the HTML is stale.
+- **The keystore must never be committed.** `.gitignore` excludes `keystore.properties` and `*.jks`;
+  the release gate also checks that git is not tracking them. `dist/` is ignored too — the bundle and
+  the source zip are rebuilt, not committed.
 
 ## Store material
 
@@ -122,5 +135,7 @@ tested on this machine, so the billing dependency graph stays untouched.
   compiler runs in-process. Do not raise the heap.
 - No emulator and no device is available: the UI is verified by Robolectric smoke tests and by
   code-rendered store screenshots, not by a real device.
+- **Git is portable too**: `E:\Minimax\toolchain\git\cmd\git.exe` (2.56). Put that directory on
+  `PATH` before using `git`, and note that the system has no `git` of its own.
 - `keystore.properties` must stay **UTF-8 without a BOM**. A BOM makes Java's `Properties` read
   the first key as `﻿storeFile`, and the release bundle is then silently left unsigned.

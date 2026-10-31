@@ -31,14 +31,14 @@ of them has drifted.
 ```powershell
 Set-Location E:\Minimax\dao-fortune
 python tools\reference\luopan_reference.py       # SELF-CHECK: ALL PASS, rewrites the golden TSVs
-.\gradlew.bat :app:testDebugUnitTest             # 31 tests
+.\gradlew.bat :app:testDebugUnitTest             # 37 tests
 ```
 
 `SampleReadingDump` also writes `docs/store/reading_sample.json` — the real output the store
 screenshots are rendered from. Run the tests before regenerating the screenshots, never edit that file
 by hand.
 
-**Expected:** `EngineTest` 25, `SampleReadingDump` 1, `ScreenshotTest` 5, zero failures.
+**Expected:** `EngineTest` 25, `SampleReadingDump` 1, `ScreenshotTest` 5, `ReconnectPolicyTest` 6, zero failures.
 
 ### 1.2 Lint
 
@@ -84,11 +84,23 @@ same cache; a helper that assembles the classpath lives at `tools/qa/bundletool_
 ```powershell
 & 'E:\Minimax\toolchain\jdk17\bin\keytool.exe' -printcert -jarfile dist\app-release.aab
 ```
-
 `META-INF/DAO-FORT.SF`, `META-INF/DAO-FORT.RSA` and `META-INF/MANIFEST.MF` must be present in the zip,
 and the certificate must be `CN=Dao Fortune` and valid past **22 October 2033** (Play's requirement).
 
-### 1.5 Deliverable packaging
+### 1.5 16 KB page size
+
+Android 15+ requires apps targeting API 35 or later to support 16 KB page sizes. The app is written in
+Kotlin and has no native code of its own, but the bundle still carries
+`libandroidx.graphics.path.so` (from Compose) for four ABIs — so the alignment is **checked**, not
+assumed:
+
+```powershell
+python tools\qa\check_16kb_pages.py dist\app-release.aab
+```
+
+Every PT_LOAD segment must report `p_align = 0x4000` (16 KB). This runs inside the release gate.
+
+### 1.6 Deliverable packaging
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\release\package_release.ps1
@@ -151,37 +163,54 @@ production.
 
 | # | Action | Expected |
 |---|---|---|
-| 23 | Tap the ▶ chevron | The plate moves to tomorrow; the header shows the new date, and the reading says "that day", never "today" |
-| 24 | Tap ◀ repeatedly | The plate walks back day by day; a past date is read the same way as a future one |
-| 25 | Open the calendar | A date picker opens; picking any date loads that day's plate |
-| 26 | Tap a day in **Favourable Days** | That date is selected and its plate is drawn |
-| 27 | Check the list itself | Five days, ranked best first, each with its day pillar, solar term, score and one-line verdict |
-| 28 | Pick the top day | The date selector jumps to it; the windfall score on the plate matches the list |
-| 29 | Check the hour | On a chosen date the reading has **no hour** — no hour pillar, no hour-officers, no hour windows |
+| 15 | Tap the ▶ chevron | The plate moves to tomorrow; the header shows the new date, and the reading says "that day", never "today" |
+| 16 | Tap ◀ repeatedly | The plate walks back day by day; a past date is read the same way as a future one |
+| 17 | Open the calendar | A date picker opens; picking any date loads that day's plate |
+| 18 | Tap a day in **Favourable Days** | That date is selected and its plate is drawn |
+| 19 | Check the list itself | Five days, ranked best first, each with its day pillar, solar term, score and one-line verdict |
+| 20 | Pick the top day | The date selector jumps to it; the windfall score on the plate matches the list |
+| 21 | Check the hour | On a chosen date the reading has **no hour** — no hour pillar, no hour-officers, no hour windows |
 
 ### 2.5 The year sign
 
 | # | Action | Expected |
 |---|---|---|
-| 30 | Open the year-sign sheet | Twelve zodiac branches, one tap each; no date of birth is asked for anywhere |
-| 31 | Pick one | The plate draws your sign as a hollow ring; the readings gain the harmony / triad / clash / harm note |
-| 32 | Change it | The readings change immediately; the ring moves to the new mountain |
-| 33 | Clear it | The ring disappears and the readings return to the unpersonalised form |
-| 34 | Check what was stored | One integer in `dao_fortune_profile.xml`; nothing in `dao_fortune_access.xml` |
-| 35 | Check the backup | The year sign is **not** in the allow-list: after a device-to-device transfer it is gone, while the purchase unlock survives |
+| 22 | Open the year-sign sheet | Twelve zodiac branches, one tap each; no date of birth is asked for anywhere |
+| 23 | Pick one | The plate draws your sign as a hollow ring; the readings gain the harmony / triad / clash / harm note |
+| 24 | Change it | The readings change immediately; the ring moves to the new mountain |
+| 25 | Clear it | The ring disappears and the readings return to the unpersonalised form |
+| 26 | Check what was stored | One integer in `dao_fortune_profile.xml`; nothing in `dao_fortune_access.xml` |
+| 27 | Check the backup | The year sign is **not** in the allow-list: after a device-to-device transfer it is gone, while the purchase unlock survives |
 
 ### 2.6 Edge cases
 
 | # | Check | How |
 |---|---|---|
-| 36 | Airplane mode | App opens and reads the plate; only the purchase needs the network |
-| 37 | Another time zone | `adb shell service call alarm 3 s16 Asia/Tokyo` or change it in Settings; the pillars must follow |
-| 38 | 12-hour clock | Change the system clock format; the header must still read correctly |
-| 39 | Wrong clock | Set the clock forward a day; the plate must follow the device clock (the app does not use a server time) |
-| 40 | Dark / light mode | Both themes render; the dial stays readable |
-| 41 | Clear app data | The free reading comes back — expected and documented |
-| 42 | Font scale | Set the system font size to the largest; nothing must be clipped |
-| 43 | Tablet / foldable | Resize the window; the layout must not break |
+| 28 | Airplane mode | App opens and reads the plate; only the purchase needs the network |
+| 29 | Another time zone | `adb shell service call alarm 3 s16 Asia/Tokyo` or change it in Settings; the pillars must follow |
+| 30 | 12-hour clock | Change the system clock format; the header must still read correctly |
+| 31 | Wrong clock | Set the clock forward a day; the plate must follow the device clock (the app does not use a server time) |
+| 32 | Dark / light mode | Both themes render; the dial stays readable |
+| 33 | Clear app data | The free reading comes back — expected and documented |
+| 34 | Font scale | Set the system font size to the largest; nothing must be clipped |
+| 35 | Tablet / foldable | Resize the window; the layout must not break |
+
+### 2.7 Billing under a bad connection
+
+This is the part that cannot be proven on this machine at all, and it is where the reconnector earns
+its keep.
+
+| # | Action | Expected |
+|---|---|---|
+| 36 | Open the paywall in airplane mode | The sheet says Play could not be reached — it must **not** pretend there is no purchase |
+| 37 | Turn the network back on | The app reconnects on its own (backoff of 2s, 4s, 8s, 16s, then 30s) and the price appears without a restart |
+| 38 | Watch the paywall during the retry | "Play connection lost — retrying in Ns (attempt N)" — the reader can see it is working |
+| 39 | Tap **Restore purchase** with no network | A clear error, not silence |
+| 40 | Tap **Restore purchase** on an account that bought nothing | "No previous purchase found on this Google account" — and no crash |
+| 41 | Buy, then force-stop the app, then reopen | The app is still unlocked: the ownership check runs on every connection |
+| 42 | Buy on one device, install on another | The second device unlocks on first launch, from Play's record |
+| 43 | Read the first free reading | A banner appears on the home screen saying the free reading has been used — and it can be dismissed |
+| 44 | Airplane mode, then try to buy | The purchase sheet does not open; the failure is reported |
 
 ---
 
@@ -214,16 +243,20 @@ Everything below must be true before an upload. If any line is unchecked, stop.
 | Gate | How to verify | Status |
 |---|---|---|
 | Engine parity green | `python tools\reference\luopan_reference.py` → ALL PASS | ☐ |
-| Unit tests green | `:app:testDebugUnitTest` → 31/31 | ☐ |
+| Unit tests green | `:app:testDebugUnitTest` → 37/37 | ☐ |
 | Lint has zero errors | `:app:lintRelease` → `app/build/reports/lint-results-release.txt` | ☐ |
 | Bundle validates | `bundletool validate` → exit 0 | ☐ |
+| 16 KB page size | `python tools\qa\check_16kb_pages.py dist\app-release.aab` → PASSED | ☐ |
 | Manifest correct | package / versionCode / minSdk 26 / targetSdk 36 / no location permission | ☐ |
 | Signature present and valid | `keytool -printcert` | ☐ |
 | Source zip has no secrets | no `keystore.properties`, no `.jks` | ☐ |
 | Store folder is clean | `docs/store/screenshots/` holds exactly 5 PNGs | ☐ |
+| Privacy policy page is current | `python tools\docs\make_privacy_html.py --check` | ☐ |
 | Copy matches the app | free previews / first free reading / one-off unlock / year sign described the same way in the listing, the privacy policy and in-app | ☐ |
 | Real-device pass done | Layer 2 complete, including the purchase | ☐ |
-| Keystore safe | `dao-fortune-release.jks` + `keystore.properties` backed up somewhere private | ☐ |
+| Keystore safe | `dao-fortune-release.jks` + `keystore.properties` backed up **off this machine** | ☐ |
+| Play App Signing | enrolled in Play Console → App integrity | ☐ |
+| Everything committed | `git status` clean, `git push` done | ☐ |
 
 ---
 

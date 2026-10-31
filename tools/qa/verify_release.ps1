@@ -138,6 +138,23 @@ if (Test-Path $srcZip) {
 }
 
 Write-Output ''
+Write-Output '=== 6. Public policy page and version control ==='
+
+# The hosted policy page must not drift from the Markdown it is generated from.
+$policyCheck = & python 'tools\docs\make_privacy_html.py' --check 2>&1 | Out-String
+Check 'privacy policy page is up to date' ($LASTEXITCODE -eq 0) ($policyCheck.Trim() -split "`n" | Select-Object -First 1)
+
+# The signing key must never be in git, not even in a private repository.
+$gitExe = 'E:\Minimax\toolchain\git\cmd\git.exe'
+if (Test-Path $gitExe) {
+    $tracked = & $gitExe ls-files 2>$null
+    Check 'git tracks no keystore' (-not ($tracked -match 'keystore\.properties$|\.jks$')) `
+        ("{0} tracked files" -f ($tracked | Measure-Object).Count)
+} else {
+    Write-Output '[SKIP] git not found - could not check that the keystore is untracked'
+}
+
+Write-Output ''
 if ($failures.Count -eq 0) {
     Write-Output 'ALL CHECKS PASSED'
     exit 0

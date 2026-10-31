@@ -181,8 +181,26 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\qa\verify_release.ps1
 ```
 
 Runs the Python reference self-check, the unit tests, lint, `bundletool validate`, the manifest
-assertions, the signature check and the store/source-package checks in one go. `docs\TESTING.md`
-describes the full three-layer plan, including the part that has to be done on a real phone.
+assertions, the 16 KB page-size check, the signature check and the store/source-package checks in one
+go. `docs\TESTING.md` describes the full three-layer plan, including the part that has to be done on
+a real phone.
+
+### Version control
+
+The project is a git repository on `main`. Git is portable here too:
+
+```powershell
+$env:PATH = "E:\Minimax\toolchain\git\cmd;$env:PATH"
+cd E:\Minimax\dao-fortune
+git status
+git add -A
+git commit -m "v1.0.1: …"
+git push
+```
+
+`keystore.properties`, `*.jks`, `build/` and `dist/` are ignored — the signing key never enters the
+repository, and the release artifacts are rebuilt by `tools/release/package_release.ps1` rather than
+being committed.
 
 ### Signing
 
@@ -196,7 +214,12 @@ keyPassword=…
 ```
 
 That file and the `.jks` are in `.gitignore`. **Keep the keystore safe — if you lose it you can never
-update the app on Play under this listing.** Generate your own with:
+update the app on Play under this listing**, unless you have enrolled for
+[Play App Signing](https://support.google.com/googleplay/android-developer/answer/9842756) (Google
+then holds the app signing key and can reset your upload key from Play Console). A second copy of the
+key is kept at `E:\Minimax\dao-fortune-backup\` with a README that lists the fingerprint — but a copy
+on the same drive is not an offline backup, so move it to encrypted removable media and a password
+manager.
 
 ```bash
 keytool -genkeypair -v -keystore my-release.jks -alias my-alias \
@@ -220,14 +243,20 @@ A validity of 10950 days (30 years) is required: Play requires the signing key t
 2. **Create the one-off product** `dao_fortune_full_access` (in-app products, not a subscription).
    The id must match `BillingManager.PRODUCT_ID`.
 3. **Target API 36** is mandatory for new listings since August 2026 — this project already targets it.
-4. **Privacy policy** — `docs/PRIVACY_POLICY.md` is the source; host it on a public URL and link it in
-   Play Console → App content → Privacy policy.
-5. **Data safety** — answer *no data collected* and *no data shared*. The purchase is processed by
+4. **Enrol for Play App Signing** (App integrity → App signing key). Google then holds the app
+   signing key and can reset your upload key if it is ever lost — which removes the single worst
+   failure mode of the whole release.
+5. **Privacy policy** — `docs/PRIVACY_POLICY.md` is the source; `docs/privacy-policy.html` is the
+   hosted page generated from it (`python tools/docs/make_privacy_html.py`). Publish the HTML on a
+   public URL — GitHub Pages with the `docs` folder as the source works — and paste that URL into
+   Play Console → App content → Privacy policy. The developer contact is
+   `gubingjing@hotmail.com`.
+6. **Data safety** — answer *no data collected* and *no data shared*. The purchase is processed by
    Google Play, which is disclosed in the privacy policy. The optional year sign is a device-local
    preference, excluded from backup and never transmitted, so it is not collected data.
-6. **Listing copy** — `docs/PLAY_STORE_LISTING.md` contains the title, short and full descriptions,
+7. **Listing copy** — `docs/PLAY_STORE_LISTING.md` contains the title, short and full descriptions,
    release notes and the store settings checklist.
-7. **Graphics** — `docs/store/icon_512.png` (512×512) and `docs/store/feature_graphic_1024x500.png`
+8. **Graphics** — `docs/store/icon_512.png` (512×512) and `docs/store/feature_graphic_1024x500.png`
    are generated from code by `tools/store_assets/build_assets.ps1`.
 
 ### Why the app shows the verdict free
