@@ -157,7 +157,8 @@ production.
 | # | Action | Expected |
 |---|---|---|
 | 12 | Fresh install, before paying | All five cards show a verdict line and a `PREVIEW` tag |
-| 13 | Locked cards | Lock icon, no score |
+| 12a | Open **Today's Fortune** without paying | The full reading opens — score, factors, hours, advice — and the free-reading counter is untouched |
+| 13 | Locked cards (the other four, after the free reading is spent) | Lock icon, no score; Today's Fortune never locks |
 | 14 | After unlocking | Scores appear on every card, `PREVIEW` tag gone |
 
 ### 2.4 Looking ahead — the date selector and the forward scan

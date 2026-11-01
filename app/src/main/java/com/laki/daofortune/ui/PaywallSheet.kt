@@ -72,7 +72,7 @@ fun PaywallSheet(
                     .padding(16.dp)
             ) {
                 listOf(
-                    "All five modules: overall fortune, windfall, love, career and body",
+                    "Windfall, love, career and body in full — Today's Fortune stays free",
                     "The complete luopan plate every day, with the sun's mountain",
                     "Every favourable double-hour, with the reason for each score",
                     "The full factor breakdown behind every reading",

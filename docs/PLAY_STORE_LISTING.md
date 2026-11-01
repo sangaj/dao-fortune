@@ -75,16 +75,17 @@ Dao Fortune stores no personal data. It never asks for your name, your date of b
 A NOTE ON WHAT THIS IS
 Dao Fortune is a cultural and entertainment product built on classical Chinese divination — not financial, medical, legal, investment or psychological advice. It promises no outcome and should not be used for financial decisions. You remain responsible for your own choices.
 
-Your first reading is free. One payment unlocks every module, every day — no subscription.
+Today's Fortune is free every day, in full. Your first reading of each other module is free too. One payment unlocks everything, every day — no subscription.
 ```
 
 *(3912 characters. Play caps the full description at 4000 — the Dream & Omens section is
 new in this release, so the copy was tightened to fit. Keep it under.)*
 
-The last two lines cover the paywall model in the listing itself. Keep them accurate: the app shows the
-**verdict line of all five readings for free**, and the first *full* reading (score, factors, advice,
-hours) is free as well. If you ever change that balance, change this copy with it — Play's
-deceptive-behaviour policy is easier to defend when the listing says exactly what the app does.
+The last two lines cover the paywall model in the listing itself. Keep them accurate: **Today's
+Fortune (the overall module) is free every day, in full** — score, factors, advice and hours — and
+the first *full* reading of each other module is free as well. If you ever change that balance,
+change this copy with it — Play's deceptive-behaviour policy is easier to defend when the listing
+says exactly what the app does.
 
 ---
 
@@ -131,7 +132,7 @@ First release.
 • Your year sign personalises every reading.
 • Every double-hour scored.
 • Each reading shows the factors behind its score.
-• All five verdicts free; first full reading free too.
+• Today's Fortune free every day, in full; first reading of each other module free too.
 • One-off unlock via Google Play. No subscription.
 ```
 
@@ -141,7 +142,7 @@ First release.
 
 ## Store listing notes (internal, not for the listing)
 
-- The free-reading mechanic ("first reading free, every later reading paid") is a **one-off in-app product**, so Play Billing is used. Do not also list the app as a paid app — one model only.
+- The free-reading mechanic ("Today's Fortune always free in full; first reading of each other module free, every later reading paid") is a **one-off in-app product**, so Play Billing is used. Do not also list the app as a paid app — one model only.
 - Google Play's *Deceptive Behaviour* policy restricts fortune-telling apps that promise outcomes. The listing and the in-app copy avoid guarantees ("the plate says", "the reading points to"), and both the listing and the About sheet carry the entertainment/advice disclaimer. Keep that wording if the listing is edited.
 - The Data safety form should answer **"No data collected"** and **"No data shared"**. The purchase is handled by Google Play, which is documented in the privacy policy as a third party.
 - The privacy policy must be hosted on a public URL and linked from Play Console → App content → Privacy policy. `docs/PRIVACY_POLICY.md` is the source; host it on GitHub Pages or the developer site.

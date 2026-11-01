@@ -209,7 +209,13 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         _ui.update { it.copy(notifyEnabled = enabled) }
     }
 
-    /** Opens a module. The first reading is free; later ones need the unlock. */
+    /**
+     * Opens a module.
+     *
+     * Today's Fortune is always free — every day, in full. The other four
+     * modules keep the old rule: the first reading is free, later ones need
+     * the unlock.
+     */
     fun open(module: FortuneModule) {
         val state = _ui.value
         val key = ReadingKey(state.selectedDate, module)
@@ -217,12 +223,13 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             _ui.update { current -> current.copy(selected = key) }
             return
         }
-        if (!access.canRead()) {
+        val alwaysFree = module == FortuneModule.OVERALL
+        if (!alwaysFree && !access.canRead()) {
             _ui.update { current -> current.copy(pendingModule = module, showPaywall = true) }
             return
         }
         val reading = FortuneEngine.reading(state.snapshot, module, state.yearSign?.branch)
-        val spentFree = !access.isUnlocked && !access.freeReadingUsed
+        val spentFree = !alwaysFree && !access.isUnlocked && !access.freeReadingUsed
         if (spentFree) access.consumeFreeReading()
         _ui.update { current ->
             current.copy(

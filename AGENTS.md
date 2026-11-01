@@ -23,10 +23,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\qa\verify_release.ps1 
 ## Invariants that must not drift
 
 - **In-app product id `dao_fortune_full_access`** must match `BillingManager.PRODUCT_ID` and the
-  Play Console product. The app is free to download. The **verdict line of all five modules is
-  free**, the **first full reading is free**, and every later reading needs the one-off unlock
-  (`data/AccessState.kt`, `vm/MainViewModel.kt` for the preview map). If that split changes, change
-  `docs/PLAY_STORE_LISTING.md` with it — the listing describes the paywall model in its own words.
+  Play Console product. The app is free to download. **Today's Fortune (`FortuneModule.OVERALL`) is
+  free every day, in full** — it never spends the free reading and never hits the paywall. Of the
+  other four modules and the dream, the **first full reading is free**, and every later reading
+  needs the one-off unlock (`data/AccessState.kt`, `vm/MainViewModel.kt`). If that split changes,
+  change `docs/PLAY_STORE_LISTING.md` with it — the listing describes the paywall model in its own
+  words.
 - **The price is never hard-coded in the app.** It is $9.99 in every market, set once in Play
   Console; the paywall reads `formattedPrice` from Play Billing. The only literal `$9.99` in the
   repo is in the store screenshot generator and the screenshot test.
@@ -72,8 +74,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\qa\verify_release.ps1 
   "your birth-year branch". The listing, the About sheet and the privacy policy must agree with
   whatever the UI says.
 - **The forward scan is free.** The Favourable Days list (date, score, one-line verdict) costs
-  nothing; opening the full reading of any day still goes through the normal free-reading-then-paywall
-  path.
+  nothing; opening the full reading of any scanned day follows the normal module rule — the overall
+  module is free, the others are first-free-then-paid.
 - **The dream text is never stored, never logged and never transmitted.** It lives in `UiState` while
   the dream sheet is open and is dropped by `MainViewModel.closeDream()`. Do not add a preference, a
   file, a database, a log line or a network call for it. The ink-wash plate is drawn procedurally on
@@ -81,8 +83,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\qa\verify_release.ps1 
   `DreamImage.seed` so the same dream always draws the same plate — there is deliberately **no cloud
   AI image generation**, because a dream is sensitive personal data and uploading it would break the
   "no data collected" promise that the whole app's Play Data safety form rests on.
-- **The dream module obeys the same product rule as the other five.** First reading free, later
-  readings behind the one-off unlock (`readDream()` → paywall → `produceDream()` after the purchase).
+- **The dream module obeys the same product rule as windfall, love, career and body.** First reading
+  free, later readings behind the one-off unlock (`readDream()` → paywall → `produceDream()` after
+  the purchase). Only Today's Fortune is always free.
   It is not a `FortuneModule`: it needs the reader's own words, so it has its own entry card and sheet.
 - **A dream is read against a *day plate*, never a now-plate** — it is a past event and has no hour of
   its own. The double-hour of waking is a separate input (`DreamEngine.branchOfHour`), and the day a

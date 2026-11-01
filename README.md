@@ -55,7 +55,7 @@ procedural and seeded by the dream's own text, so the same dream always draws th
 
 Nothing about the dream leaves the phone: the text is not written to storage, not logged and not sent
 anywhere, no AI service is involved, and closing the sheet erases it. The module follows the same rule
-as the other five — the first reading is free, later readings need the one-off unlock.
+as windfall, love, career and body — the first reading is free, later readings need the one-off unlock.
 
 ![The dream sheet, with the ink-wash plate](docs/store/screenshots/06_dream.png)
 
@@ -303,16 +303,15 @@ A validity of 10950 days (30 years) is required: Play requires the signing key t
 8. **Graphics** — `docs/store/icon_512.png` (512×512) and `docs/store/feature_graphic_1024x500.png`
    are generated from code by `tools/store_assets/build_assets.ps1`.
 
-### Why the app shows the verdict free
+### Why the app shows Today's Fortune free
 
 The reading is computed locally, so the only thing being sold is access to it. The rule is implemented in
-`data/AccessState.kt`:
+`data/AccessState.kt` and `vm/MainViewModel.kt`:
 
-* **All five verdict lines are free.** The home screen shows the one-line verdict of every module
-  (marked `PREVIEW`) before any payment, so the user can see what the plate says and decide on
-  substance rather than on a blind paywall.
-* **The first full reading is free** — score, factors, hours and advice. That is the second click
-  after the free preview.
+* **Today's Fortune is free every day, in full.** The overall module — score, factors, hours and
+  advice — never costs anything and never spends the free reading. It is the daily hook.
+* **The first full reading of each other module is free.** Windfall, love, career, body and the
+  dream: the first one is on the house.
 * **After that, every reading needs the one-off unlock** (`dao_fortune_full_access`, $9.99 in every
   market; the app reads the converted price straight from Play Billing).
 

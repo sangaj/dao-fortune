@@ -218,12 +218,12 @@ fun HomeScreen(
                     if (!unlocked) {
                         Text(
                             if (freeReadingsLeft > 0)
-                                "Your first reading is free — open any module below. After that, " +
-                                    "each reading needs the one-off unlock. The verdicts are free; the " +
-                                    "reasoning behind them is not."
+                                "Today's Fortune is free every day, in full. Your first reading " +
+                                    "of each other module is free too — after that, each one needs " +
+                                    "the one-off unlock."
                             else
-                                "Your free reading has been used. The verdicts below are free; open " +
-                                    "one to see the score, the hours and the reasoning behind it.",
+                                "Today's Fortune is free every day, in full. Your free reading of " +
+                                    "the other modules has been used — open one to unlock it.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -237,7 +237,7 @@ fun HomeScreen(
                     module = module,
                     reading = readings[ReadingKey(selectedDate, module)],
                     preview = previews[module],
-                    locked = !unlocked && freeReadingsLeft == 0 && readings[ReadingKey(selectedDate, module)] == null,
+                    locked = module != FortuneModule.OVERALL && !unlocked && freeReadingsLeft == 0 && readings[ReadingKey(selectedDate, module)] == null,
                     onClick = { onOpen(module) }
                 )
             }

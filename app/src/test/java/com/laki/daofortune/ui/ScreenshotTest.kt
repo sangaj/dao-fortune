@@ -73,7 +73,9 @@ class ScreenshotTest {
                         onSelectDate = {},
                         onSetYearSign = {},
                         onDismissNotice = {},
-                        onAbout = {}
+                        onAbout = {},
+                        notifyEnabled = false,
+                        onToggleNotify = {}
                     )
                 }
             }
@@ -107,7 +109,9 @@ class ScreenshotTest {
                         onSelectDate = {},
                         onSetYearSign = {},
                         onDismissNotice = {},
-                        onAbout = {}
+                        onAbout = {},
+                        notifyEnabled = false,
+                        onToggleNotify = {}
                     )
                 }
             }

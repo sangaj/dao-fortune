@@ -200,8 +200,8 @@ relationships), so 18+ avoids any friction with the advertising ID requirement.
 ### 2.8 App access
 
 All functionality is available without credentials, so leave the app access section empty. If you
-later add a reviewer's shortcut, note that the **first reading is free and every later reading hits
-the paywall** — a reviewer should still be able to see a full reading.
+later add a reviewer's shortcut, note that **Today's Fortune is free in full every day** and the
+first reading of each other module is free — a reviewer should still be able to see a full reading.
 
 ### 2.9 Ads
 
@@ -286,8 +286,9 @@ So: nothing to install. Watch Vitals after each release instead.
    check:
    * the plate shows today's date and the correct solar term
    * all five verdict headlines are visible on the home screen before any payment
-   * the first full reading opens for free
-   * the second reading opens the paywall
+   * **Today's Fortune opens in full for free**, every day, without spending the free reading
+   * the first full reading of each other module opens for free
+   * the second reading of those modules opens the paywall
    * the price shows in your local currency and the purchase completes
    * after purchase, every module opens without a paywall
    * the app still opens with no network (airplane mode)
@@ -328,7 +329,8 @@ the following still need a human pass:
 * **The free reading is tracked locally.** Clearing the app's storage resets it. It survives a device
   transfer because it is included in Android's backup.
 * **Locked modules still show a verdict line.** The teaser headline of all five readings is free;
-  the score, the factors, the hours and the advice are behind the unlock. If you change that split,
+  Today's Fortune is free in full every day; the score, the factors, the hours and the advice of the
+  other four modules are behind the unlock (first reading free). If you change that split,
   change `docs/PLAY_STORE_LISTING.md` with it.
 * **A chosen date is read without the hour.** Only today has an hour pillar, hour-officers and hour
   windows; any other date is a "day plate", because a day that has not happened yet has no hour.

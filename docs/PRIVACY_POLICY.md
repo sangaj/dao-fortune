@@ -37,7 +37,7 @@ app does not use them for analytics and does not read anything they collect.
 
 | Data | Where | Why | How long |
 |---|---|---|---|
-| Whether your free reading has been used | App preferences (private storage) | To honour the "first reading free, later readings paid" rule | Until you clear app data or uninstall |
+| Whether your free reading has been used | App preferences (private storage) | To honour the "first reading of each module beyond Today's Fortune free, later readings paid" rule | Until you clear app data or uninstall |
 | Whether you have purchased the unlock | App preferences (private storage) | To avoid asking you to pay twice | Until you clear app data or uninstall |
 | Your year sign (one of twelve branches) | A separate preferences file (private storage) | To read the plate against your own position | Until you clear it, clear app data, or uninstall |
 
