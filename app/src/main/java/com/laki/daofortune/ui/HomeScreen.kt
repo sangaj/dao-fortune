@@ -58,6 +58,7 @@ fun HomeScreen(
     selectedDate: LocalDate,
     isToday: Boolean,
     yearSign: YearSign?,
+    birthDate: LocalDate?,
     favourableDays: List<FavourableDay>,
     freeReadingsLeft: Int,
     unlocked: Boolean,
@@ -68,6 +69,7 @@ fun HomeScreen(
     onOpenDream: () -> Unit,
     onSelectDate: (LocalDate) -> Unit,
     onSetYearSign: (YearSign?) -> Unit,
+    onSetBirthDate: (LocalDate?) -> Unit,
     onDismissNotice: () -> Unit,
     onAbout: () -> Unit
 ) {
@@ -160,7 +162,9 @@ fun HomeScreen(
             item {
                 YearSignRow(
                     yearSign = yearSign,
-                    onSetYearSign = onSetYearSign
+                    birthDate = birthDate,
+                    onSetYearSign = onSetYearSign,
+                    onSetBirthDate = onSetBirthDate
                 )
             }
 

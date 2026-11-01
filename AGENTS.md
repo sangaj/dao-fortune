@@ -36,8 +36,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\qa\verify_release.ps1 
   reference is a second, independent implementation of the same classical rules and emits
   `app/src/test/resources/golden_pillars.tsv` (742 rows — two years of daily samples),
   `app/src/test/resources/golden_natal.tsv` (360 rows — the year-sign relations and element tones) and
-  `app/src/test/resources/golden_dream.tsv` (96 rows — twelve dreams read against eight days);
-  `EngineTest` and `DreamTest` assert the Kotlin engine against all three.
+  `app/src/test/resources/golden_dream.tsv` (96 rows — twelve dreams read against eight days) and
+  `app/src/test/resources/golden_birthdays.tsv` (343 rows — day pillars across 1930–2020, for the
+  optional birth-day anchor); `EngineTest` and `DreamTest` assert the Kotlin engine against all four.
   If you change a rule, change the Python too and regenerate:
   ```bash
   python tools\reference\luopan_reference.py
@@ -58,10 +59,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\qa\verify_release.ps1 
 - **Lint is configured with `abortOnError = false`, so a green build does not mean lint is clean.**
   Run `.\gradlew.bat :app:lintRelease` and read `app/build/reports/lint-results-release.txt` before
   every release. Errors are upload blockers.
-- **The year sign is not a birth date and never may become one.** `ProfileState` stores exactly one
-  integer — the branch ordinal out of twelve — in `dao_fortune_profile.xml`. Do not add a birth date, a
-  birth year, a name or any other identifier; the whole point of the design is that the app never asks
-  for personal information, which is what lets the Play Data safety form say "no data collected".
+- **The year sign and the optional birth day are anchors, not an identity.** `ProfileState` stores the
+  year-sign branch ordinal and, optionally, the birth day as a plain date — in
+  `dao_fortune_profile.xml`. When a birth day is set it anchors readings on the day pillar of that day
+  (`UiState.natalBranch`), taking precedence over the year sign. No name, no birth time, no place, no
+  account: both values stay on the device and are used only to compute a pillar locally, which is what
+  lets the Play Data safety form say "no data collected".
 - **`dao_fortune_profile.xml` must stay out of the backup allow-list.** `backup_rules.xml` and
   `data_extraction_rules.xml` allow-list only `dao_fortune_access.xml` (the purchase flags). The year
   sign is left out on purpose so it never leaves the device, not even into cloud backup. If you add a

@@ -102,6 +102,25 @@ class EngineTest {
         assertEquals("JiaChen", CalendarEngine.dayGanZhi(LocalDateTime.of(2024, 2, 10, 12, 0)).toString())
     }
 
+    /**
+     * A birth day can be anywhere in a reader's life, far outside the two
+     * years the daily golden file covers. These samples walk 1930–2020 in
+     * 97-day steps; the day pillar of every one must match the reference.
+     */
+    @Test
+    fun `birthday pillars match the reference implementation`() {
+        val stream = javaClass.getResourceAsStream("/golden_birthdays.tsv")
+            ?: error("golden_birthdays.tsv missing from test resources")
+        val all = stream.bufferedReader().use { it.readLines() }.filter { it.isNotBlank() }
+        val rows = all.drop(1)
+        assertTrue(rows.size > 300)
+        rows.forEach { line ->
+            val (date, day) = line.split("\t")
+            val moment = LocalDateTime.parse("${date}T12:00")
+            assertEquals("$date birth-day pillar", day, CalendarEngine.dayGanZhi(moment).toString())
+        }
+    }
+
     @Test
     fun `the day turns over at 23 00`() {
         val justBefore = LocalDateTime.of(2026, 5, 5, 22, 59)

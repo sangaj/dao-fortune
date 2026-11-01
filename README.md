@@ -33,12 +33,13 @@ Every reading shows **the factors that produced its score**, so the number is ne
 | **Favourable Days** | The next sixty days are scored on the same day-plate rules and ranked by the windfall reading, so you can see *when* to move, not just whether today is good. |
 | **Any date** | Step day by day or open the calendar. A day that is not today is read as a **day plate** — no hour is involved, because a day that has not happened yet has no hour. |
 | **Your year sign** | Choose your zodiac branch once and every reading is measured against your own position on the plate: harmony, three-harmony, clash or harm against the day's branch, and the element tone between your branch and the day's. |
+| **Your birth day (optional)** | For a deeper anchor, add the day you were born: every reading is then measured against that day's own pillar. A birth day is optional, lives only on your device, and is excluded from backup. |
 | **Dream & Omens (梦占)** | Write what you remember of a dream. The app finds the classical images in your own words and reads them against the plate of the night they belong to. |
 
-The year sign is **not** a birth date, a birth chart or a BaZi reading. The app never asks for your
-birthday, your name or your age — it asks which of the twelve branches you were born under, which is
-how the *nian ming* works in this tradition. That single choice is stored on your device in its own
-preferences file, is excluded from Android's backup, and is never transmitted.
+The anchors are **not** a birth chart or a BaZi reading. There is no day-master strength analysis, no
+useful-god judgement and no luck pillars — the lightest classical anchors are used on purpose. The year
+sign is one branch out of twelve; the optional birth day is a plain date. Both are stored on your device
+in their own preferences file, excluded from Android's backup, and never transmitted.
 
 ### Dream & Omens
 
@@ -296,8 +297,8 @@ A validity of 10950 days (30 years) is required: Play requires the signing key t
    Play Console → App content → Privacy policy. The developer contact is
    `gubingjing@hotmail.com`.
 6. **Data safety** — answer *no data collected* and *no data shared*. The purchase is processed by
-   Google Play, which is disclosed in the privacy policy. The optional year sign is a device-local
-   preference, excluded from backup and never transmitted, so it is not collected data.
+   Google Play, which is disclosed in the privacy policy. The optional year sign and birth day are
+   device-local preferences, excluded from backup and never transmitted, so they are not collected data.
 7. **Listing copy** — `docs/PLAY_STORE_LISTING.md` contains the title, short and full descriptions,
    release notes and the store settings checklist.
 8. **Graphics** — `docs/store/icon_512.png` (512×512) and `docs/store/feature_graphic_1024x500.png`

@@ -6,6 +6,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.laki.daofortune.billing.BillingManager
 import com.laki.daofortune.billing.BillingUiState
+import com.laki.daofortune.core.Branch
+import com.laki.daofortune.core.CalendarEngine
 import com.laki.daofortune.core.DreamEngine
 import com.laki.daofortune.core.DreamReading
 import com.laki.daofortune.core.FavourableDates
@@ -48,6 +50,11 @@ data class UiState(
     val isToday: Boolean = true,
     /** The reader's year branch (nian ming), when they have chosen one. */
     val yearSign: YearSign? = null,
+    /**
+     * The reader's birth day, when they have given one. Optional and local
+     * only; when set it anchors every reading on the birth day's own pillar.
+     */
+    val birthDate: LocalDate? = null,
     /** The forward scan: the best days ahead, ranked. */
     val favourableDays: List<FavourableDay> = emptyList(),
     /** True when the daily reading notification is switched on. */
@@ -76,7 +83,18 @@ data class UiState(
     val showDream: Boolean = false,
     /** True when a dream is waiting for the unlock to be bought. */
     val pendingDream: Boolean = false
-)
+) {
+    /**
+     * The branch every reading is measured against.
+     *
+     * The birth day's own pillar branch when a birth day was given (the
+     * day-master anchor), otherwise the year sign. Noon is used for the birth
+     * day so the 23:00 day-turn never makes the pillar ambiguous.
+     */
+    val natalBranch: Branch?
+        get() = birthDate?.let { CalendarEngine.dayGanZhi(it.atTime(12, 0)).branch }
+            ?: yearSign?.branch
+}
 
 class MainViewModel(app: Application) : AndroidViewModel(app) {
 
@@ -108,10 +126,11 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             selectedDate = today,
             isToday = true,
             yearSign = profile.yearSign,
+            birthDate = profile.birthDate,
             notifyEnabled = profile.dailyReadingEnabled,
             freeReadingsLeft = access.freeReadingsLeft(),
             unlocked = access.isUnlocked
-        ).let { it.copy(previews = previewsFor(it.snapshot, it.yearSign)) }
+        ).let { it.copy(previews = previewsFor(it.snapshot, it.natalBranch)) }
     }
 
     init {
@@ -120,8 +139,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** The headline of each module — the free teaser shown on the home cards. */
-    private fun previewsFor(snapshot: LuopanSnapshot, yearSign: YearSign?): Map<FortuneModule, String> {
-        val natal = yearSign?.branch
+    private fun previewsFor(snapshot: LuopanSnapshot, natal: Branch?): Map<FortuneModule, String> {
         return FortuneModule.entries.associateWith { FortuneEngine.reading(snapshot, it, natal).headline }
     }
 
@@ -146,7 +164,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 snapshot = fresh,
                 selectedDate = today,
                 isToday = true,
-                previews = previewsFor(fresh, it.yearSign)
+                previews = previewsFor(fresh, it.natalBranch)
             )
         }
         rescanFavourableDays()
@@ -170,7 +188,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 snapshot = snapshot,
                 selectedDate = date,
                 isToday = date == today,
-                previews = previewsFor(snapshot, it.yearSign),
+                previews = previewsFor(snapshot, it.natalBranch),
                 selected = null
             )
         }
@@ -180,16 +198,34 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     fun setYearSign(sign: YearSign?) {
         profile.setYearSign(sign)
         val state = _ui.value
-        val natal = sign?.branch
         _ui.update {
-            it.copy(
-                yearSign = sign,
-                previews = previewsFor(it.snapshot, sign)
-            )
+            val next = it.copy(yearSign = sign)
+            next.copy(previews = previewsFor(next.snapshot, next.natalBranch))
         }
         // The readings drawn without the year sign are still true, but they are
         // no longer the readings the reader would get now.
-        if (natal != null || state.yearSign != null) {
+        if (sign != null || state.yearSign != null) {
+            _ui.update { it.copy(readings = emptyMap(), selected = null, dreamReading = null) }
+        }
+        rescanFavourableDays()
+    }
+
+    /**
+     * Sets or clears the reader's birth day.
+     *
+     * When a birth day is set it becomes the anchor every reading is measured
+     * against (the day pillar of that day), taking precedence over the year
+     * sign. It stays on the device and out of the backup, exactly like the
+     * year sign.
+     */
+    fun setBirthDate(date: LocalDate?) {
+        profile.setBirthDate(date)
+        val state = _ui.value
+        _ui.update {
+            val next = it.copy(birthDate = date)
+            next.copy(previews = previewsFor(next.snapshot, next.natalBranch))
+        }
+        if (date != null || state.birthDate != null) {
             _ui.update { it.copy(readings = emptyMap(), selected = null, dreamReading = null) }
         }
         rescanFavourableDays()
@@ -228,7 +264,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             _ui.update { current -> current.copy(pendingModule = module, showPaywall = true) }
             return
         }
-        val reading = FortuneEngine.reading(state.snapshot, module, state.yearSign?.branch)
+        val reading = FortuneEngine.reading(state.snapshot, module, state.natalBranch)
         val spentFree = !alwaysFree && !access.isUnlocked && !access.freeReadingUsed
         if (spentFree) access.consumeFreeReading()
         _ui.update { current ->
@@ -332,7 +368,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         val day = dreamDay(now.toLocalDate(), wokeAt)
         val plate = LuopanEngine.dayPlate(day, zone)
         val image = DreamEngine.extract(text, wokeAt)
-        val reading = DreamEngine.reading(plate, image, state.yearSign?.branch)
+        val reading = DreamEngine.reading(plate, image, state.natalBranch)
 
         val spentFree = !access.isUnlocked && !access.freeReadingUsed
         if (spentFree) access.consumeFreeReading()
@@ -400,7 +436,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
      * because the solar terms are cached per year.
      */
     private fun rescanFavourableDays() {
-        val natal = _ui.value.yearSign?.branch
+        val natal = _ui.value.natalBranch
         val today = LocalDate.now()
         scanJob?.cancel()
         scanJob = viewModelScope.launch {

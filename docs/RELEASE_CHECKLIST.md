@@ -294,7 +294,9 @@ So: nothing to install. Watch Vitals after each release instead.
    * the app still opens with no network (airplane mode)
    * the date selector moves the plate day by day, and a chosen date reads "that day", not "today"
    * the Favourable Days list shows five ranked days, and tapping one selects that date
-   * the year sign sheet offers the twelve zodiac branches and never asks for a date of birth
+   * the year sign sheet offers the twelve zodiac branches, and the birth day below them is optional
+   * setting a birth day re-anchors the readings on that day's pillar, and removing it falls back to
+     the year sign
    * setting a year sign changes the readings and draws the sign on the dial
    * the dream sheet reads a written dream, draws its images on the plate, and keeps the text on the
      device only — nothing about the dream appears in any file
@@ -334,9 +336,9 @@ the following still need a human pass:
   change `docs/PLAY_STORE_LISTING.md` with it.
 * **A chosen date is read without the hour.** Only today has an hour pillar, hour-officers and hour
   windows; any other date is a "day plate", because a day that has not happened yet has no hour.
-* **The year sign is a zodiac branch, not a birth date.** The app never asks for personal information.
-  It is stored on the device in its own preferences file, excluded from Android's backup, and can be
-  cleared in one tap — which is what keeps the Data safety form honest.
+* **The anchors are a zodiac branch and, optionally, a birth day.** Both are stored on the device in
+  their own preferences file, excluded from Android's backup, never transmitted, and can be cleared in
+  one tap — which is what keeps the Data safety form honest.
 * **The app never forecasts an amount.** It reports whether the classical configuration supports an
   unexpected gain and where to look — deliberately, because Play's deceptive-behaviour policy
   restricts fortune telling that promises outcomes. Keep the disclaimer wording intact.

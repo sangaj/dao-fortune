@@ -1,4 +1,4 @@
-﻿"""Independent reference implementation of the Dao Fortune calendar engine.
+"""Independent reference implementation of the Dao Fortune calendar engine.
 
 Purpose: cross-check the Kotlin engine in app/src/main/java/com/laki/daofortune/core
 against a second, separately written implementation, and produce golden values
@@ -1105,6 +1105,31 @@ def export_golden_dream(path: Path) -> None:
     print(f"Wrote {len(rows)} dream golden rows -> {path}")
 
 
+def export_golden_birthdays(path: Path) -> None:
+    """Write golden day pillars for birth days across a century.
+
+    The daily golden file covers only two years; a birth day can be anywhere
+    in a reader's life. A step of 97 days from 1930 to 2020 walks every
+    residue of the 60-day cycle many times over, so the Kotlin side is
+    checked on the same cycle math far outside the daily sample's range.
+    Noon is used so the 23:00 day-turn never makes a sample ambiguous.
+    """
+    rows = []
+    day = datetime(1930, 1, 1, 12, 0)
+    end = datetime(2020, 12, 31, 12, 0)
+    while day <= end:
+        d_stem, d_branch = day_pillar(day)
+        rows.append({"date": day.date().isoformat(), "day": d_stem + d_branch})
+        day += timedelta(days=97)
+
+    lines = ["\t".join(["date", "day"])]
+    for r in rows:
+        lines.append("\t".join([r["date"], r["day"]]))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(f"Wrote {len(rows)} birthday golden rows -> {path}")
+
+
 if __name__ == "__main__":
     print("=== Dao Fortune reference engine ===")
     passed = run_self_checks()
@@ -1112,6 +1137,7 @@ if __name__ == "__main__":
     export_golden(resources / "golden_pillars.tsv")
     export_golden_natal(resources / "golden_natal.tsv")
     export_golden_dream(resources / "golden_dream.tsv")
+    export_golden_birthdays(resources / "golden_birthdays.tsv")
     print("\nSELF-CHECK:", "ALL PASS" if passed else "FAILURES PRESENT")
     raise SystemExit(0 if passed else 1)
 

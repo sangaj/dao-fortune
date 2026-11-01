@@ -14,9 +14,14 @@ your device from your device's local clock and time zone.
 The app lets you choose a **year sign** — one of the twelve branches of the Chinese zodiac — so that the
 plate can be read against your own position. That choice is a single branch stored in a private
 preferences file on your device. It is never transmitted, never included in an Android backup, and never
-seen by us or by Google. **The app never asks for your date of birth, your name, your age or any other
-identifier.** A year sign is not a personal identifier in the sense Play's Data safety form uses: it is
-one choice out of twelve, it identifies nobody, and it is deleted the moment you clear it.
+seen by us or by Google. A year sign is not a personal identifier in the sense Play's Data safety form
+uses: it is one choice out of twelve, it identifies nobody, and it is deleted the moment you clear it.
+
+Optionally, you can also give your **birth day** for a more personal reading: the app then anchors every
+reading on the pillar of the day you were born. The birth day is **optional**, is stored only in the same
+private preferences file on your device, is **excluded from Android's backup**, and is **never
+transmitted** — there is no server behind this app. It is used only to compute a pillar locally. You can
+remove it in one tap from the same sheet where you set it.
 
 The app can also read a dream you write yourself (梦占). **The words of your dream are read on your
 device and are never written to storage, never transmitted and never seen by us.** The picture that
@@ -40,24 +45,27 @@ app does not use them for analytics and does not read anything they collect.
 | Whether your free reading has been used | App preferences (private storage) | To honour the "first reading of each module beyond Today's Fortune free, later readings paid" rule | Until you clear app data or uninstall |
 | Whether you have purchased the unlock | App preferences (private storage) | To avoid asking you to pay twice | Until you clear app data or uninstall |
 | Your year sign (one of twelve branches) | A separate preferences file (private storage) | To read the plate against your own position | Until you clear it, clear app data, or uninstall |
+| Your birth day (optional) | The same separate preferences file (private storage) | To anchor readings on the pillar of your birth day | Until you remove it, clear app data, or uninstall |
 
-These two flags are included in Android's device backup so that a phone transfer does not reset your purchase. They are not transmitted anywhere. The year sign is not — see below.
+These two flags are included in Android's device backup so that a phone transfer does not reset your purchase. They are not transmitted anywhere. The year sign and the birth day are not — see below.
 
-### Your year sign
+### Your year sign and birth day
 
 If you set a year sign, the app stores **one integer** — the ordinal of your branch out of twelve — in a
-preferences file named `dao_fortune_profile.xml`. Nothing else about you is recorded:
+preferences file named `dao_fortune_profile.xml`. If you also set a birth day, the date is stored in the
+same file, as a date and nothing else — no name, no time of day, no place:
 
-* **No birth date is collected.** The app never asks for your birthday, and it cannot derive one.
-* **It is kept in a different file from the purchase flags.** The purchase flags live in
-  `dao_fortune_access.xml`; the year sign lives in `dao_fortune_profile.xml`.
-* **It is excluded from backup.** Android's backup rules (`backup_rules.xml` and
-  `data_extraction_rules.xml`) allow-list only `dao_fortune_access.xml`. Your year sign is left out on
-  purpose, so it never leaves the device — not into cloud backup, not into a device-to-device transfer.
-* **It is never transmitted.** There is no server behind this app. The year sign is used to compute a
-  reading locally and is then forgotten until you change it.
-* **You can erase it in one tap** — the year-sign sheet in the app has a "clear" action — or by clearing
-  the app's storage in Android Settings, or by uninstalling.
+* **Both are optional.** The app works fully with neither, and the birth day is never required.
+* **They are kept in a different file from the purchase flags.** The purchase flags live in
+  `dao_fortune_access.xml`; the year sign and birth day live in `dao_fortune_profile.xml`.
+* **They are excluded from backup.** Android's backup rules (`backup_rules.xml` and
+  `data_extraction_rules.xml`) allow-list only `dao_fortune_access.xml`. Your year sign and birth day are
+  left out on purpose, so they never leave the device — not into cloud backup, not into a
+  device-to-device transfer.
+* **They are never transmitted.** There is no server behind this app. They are used to compute a
+  reading locally and are then forgotten until you change them.
+* **You can erase either in one tap** — the year-sign sheet in the app has a clear action for both — or
+  by clearing the app's storage in Android Settings, or by uninstalling.
 
 ### Dates you look at
 
@@ -109,14 +117,14 @@ permission, so that code cannot collect anything.
 
 ## 5. Children
 
-Dao Fortune is not directed at children under 13. It contains no chat, no accounts, no user accounts visible to anyone else, and no data collection. The optional year sign is a preference the reader sets on their own device; it is not transmitted and is excluded from backup. A dream written in the Dream & Omens module is read privately on the device and is never shared with anybody, published, or transmitted — it is not user-generated content in the sense Play's policies mean, because no other person can ever see it.
+Dao Fortune is not directed at children under 13. It contains no chat, no accounts, no user accounts visible to anyone else, and no data collection. The optional year sign and birth day are preferences the reader sets on their own device; they are not transmitted and are excluded from backup. A dream written in the Dream & Omens module is read privately on the device and is never shared with anybody, published, or transmitted — it is not user-generated content in the sense Play's policies mean, because no other person can ever see it.
 
 ## 6. Your rights
 
 Because we collect no personal data, there is nothing for us to export, correct or delete on request. Everything the app holds is on your device, and you can erase it yourself at any time:
 
-* **Your year sign** — clear it inside the app (the year-sign sheet has a clear action), or by clearing the
-  app's storage in Android Settings, or by uninstalling.
+* **Your year sign and birth day** — clear them inside the app (the year-sign sheet has a clear action
+  for both), or by clearing the app's storage in Android Settings, or by uninstalling.
 * **A dream you wrote** — nothing to delete: it is never written to storage. Closing the dream sheet
   erases it from memory.
 * **The free-reading flag and the unlock** — clear the app's storage in Android Settings, or uninstall.

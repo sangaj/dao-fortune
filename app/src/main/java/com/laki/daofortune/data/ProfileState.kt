@@ -3,6 +3,7 @@ package com.laki.daofortune.data
 import android.content.Context
 import androidx.core.content.edit
 import com.laki.daofortune.core.YearSign
+import java.time.LocalDate
 
 /**
  * The querent's year branch (nian ming), kept in its own preferences file.
@@ -44,9 +45,30 @@ class ProfileState(context: Context) {
         prefs.edit { putBoolean(KEY_DAILY_READING, enabled) }
     }
 
+    /**
+     * The reader's birth day, or null when they have not given one.
+     *
+     * Optional and strictly local: it lives in this same preferences file,
+     * which is excluded from backup, so it never leaves the device. When set,
+     * readings anchor on the day pillar of the birth day instead of the year
+     * sign — the classical day-master anchor, which is more personal.
+     */
+    val birthDate: LocalDate?
+        get() = prefs.getString(KEY_BIRTH_DATE, null)?.let {
+            runCatching { LocalDate.parse(it) }.getOrNull()
+        }
+
+    /** Sets or clears the birth day. */
+    fun setBirthDate(date: LocalDate?) {
+        prefs.edit {
+            if (date == null) remove(KEY_BIRTH_DATE) else putString(KEY_BIRTH_DATE, date.toString())
+        }
+    }
+
     companion object {
         private const val PREFS_NAME = "dao_fortune_profile"
         private const val KEY_YEAR_SIGN = "year_sign_branch"
         private const val KEY_DAILY_READING = "daily_reading_enabled"
+        private const val KEY_BIRTH_DATE = "birth_date"
     }
 }

@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -185,7 +186,9 @@ private fun DayPickerDialog(
 @Composable
 fun YearSignRow(
     yearSign: YearSign?,
+    birthDate: LocalDate?,
     onSetYearSign: (YearSign?) -> Unit,
+    onSetBirthDate: (LocalDate?) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showPicker by remember { mutableStateOf(false) }
@@ -202,19 +205,30 @@ fun YearSignRow(
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                "YEAR SIGN",
+                "YOUR ANCHOR",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                if (yearSign == null) "Set yours to personalise the plate"
-                else "${yearSign.animal} · ${yearSign.branch.pinyin}",
+                when {
+                    birthDate != null -> "Birth day · ${birthDate.format(shortDateFormat)}"
+                    yearSign != null -> "${yearSign.animal} · ${yearSign.branch.pinyin}"
+                    else -> "Set yours to personalise the plate"
+                },
                 style = MaterialTheme.typography.titleMedium,
-                color = if (yearSign == null) MaterialTheme.colorScheme.onSurfaceVariant
+                color = if (yearSign == null && birthDate == null)
+                    MaterialTheme.colorScheme.onSurfaceVariant
                 else MaterialTheme.colorScheme.primary
             )
+            if (birthDate == null) {
+                Text(
+                    "Add your birth day for a deeper reading",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
-        if (yearSign != null) {
+        if (yearSign != null || birthDate != null) {
             Text(
                 "CHANGE",
                 style = MaterialTheme.typography.labelSmall,
@@ -226,10 +240,12 @@ fun YearSignRow(
     if (showPicker) {
         YearSignDialog(
             current = yearSign,
+            birthDate = birthDate,
             onPick = {
                 onSetYearSign(it)
                 showPicker = false
             },
+            onPickBirthDate = onSetBirthDate,
             onDismiss = { showPicker = false }
         )
     }
@@ -238,9 +254,13 @@ fun YearSignRow(
 @Composable
 private fun YearSignDialog(
     current: YearSign?,
+    birthDate: LocalDate?,
     onPick: (YearSign?) -> Unit,
+    onPickBirthDate: (LocalDate?) -> Unit,
     onDismiss: () -> Unit
 ) {
+    var showBirthPicker by remember { mutableStateOf(false) }
+
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             shape = RoundedCornerShape(24.dp),
@@ -268,7 +288,7 @@ private fun YearSignDialog(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         row.forEach { sign ->
-                            val selected = sign == current
+                            val selected = sign == current && birthDate == null
                             Column(
                                 modifier = Modifier
                                     .weight(1f)
@@ -303,6 +323,40 @@ private fun YearSignDialog(
                     }
                 }
 
+                HorizontalDivider()
+                Spacer(Modifier.height(10.dp))
+                Text(
+                    "BIRTH DAY (OPTIONAL)",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    "More personal: the reading anchors on the pillar of the day you were born. " +
+                        "Stored on this phone only, and excluded from backup.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextButton(onClick = { showBirthPicker = true }) {
+                        Text(
+                            if (birthDate == null) "Add birth day"
+                            else birthDate.format(longDateFormat),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    if (birthDate != null) {
+                        TextButton(onClick = { onPickBirthDate(null) }) {
+                            Text("Remove", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
+                }
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -316,6 +370,17 @@ private fun YearSignDialog(
                 }
             }
         }
+    }
+
+    if (showBirthPicker) {
+        DayPickerDialog(
+            initial = birthDate ?: LocalDate.now().minusYears(30),
+            onPick = {
+                onPickBirthDate(it)
+                showBirthPicker = false
+            },
+            onDismiss = { showBirthPicker = false }
+        )
     }
 }
 

@@ -177,12 +177,14 @@ production.
 
 | # | Action | Expected |
 |---|---|---|
-| 22 | Open the year-sign sheet | Twelve zodiac branches, one tap each; no date of birth is asked for anywhere |
+| 22 | Open the year-sign sheet | Twelve zodiac branches, one tap each; the birth day below them is optional |
 | 23 | Pick one | The plate draws your sign as a hollow ring; the readings gain the harmony / triad / clash / harm note |
 | 24 | Change it | The readings change immediately; the ring moves to the new mountain |
 | 25 | Clear it | The ring disappears and the readings return to the unpersonalised form |
-| 26 | Check what was stored | One integer in `dao_fortune_profile.xml`; nothing in `dao_fortune_access.xml` |
-| 27 | Check the backup | The year sign is **not** in the allow-list: after a device-to-device transfer it is gone, while the purchase unlock survives |
+| 25a | Add a birth day | The readings re-anchor on the birth day's pillar; the home row shows the birth day instead of the animal |
+| 25b | Set both a year sign and a birth day | The birth day wins; removing it falls back to the year sign |
+| 26 | Check what was stored | One integer and an optional ISO date in `dao_fortune_profile.xml`; nothing in `dao_fortune_access.xml` |
+| 27 | Check the backup | The year sign and the birth day are **not** in the allow-list: after a device-to-device transfer they are gone, while the purchase unlock survives |
 
 ### 2.6 Dream & Omens (梦占)
 

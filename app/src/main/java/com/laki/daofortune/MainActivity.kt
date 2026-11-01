@@ -55,6 +55,7 @@ class MainActivity : ComponentActivity() {
                         selectedDate = state.selectedDate,
                         isToday = state.isToday,
                         yearSign = state.yearSign,
+                        birthDate = state.birthDate,
                         favourableDays = state.favourableDays,
                         freeReadingsLeft = state.freeReadingsLeft,
                         unlocked = state.unlocked,
@@ -78,6 +79,7 @@ class MainActivity : ComponentActivity() {
                         onOpenDream = viewModel::showDream,
                         onSelectDate = viewModel::selectDate,
                         onSetYearSign = viewModel::setYearSign,
+                        onSetBirthDate = viewModel::setBirthDate,
                         onDismissNotice = viewModel::dismissNotice,
                         onAbout = { viewModel.showAbout(true) }
                     )
