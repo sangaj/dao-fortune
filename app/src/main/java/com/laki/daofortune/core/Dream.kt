@@ -129,7 +129,6 @@ internal object DreamLexicon {
         Branch.SI, Branch.WU, Branch.WEI -> DreamSpirit.ZHU_QUE
         Branch.SHEN, Branch.YOU, Branch.XU -> DreamSpirit.BAI_HU
         Branch.HAI, Branch.ZI, Branch.CHOU -> DreamSpirit.XUAN_WU
-        else -> DreamSpirit.QING_LONG
     }
 
     private fun element(words: List<String>, element: WuXing, chinese: String) = Lexeme(
