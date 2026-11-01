@@ -67,7 +67,10 @@ class TodayWidget : GlanceAppWidget() {
                     verticalAlignment = Alignment.Vertical.CenterVertically
                 ) {
                     Text(
-                        text = snapshot.day.toString()
+                        // The date, not the pillar: String.format(DateTimeFormatter, …)
+                        // uses the receiver as the pattern, so formatting the
+                        // pillar's "WuYin" would print "WuYin" back verbatim.
+                        text = snapshot.moment.toLocalDate()
                             .format(DateTimeFormatter.ofPattern("EEE d MMM", Locale.ENGLISH))
                             .uppercase(Locale.ENGLISH),
                         style = TextStyle(
