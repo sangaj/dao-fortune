@@ -24,8 +24,13 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import android.os.Build
+import android.widget.Toast
 import com.laki.daofortune.core.ModuleReading
+import com.laki.daofortune.ui.share.ShareCard
+import com.laki.daofortune.ui.share.ShareImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -166,6 +171,55 @@ fun ReadingSheet(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+            }
+
+            item {
+                val context = LocalContext.current
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    TextButton(onClick = {
+                        val bitmap = ShareImage.render(context) {
+                            ShareCard(
+                                moduleTitle = reading.module.title,
+                                contextLabel = reading.contextLabel,
+                                score = reading.score,
+                                verdict = reading.verdict,
+                                headline = reading.headline,
+                                summary = reading.summary
+                            )
+                        }
+                        ShareImage.share(context, bitmap)
+                    }) {
+                        Text("Share as image", color = MaterialTheme.colorScheme.primary)
+                    }
+                    if (Build.VERSION.SDK_INT >= 29) {
+                        TextButton(onClick = {
+                            val bitmap = ShareImage.render(context) {
+                                ShareCard(
+                                    moduleTitle = reading.module.title,
+                                    contextLabel = reading.contextLabel,
+                                    score = reading.score,
+                                    verdict = reading.verdict,
+                                    headline = reading.headline,
+                                    summary = reading.summary
+                                )
+                            }
+                            val saved = ShareImage.saveToGallery(
+                                context, bitmap,
+                                "DaoFortune_${reading.module.name.lowercase()}"
+                            )
+                            Toast.makeText(
+                                context,
+                                if (saved) "Saved to gallery" else "Could not save the image",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }) {
+                            Text("Save image", color = MaterialTheme.colorScheme.primary)
+                        }
+                    }
+                }
             }
 
             item {

@@ -1,5 +1,7 @@
 package com.laki.daofortune.ui
 
+import android.os.Build
+import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -35,6 +37,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
@@ -49,6 +52,8 @@ import com.laki.daofortune.core.FortuneEngine
 import com.laki.daofortune.core.LuopanSnapshot
 import com.laki.daofortune.core.Palace
 import com.laki.daofortune.core.YearSign
+import com.laki.daofortune.ui.share.ShareCard
+import com.laki.daofortune.ui.share.ShareImage
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
@@ -199,6 +204,52 @@ fun DreamSheet(
                 item { SectionTitle("What to do") }
                 items(reading.advice.size) { index ->
                     InsightRow(reading.advice[index])
+                }
+
+                item {
+                    val context = LocalContext.current
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        TextButton(onClick = {
+                            val bitmap = ShareImage.render(context) {
+                                ShareCard(
+                                    moduleTitle = "Dream & Omens",
+                                    contextLabel = reading.contextLabel,
+                                    score = reading.score,
+                                    verdict = reading.verdict,
+                                    headline = reading.headline,
+                                    summary = reading.summary
+                                )
+                            }
+                            ShareImage.share(context, bitmap)
+                        }) {
+                            Text("Share as image", color = MaterialTheme.colorScheme.primary)
+                        }
+                        if (Build.VERSION.SDK_INT >= 29) {
+                            TextButton(onClick = {
+                                val bitmap = ShareImage.render(context) {
+                                    ShareCard(
+                                        moduleTitle = "Dream & Omens",
+                                        contextLabel = reading.contextLabel,
+                                        score = reading.score,
+                                        verdict = reading.verdict,
+                                        headline = reading.headline,
+                                        summary = reading.summary
+                                    )
+                                }
+                                val saved = ShareImage.saveToGallery(context, bitmap, "DaoFortune_dream")
+                                Toast.makeText(
+                                    context,
+                                    if (saved) "Saved to gallery" else "Could not save the image",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }) {
+                                Text("Save image", color = MaterialTheme.colorScheme.primary)
+                            }
+                        }
+                    }
                 }
 
                 item {
