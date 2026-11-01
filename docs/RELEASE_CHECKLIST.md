@@ -200,8 +200,8 @@ relationships), so 18+ avoids any friction with the advertising ID requirement.
 ### 2.8 App access
 
 All functionality is available without credentials, so leave the app access section empty. If you
-later add a reviewer's shortcut, note that **Today's Fortune is free in full every day** and the
-first reading of each other module is free — a reviewer should still be able to see a full reading.
+later add a reviewer's shortcut, note that **Today's Fortune is free in full every day** and one
+further reading is free — a reviewer should still be able to see a full reading.
 
 ### 2.9 Ads
 
@@ -287,8 +287,8 @@ So: nothing to install. Watch Vitals after each release instead.
    * the plate shows today's date and the correct solar term
    * all five verdict headlines are visible on the home screen before any payment
    * **Today's Fortune opens in full for free**, every day, without spending the free reading
-   * the first full reading of each other module opens for free
-   * the second reading of those modules opens the paywall
+   * one further reading opens for free — the free-reading flag is spent once, not once per module
+   * the next reading of those modules opens the paywall
    * the price shows in your local currency and the purchase completes
    * after purchase, every module opens without a paywall
    * the app still opens with no network (airplane mode)

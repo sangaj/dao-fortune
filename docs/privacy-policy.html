@@ -57,10 +57,11 @@
 <p><strong>Package:</strong> <code>com.laki.daofortune</code></p>
 <p><strong>Developer contact:</strong> gubingjing@hotmail.com</p>
 <h2>1. Summary</h2>
-<p>Dao Fortune collects <strong>no personal data</strong>. The app itself has no account system, no analytics, no advertising SDKs, and no crash-reporting or tracking libraries. Your reading is calculated entirely on your device from your device&#x27;s local clock and time zone.</p>
+<p>Dao Fortune collects <strong>no personal data</strong> — in Play&#x27;s sense of the word, nothing leaves your device at all. The app itself has no account system, no analytics, no advertising SDKs, and no crash-reporting or tracking libraries. Your reading is calculated entirely on your device from your device&#x27;s local clock and time zone.</p>
 <p>The app lets you choose a <strong>year sign</strong> — one of the twelve branches of the Chinese zodiac — so that the plate can be read against your own position. That choice is a single branch stored in a private preferences file on your device. It is never transmitted, never included in an Android backup, and never seen by us or by Google. A year sign is not a personal identifier in the sense Play&#x27;s Data safety form uses: it is one choice out of twelve, it identifies nobody, and it is deleted the moment you clear it.</p>
 <p>Optionally, you can also give your <strong>birth day</strong> for a more personal reading: the app then anchors every reading on the pillar of the day you were born. The birth day is <strong>optional</strong>, is stored only in the same private preferences file on your device, is <strong>excluded from Android&#x27;s backup</strong>, and is <strong>never transmitted</strong> — there is no server behind this app. It is used only to compute a pillar locally. You can remove it in one tap from the same sheet where you set it.</p>
 <p>The app can also read a dream you write yourself (梦占). <strong>The words of your dream are read on your device and are never written to storage, never transmitted and never seen by us.</strong> The picture that accompanies the reading is drawn on the device by the app itself — it is not uploaded, and no cloud service or AI model is involved. Closing the dream sheet erases the text; there is nothing left behind to delete.</p>
+<p>The app can post notifications — a daily reading each morning, and a reminder on a day you marked. They are computed on your device at the moment they fire and are never sent from a server. The home-screen widget shows the same reading, also computed locally. If you share a reading, the app draws a picture on your device and hands it to the app you chose; the picture never passes through us.</p>
 <p>The only data handled by a third party is the purchase itself: if you unlock the app, the transaction is processed by <strong>Google Play Billing</strong>, and Google Play handles the payment details, your Google account and the receipt. Dao Fortune never sees or stores your card details.</p>
 <p>The app bundles Google&#x27;s Play Billing library, which brings a small number of Google Play services components with it. Those components are Google&#x27;s code, operate under Google&#x27;s own privacy policy, and can transmit technical diagnostics to Google in the ordinary course of talking to the Play Store. The app does not use them for analytics and does not read anything they collect.</p>
 <h2>2. What the app stores on your device</h2>
@@ -73,7 +74,7 @@
 <tr>
 <td>Whether your free reading has been used</td>
 <td>App preferences (private storage)</td>
-<td>To honour the &quot;first reading of each module beyond Today&#x27;s Fortune free, later readings paid&quot; rule</td>
+<td>To honour the &quot;one free reading in total, beyond Today&#x27;s Fortune which is always free&quot; rule</td>
 <td>Until you clear app data or uninstall</td>
 </tr>
 <tr>
@@ -154,7 +155,21 @@
 </ul>
 <p>re-created if you read the same dream again.</p>
 <h2>3. Permissions</h2>
-<p><strong>Dao Fortune itself declares no permissions at all.</strong> The Google Play Billing library that the app bundles adds two at the manifest level:</p>
+<p>The app declares <strong>two</strong> permissions of its own:</p>
+<table><thead><tr>
+<th>Permission</th>
+<th>Why</th>
+</tr></thead><tbody>
+<tr>
+<td><code>POST_NOTIFICATIONS</code></td>
+<td>To post the daily reading and the day reminders you ask for. It is a runtime permission: Android asks you for it the first time you turn a notification on, and you can revoke it in Android Settings at any time — the app then simply stops posting.</td>
+</tr>
+<tr>
+<td><code>RECEIVE_BOOT_COMPLETED</code></td>
+<td>To put the daily reminder back after the phone restarts.</td>
+</tr>
+</tbody></table>
+<p>The libraries the app bundles add these at the manifest level:</p>
 <table><thead><tr>
 <th>Permission</th>
 <th>Where it comes from</th>
@@ -170,8 +185,24 @@
 <td>Play Billing library</td>
 <td>To check whether the device is online before contacting the Play Store</td>
 </tr>
+<tr>
+<td><code>com.android.vending.BILLING</code></td>
+<td>Play Billing library</td>
+<td>To talk to the Play Store at all</td>
+</tr>
+<tr>
+<td><code>WAKE_LOCK</code></td>
+<td>WorkManager library</td>
+<td>To hold the device awake long enough to post a scheduled notification</td>
+</tr>
+<tr>
+<td><code>FOREGROUND_SERVICE</code></td>
+<td>WorkManager library</td>
+<td>A fallback path inside WorkManager for expedited work; the app never starts a foreground service of its own</td>
+</tr>
 </tbody></table>
-<p>Neither is a runtime permission — you are never asked to approve anything. The app does <strong>not</strong> request location, camera, microphone, contacts, storage or any sensor. The Play services components bundled with the billing library include code that could read location, but the app never asks for the location permission, so that code cannot collect anything.</p>
+<p>None of these reaches the network on its own: the app makes no request of its own, and every notification is computed on the device. The app does <strong>not</strong> request location, camera, microphone, contacts, storage or any sensor. The Play services components bundled with the billing library include code that could read location, but the app never asks for the location permission, so that code cannot collect anything.</p>
+<p>Sharing a reading is something you do, not something the app does on its own: the image is written to the app&#x27;s private cache, handed to the app you chose, and never sent anywhere by us.</p>
 <h2>4. Network activity</h2>
 <ul>
 <li><strong>Google Play Billing</strong>: used only when you choose to unlock the app or restore a previous purchase.</li>
@@ -188,7 +219,7 @@
 <h2>5. Children</h2>
 <p>Dao Fortune is not directed at children under 13. It contains no chat, no accounts, no user accounts visible to anyone else, and no data collection. The optional year sign and birth day are preferences the reader sets on their own device; they are not transmitted and are excluded from backup. A dream written in the Dream &amp; Omens module is read privately on the device and is never shared with anybody, published, or transmitted — it is not user-generated content in the sense Play&#x27;s policies mean, because no other person can ever see it.</p>
 <h2>6. Your rights</h2>
-<p>Because we collect no personal data, there is nothing for us to export, correct or delete on request. Everything the app holds is on your device, and you can erase it yourself at any time:</p>
+<p>Because nothing is ever transmitted to us, there is nothing for us to export, correct or delete on request. Everything the app holds is on your device, and you can erase it yourself at any time:</p>
 <ul>
 <li><strong>Your year sign and birth day</strong> — clear them inside the app (the year-sign sheet has a clear action</li>
 </ul>

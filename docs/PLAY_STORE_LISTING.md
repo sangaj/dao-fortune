@@ -70,22 +70,23 @@ HONEST BY DESIGN
 • The only third-party component is Google's Play Billing library. Nothing is sold on to anyone.
 
 PRIVACY
-Dao Fortune stores no personal data. It never asks for your name, your date of birth or your age. The only things written to your phone are a flag for your free reading, your unlock, and — if you choose one — your year sign, which stays on the device and is excluded from backup. The dream you write is read and drawn on the device and erased when you close the sheet; it is never stored or transmitted.
+Dao Fortune collects no personal data. It never asks for your name or your age. You may optionally give your birth day to anchor the reading — it stays on this phone, is excluded from backup and is never transmitted; your year sign is stored the same way. The dream you write is read and drawn here and erased when you close the sheet. A reading you share is an image you send yourself. Notifications are local and can be turned off.
 
 A NOTE ON WHAT THIS IS
-Dao Fortune is a cultural and entertainment product built on classical Chinese divination — not financial, medical, legal, investment or psychological advice. It promises no outcome and should not be used for financial decisions. You remain responsible for your own choices.
+Dao Fortune is a cultural and entertainment product built on classical Chinese divination — not financial, medical, legal, investment or psychological advice. It promises no outcome, and you remain responsible for your own choices.
 
-Today's Fortune is free every day, in full. Your first reading of each other module is free too. One payment unlocks everything, every day — no subscription.
+Today's Fortune is free every day, in full. Your first reading is free too. One payment unlocks everything, every day — no subscription.
 ```
 
-*(3912 characters. Play caps the full description at 4000 — the Dream & Omens section is
-new in this release, so the copy was tightened to fit. Keep it under.)*
+*(3945 characters. Play caps the full description at 4000 — keep it under. The count is checked by
+`tools/qa/check_listing_lengths.py`, which the release gate runs.)*
 
 The last two lines cover the paywall model in the listing itself. Keep them accurate: **Today's
-Fortune (the overall module) is free every day, in full** — score, factors, advice and hours — and
-the first *full* reading of each other module is free as well. If you ever change that balance,
-change this copy with it — Play's deceptive-behaviour policy is easier to defend when the listing
-says exactly what the app does.
+Fortune (the overall module) is free every day, in full** — score, factors, advice and hours — and the
+first *full* reading of anything else (another module, or a dream) is free as well. That is **one free
+reading in total**, not one per module: the app keeps a single free-reading flag, so the second paid
+reading of the day reaches the unlock. If you ever change that balance, change this copy with it —
+Play's deceptive-behaviour policy is easier to defend when the listing says exactly what the app does.
 
 ---
 
@@ -100,8 +101,8 @@ says exactly what the app does.
 | Target audience | 18+ (recommended); contains no adult content |
 | Contains ads | **No** |
 | In-app purchases | **Yes** — `dao_fortune_full_access` (one-off, not a subscription) |
-| Data safety | No data collected, no data shared by the app. The app has no account and never asks for a name, a date of birth or an age. The optional year sign is a preference stored on the device only, excluded from Android backup and never transmitted — it is not "collected" data, and it is named here so the form and the app agree. The dream text written in Dream & Omens is read on the device, drawn on the device and erased when the sheet closes: it is never written to storage and never transmitted, so it is not collected either. The only third-party component is Google's Play Billing library and the Play services components it bundles; those are processed by Google under Google's own privacy policy. If the form offers a separate option for data handled by Google Play services, select that one and leave the developer's own data types empty. |
-| Permissions | The app itself declares no permissions. The bundled Play Billing library adds `INTERNET` and `ACCESS_NETWORK_STATE` — they are used only to reach the Play Store for the purchase. No location, camera, microphone, contacts or storage permission is declared or requested. |
+| Data safety | **No data collected, no data shared by the app.** The app has no account and never asks for a name or an age. Play's *Personal info* category includes a date of birth, so the optional birth day is named here: the reader enters it only if they choose to, it is stored in a private preferences file on the device, it is excluded from Android backup, and it is never transmitted. On Play's form, "collection" means data leaving the device — nothing here does — so the developer's own data types stay empty. The optional year sign is stored the same way, and the dream text written in Dream & Omens is read on the device, drawn on the device and erased when the sheet closes: it is never written to storage and never transmitted. The only third-party component is Google's Play Billing library and the Play services components it bundles; those are processed by Google under Google's own privacy policy. If the form offers a separate option for data handled by Google Play services, select that one. |
+| Permissions | The app declares two permissions itself: `POST_NOTIFICATIONS` — Android asks you for it the first time you turn on the daily reading or a day reminder, and you can revoke it in Settings — and `RECEIVE_BOOT_COMPLETED`, to put the daily reminder back after a restart. The bundled libraries add `INTERNET` and `ACCESS_NETWORK_STATE` (the Play Billing library, to reach the Play Store), `WAKE_LOCK` and `FOREGROUND_SERVICE` (WorkManager, for scheduled work the app does not start in the foreground), and `com.android.vending.BILLING` to talk to the Play Store. No location, camera, microphone, contacts or storage permission is declared or requested. |
 | Government app | No |
 | Financial features | Declare "No" — the app does not offer financial services, trading, or money transfers. The disclaimer explicitly states it is not financial advice. |
 | Health features | Declare "No" — the Body & Balance module is wellness/cultural and is not a health feature. |
@@ -126,23 +127,27 @@ says exactly what the app does.
 First release.
 
 • The twenty-four mountain plate, sun drawn for your time.
-• Five readings: fortune, windfall, love, career, body, balance.
+• Five readings: fortune, windfall, love, career, body and balance.
 • Favourable Days: the next sixty days ranked.
 • Dream & Omens: write your dream, the plate reads it against the day.
 • Your year sign personalises every reading.
-• Every double-hour scored.
-• Each reading shows the factors behind its score.
-• Today's Fortune free every day, in full; first reading of each other module free too.
+• Every double-hour scored, with the reason for each score.
+• Today's Fortune free every day; your first reading free too.
 • One-off unlock via Google Play. No subscription.
 ```
 
-*(487 characters. Play caps release notes at 500 — keep it under.)*
+*(479 characters. Play caps release notes at 500 — keep it under.)*
 
 ---
 
 ## Store listing notes (internal, not for the listing)
 
-- The free-reading mechanic ("Today's Fortune always free in full; first reading of each other module free, every later reading paid") is a **one-off in-app product**, so Play Billing is used. Do not also list the app as a paid app — one model only.
+- The free-reading mechanic ("Today's Fortune always free in full; one free reading in total for
+  everything else; every later reading paid") is a **one-off in-app product**, so Play Billing is used.
+  Do not also list the app as a paid app — one model only.
+- **Never say "the first reading of each module is free".** The app keeps a *single* free-reading flag
+  (`data/AccessState.kt`), so only one paid reading is free in total. Promising one per module is
+  exactly the kind of mismatch Play's deceptive-behaviour policy looks for.
 - Google Play's *Deceptive Behaviour* policy restricts fortune-telling apps that promise outcomes. The listing and the in-app copy avoid guarantees ("the plate says", "the reading points to"), and both the listing and the About sheet carry the entertainment/advice disclaimer. Keep that wording if the listing is edited.
 - The Data safety form should answer **"No data collected"** and **"No data shared"**. The year sign and
   the optional birth day live only in an on-device preferences file that is excluded from backup, so

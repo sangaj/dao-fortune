@@ -225,11 +225,10 @@ fun HomeScreen(
                         Text(
                             if (freeReadingsLeft > 0)
                                 "Today's Fortune is free every day, in full. Your first reading " +
-                                    "of each other module is free too — after that, each one needs " +
-                                    "the one-off unlock."
+                                    "is free too — after that, each reading needs the one-off unlock."
                             else
-                                "Today's Fortune is free every day, in full. Your free reading of " +
-                                    "the other modules has been used — open one to unlock it.",
+                                "Today's Fortune is free every day, in full. Your free reading " +
+                                    "has been used — open another reading to unlock it.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

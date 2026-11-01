@@ -145,6 +145,13 @@ Write-Output '=== 6. Public policy page and version control ==='
 $policyCheck = & python 'tools\docs\make_privacy_html.py' --check 2>&1 | Out-String
 Check 'privacy policy page is up to date' ($LASTEXITCODE -eq 0) ($policyCheck.Trim() -split "`n" | Select-Object -First 1)
 
+# Play rejects a listing whose copy is over its character caps, and one extra
+# line of marketing text is enough to cross them. The lengths are checked here
+# so that an over-long release note can never reach the Console.
+$lengthCheck = & python 'tools\qa\check_listing_lengths.py' 2>&1 | Out-String
+Check 'store listing copy is within Play limits' ($LASTEXITCODE -eq 0) `
+    (($lengthCheck.Trim() -split "`n" | Where-Object { $_ -match 'FAIL' }) -join ' ')
+
 # The signing key must never be in git, not even in a private repository.
 $gitExe = 'E:\Minimax\toolchain\git\cmd\git.exe'
 if (Test-Path $gitExe) {
