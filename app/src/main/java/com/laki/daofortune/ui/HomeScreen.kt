@@ -22,6 +22,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.NotificationsNone
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -60,6 +62,8 @@ fun HomeScreen(
     freeReadingsLeft: Int,
     unlocked: Boolean,
     notice: String?,
+    notifyEnabled: Boolean,
+    onToggleNotify: () -> Unit,
     onOpen: (FortuneModule) -> Unit,
     onOpenDream: () -> Unit,
     onSelectDate: (LocalDate) -> Unit,
@@ -89,6 +93,16 @@ fun HomeScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = onToggleNotify) {
+                        Icon(
+                            if (notifyEnabled) Icons.Filled.Notifications else Icons.Filled.NotificationsNone,
+                            contentDescription = if (notifyEnabled)
+                                "Daily reading notification on — tap to turn off"
+                            else
+                                "Turn on the daily reading notification",
+                            tint = if (notifyEnabled) Gold else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                     IconButton(onClick = onAbout) {
                         Icon(
                             Icons.Filled.Info,

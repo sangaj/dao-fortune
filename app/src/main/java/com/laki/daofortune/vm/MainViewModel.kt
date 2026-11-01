@@ -19,6 +19,7 @@ import com.laki.daofortune.core.ReadingKey
 import com.laki.daofortune.core.YearSign
 import com.laki.daofortune.data.AccessState
 import com.laki.daofortune.data.ProfileState
+import com.laki.daofortune.notify.NotificationScheduler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,6 +50,8 @@ data class UiState(
     val yearSign: YearSign? = null,
     /** The forward scan: the best days ahead, ranked. */
     val favourableDays: List<FavourableDay> = emptyList(),
+    /** True when the daily reading notification is switched on. */
+    val notifyEnabled: Boolean = false,
     val selected: ReadingKey? = null,
     val pendingModule: FortuneModule? = null,
     val showPaywall: Boolean = false,
@@ -105,6 +108,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             selectedDate = today,
             isToday = true,
             yearSign = profile.yearSign,
+            notifyEnabled = profile.dailyReadingEnabled,
             freeReadingsLeft = access.freeReadingsLeft(),
             unlocked = access.isUnlocked
         ).let { it.copy(previews = previewsFor(it.snapshot, it.yearSign)) }
@@ -189,6 +193,20 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             _ui.update { it.copy(readings = emptyMap(), selected = null, dreamReading = null) }
         }
         rescanFavourableDays()
+    }
+
+    /**
+     * Turns the daily reading notification on or off.
+     *
+     * The caller (MainActivity) is responsible for the runtime permission on
+     * Android 13+: it only calls this with `true` once the permission is
+     * granted (or not needed).
+     */
+    fun setDailyReadingEnabled(enabled: Boolean) {
+        profile.setDailyReadingEnabled(enabled)
+        val app = getApplication<Application>()
+        if (enabled) NotificationScheduler.schedule(app) else NotificationScheduler.cancel(app)
+        _ui.update { it.copy(notifyEnabled = enabled) }
     }
 
     /** Opens a module. The first reading is free; later ones need the unlock. */

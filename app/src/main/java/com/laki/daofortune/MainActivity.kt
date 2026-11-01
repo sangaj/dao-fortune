@@ -1,13 +1,19 @@
 package com.laki.daofortune
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.getValue
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.laki.daofortune.ui.AboutSheet
 import com.laki.daofortune.ui.DaoFortuneTheme
@@ -33,6 +39,14 @@ class MainActivity : ComponentActivity() {
                 val state by viewModel.ui.collectAsStateWithLifecycle()
                 val billingState by viewModel.billingState.collectAsStateWithLifecycle()
 
+                // Android 13+ asks for the notification permission at runtime;
+                // older versions only need the toggle.
+                val notifyPermission = rememberLauncherForActivityResult(
+                    ActivityResultContracts.RequestPermission()
+                ) { granted ->
+                    if (granted) viewModel.setDailyReadingEnabled(true)
+                }
+
                 Surface(color = MaterialTheme.colorScheme.background) {
                     HomeScreen(
                         snapshot = state.snapshot,
@@ -45,6 +59,21 @@ class MainActivity : ComponentActivity() {
                         freeReadingsLeft = state.freeReadingsLeft,
                         unlocked = state.unlocked,
                         notice = state.notice,
+                        notifyEnabled = state.notifyEnabled,
+                        onToggleNotify = {
+                            if (state.notifyEnabled) {
+                                viewModel.setDailyReadingEnabled(false)
+                            } else if (
+                                Build.VERSION.SDK_INT >= 33 &&
+                                ContextCompat.checkSelfPermission(
+                                    this, Manifest.permission.POST_NOTIFICATIONS
+                                ) != PackageManager.PERMISSION_GRANTED
+                            ) {
+                                notifyPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            } else {
+                                viewModel.setDailyReadingEnabled(true)
+                            }
+                        },
                         onOpen = viewModel::open,
                         onOpenDream = viewModel::showDream,
                         onSelectDate = viewModel::selectDate,

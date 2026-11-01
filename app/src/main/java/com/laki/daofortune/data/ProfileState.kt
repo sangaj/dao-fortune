@@ -36,8 +36,17 @@ class ProfileState(context: Context) {
         }
     }
 
+    /** True when the reader has turned the daily reading notification on. */
+    val dailyReadingEnabled: Boolean get() = prefs.getBoolean(KEY_DAILY_READING, false)
+
+    /** Turns the daily reading notification on or off. */
+    fun setDailyReadingEnabled(enabled: Boolean) {
+        prefs.edit { putBoolean(KEY_DAILY_READING, enabled) }
+    }
+
     companion object {
         private const val PREFS_NAME = "dao_fortune_profile"
         private const val KEY_YEAR_SIGN = "year_sign_branch"
+        private const val KEY_DAILY_READING = "daily_reading_enabled"
     }
 }
