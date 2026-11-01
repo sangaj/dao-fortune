@@ -104,7 +104,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\qa\verify_release.ps1 
   `python tools/docs/make_privacy_html.py`; the release gate fails if the HTML is stale.
 - **The keystore must never be committed.** `.gitignore` excludes `keystore.properties` and `*.jks`;
   the release gate also checks that git is not tracking them. `dist/` is ignored too — the bundle and
-  the source zip are rebuilt, not committed.
+  the source zip are rebuilt, not committed. The repo is public, so GitHub's **secret scanning push
+  protection** (Settings → Code security → Push protection) must stay enabled as the second net.
 
 ## Store material
 
