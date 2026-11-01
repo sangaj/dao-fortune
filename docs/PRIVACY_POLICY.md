@@ -46,6 +46,15 @@ app does not use them for analytics and does not read anything they collect.
 | Whether you have purchased the unlock | App preferences (private storage) | To avoid asking you to pay twice | Until you clear app data or uninstall |
 | Your year sign (one of twelve branches) | A separate preferences file (private storage) | To read the plate against your own position | Until you clear it, clear app data, or uninstall |
 | Your birth day (optional) | The same separate preferences file (private storage) | To anchor readings on the pillar of your birth day | Until you remove it, clear app data, or uninstall |
+| The days you marked for a reminder | The same separate preferences file (private storage) | To post one local notification on the morning of a marked day | Until the day passes, you unmark it, clear app data, or uninstall |
+| Whether the daily reading notification is on | The same separate preferences file (private storage) | To honour your toggle | Until you switch it off, clear app data, or uninstall |
+
+### Notifications
+
+All notifications are **local**. The daily reading and the day reminders are scheduled with WorkManager
+and computed on your device at the moment they fire; nothing is sent to or received from any server. On
+Android 13+ the app asks for the notification permission only when you turn a notification on, and you
+can revoke it in Android Settings at any time — the app notices and simply stops posting.
 
 These two flags are included in Android's device backup so that a phone transfer does not reset your purchase. They are not transmitted anywhere. The year sign and the birth day are not — see below.
 

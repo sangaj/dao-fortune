@@ -173,6 +173,17 @@ production.
 | 20 | Pick the top day | The date selector jumps to it; the windfall score on the plate matches the list |
 | 21 | Check the hour | On a chosen date the reading has **no hour** — no hour pillar, no hour-officers, no hour windows |
 
+### 2.4a Notifications, the widget and reminders
+
+| # | Action | Expected |
+|---|---|---|
+| 21a | Tap the bell in the top bar | Android 13+ asks for the notification permission; the bell turns on |
+| 21b | Next morning at ~08:00 | One silent notification with the day's score and headline; tapping it opens the app |
+| 21c | Reboot the phone | The daily work is rescheduled by the boot receiver |
+| 21d | Tap the bell on a favourable day | The bell fills in; on that morning a reminder notification posts, and the mark clears itself |
+| 21e | Place the home-screen widget | Today's score, verdict, headline and best window; it refreshes when the app opens and each morning |
+| 21f | Revoke the notification permission | The app stops posting; no crash, and the bells still toggle |
+
 ### 2.5 The year sign
 
 | # | Action | Expected |

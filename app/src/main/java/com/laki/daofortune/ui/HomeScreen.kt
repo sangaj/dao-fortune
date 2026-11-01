@@ -60,6 +60,7 @@ fun HomeScreen(
     yearSign: YearSign?,
     birthDate: LocalDate?,
     favourableDays: List<FavourableDay>,
+    remindedDays: Set<LocalDate>,
     freeReadingsLeft: Int,
     unlocked: Boolean,
     notice: String?,
@@ -70,6 +71,7 @@ fun HomeScreen(
     onSelectDate: (LocalDate) -> Unit,
     onSetYearSign: (YearSign?) -> Unit,
     onSetBirthDate: (LocalDate?) -> Unit,
+    onToggleReminder: (LocalDate) -> Unit,
     onDismissNotice: () -> Unit,
     onAbout: () -> Unit
 ) {
@@ -254,7 +256,9 @@ fun HomeScreen(
                 FavourableDaysSection(
                     days = favourableDays,
                     selectedDate = selectedDate,
-                    onPick = onSelectDate
+                    remindedDays = remindedDays,
+                    onPick = onSelectDate,
+                    onToggleReminder = onToggleReminder
                 )
             }
 

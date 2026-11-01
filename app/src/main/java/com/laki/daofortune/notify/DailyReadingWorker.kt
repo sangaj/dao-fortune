@@ -9,6 +9,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.laki.daofortune.MainActivity
 import com.laki.daofortune.R
+import com.laki.daofortune.core.CalendarEngine
 import com.laki.daofortune.core.FortuneEngine
 import com.laki.daofortune.core.FortuneModule
 import com.laki.daofortune.core.LuopanEngine
@@ -29,6 +30,8 @@ class DailyReadingWorker(
     override suspend fun doWork(): Result {
         return try {
             postReading()
+            // The home-screen widget carries the same morning reading.
+            com.laki.daofortune.widget.TodayWidget.refresh(applicationContext)
             Result.success()
         } catch (error: Throwable) {
             // A transient failure (e.g. process limits) is worth one retry;
@@ -40,7 +43,9 @@ class DailyReadingWorker(
     private fun postReading() {
         val zone = ZoneId.systemDefault()
         val snapshot = LuopanEngine.snapshot(LocalDateTime.now(), zone)
-        val natal = ProfileState(applicationContext).yearSign?.branch
+        val profile = ProfileState(applicationContext)
+        val natal = profile.birthDate?.let { CalendarEngine.dayGanZhi(it.atTime(12, 0)).branch }
+            ?: profile.yearSign?.branch
         val reading = FortuneEngine.reading(snapshot, FortuneModule.OVERALL, natal)
 
         val tap = PendingIntent.getActivity(

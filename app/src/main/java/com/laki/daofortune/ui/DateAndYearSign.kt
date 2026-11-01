@@ -16,6 +16,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -394,7 +396,9 @@ private fun YearSignDialog(
 fun FavourableDaysSection(
     days: List<FavourableDay>,
     selectedDate: LocalDate,
+    remindedDays: Set<LocalDate>,
     onPick: (LocalDate) -> Unit,
+    onToggleReminder: (LocalDate) -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (days.isEmpty()) return
@@ -402,7 +406,8 @@ fun FavourableDaysSection(
         SectionTitle("Favourable days ahead")
         Spacer(Modifier.height(6.dp))
         Text(
-            "The next sixty days, ranked by the windfall reading. Tap a day to read its plate.",
+            "The next sixty days, ranked by the windfall reading. Tap a day to read its plate, " +
+                "the bell to be reminded on its morning.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -410,6 +415,7 @@ fun FavourableDaysSection(
 
         days.forEach { day ->
             val selected = day.date == selectedDate
+            val reminded = day.date in remindedDays
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -451,7 +457,21 @@ fun FavourableDaysSection(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                Spacer(Modifier.width(10.dp))
+                if (!day.isToday) {
+                    IconButton(
+                        onClick = { onToggleReminder(day.date) },
+                        modifier = Modifier.size(34.dp)
+                    ) {
+                        Icon(
+                            if (reminded) Icons.Filled.Notifications
+                            else Icons.Outlined.Notifications,
+                            contentDescription = if (reminded) "Cancel the reminder" else "Remind me",
+                            tint = if (reminded) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                Spacer(Modifier.width(6.dp))
                 Text(
                     "${day.score}",
                     style = MaterialTheme.typography.headlineMedium,

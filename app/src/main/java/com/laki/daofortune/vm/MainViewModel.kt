@@ -57,6 +57,8 @@ data class UiState(
     val birthDate: LocalDate? = null,
     /** The forward scan: the best days ahead, ranked. */
     val favourableDays: List<FavourableDay> = emptyList(),
+    /** The days the reader asked to be reminded of. */
+    val remindedDays: Set<LocalDate> = emptySet(),
     /** True when the daily reading notification is switched on. */
     val notifyEnabled: Boolean = false,
     val selected: ReadingKey? = null,
@@ -128,6 +130,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             yearSign = profile.yearSign,
             birthDate = profile.birthDate,
             notifyEnabled = profile.dailyReadingEnabled,
+            remindedDays = profile.remindedDays.filter { it >= today }.toSet(),
             freeReadingsLeft = access.freeReadingsLeft(),
             unlocked = access.isUnlocked
         ).let { it.copy(previews = previewsFor(it.snapshot, it.natalBranch)) }
@@ -136,6 +139,14 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     init {
         billing.start()
         rescanFavourableDays()
+        updateWidgets()
+    }
+
+    /** Refreshes the home-screen widget, if the reader has placed one. */
+    private fun updateWidgets() {
+        viewModelScope.launch {
+            runCatching { com.laki.daofortune.widget.TodayWidget.refresh(getApplication()) }
+        }
     }
 
     /** The headline of each module — the free teaser shown on the home cards. */
@@ -168,6 +179,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             )
         }
         rescanFavourableDays()
+        updateWidgets()
     }
 
     /**
@@ -243,6 +255,27 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         val app = getApplication<Application>()
         if (enabled) NotificationScheduler.schedule(app) else NotificationScheduler.cancel(app)
         _ui.update { it.copy(notifyEnabled = enabled) }
+    }
+
+    /**
+     * Marks or unmarks a favourable day for a morning reminder.
+     *
+     * The reminder is a one-off WorkManager task for 08:00 on that day; the
+     * marked dates live in the profile file and the past ones are dropped on
+     * every app start.
+     */
+    fun toggleDayReminder(date: LocalDate) {
+        val app = getApplication<Application>()
+        val current = _ui.value.remindedDays
+        if (date in current) {
+            profile.setDayReminded(date, false)
+            NotificationScheduler.cancelDayReminder(app, date)
+            _ui.update { it.copy(remindedDays = current - date) }
+        } else {
+            profile.setDayReminded(date, true)
+            NotificationScheduler.scheduleDayReminder(app, date)
+            _ui.update { it.copy(remindedDays = current + date) }
+        }
     }
 
     /**

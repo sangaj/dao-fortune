@@ -65,10 +65,29 @@ class ProfileState(context: Context) {
         }
     }
 
+    /**
+     * The favourable days the reader asked to be reminded of, as ISO dates.
+     *
+     * Just dates — which days looked promising is not personal information,
+     * and the file is excluded from backup like everything else here.
+     */
+    val remindedDays: Set<LocalDate>
+        get() = prefs.getStringSet(KEY_REMINDED_DAYS, emptySet())
+            ?.mapNotNull { runCatching { LocalDate.parse(it) }.getOrNull() }?.toSet()
+            ?: emptySet()
+
+    /** Marks or unmarks a day for a reminder. */
+    fun setDayReminded(date: LocalDate, reminded: Boolean) {
+        val current = remindedDays.map { it.toString() }.toMutableSet()
+        if (reminded) current.add(date.toString()) else current.remove(date.toString())
+        prefs.edit { putStringSet(KEY_REMINDED_DAYS, current) }
+    }
+
     companion object {
         private const val PREFS_NAME = "dao_fortune_profile"
         private const val KEY_YEAR_SIGN = "year_sign_branch"
         private const val KEY_DAILY_READING = "daily_reading_enabled"
         private const val KEY_BIRTH_DATE = "birth_date"
+        private const val KEY_REMINDED_DAYS = "reminded_days"
     }
 }

@@ -13,8 +13,12 @@ import androidx.activity.viewModels
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import java.time.LocalDate
 import com.laki.daofortune.ui.AboutSheet
 import com.laki.daofortune.ui.DaoFortuneTheme
 import com.laki.daofortune.ui.DreamSheet
@@ -40,12 +44,26 @@ class MainActivity : ComponentActivity() {
                 val billingState by viewModel.billingState.collectAsStateWithLifecycle()
 
                 // Android 13+ asks for the notification permission at runtime;
-                // older versions only need the toggle.
+                // older versions only need the toggle. One launcher serves both
+                // the daily bell and the favourable-day reminders; a pending
+                // reminder date says which flow asked.
+                var pendingReminder by remember { mutableStateOf<LocalDate?>(null) }
                 val notifyPermission = rememberLauncherForActivityResult(
                     ActivityResultContracts.RequestPermission()
                 ) { granted ->
-                    if (granted) viewModel.setDailyReadingEnabled(true)
+                    val pending = pendingReminder
+                    if (pending != null) {
+                        pendingReminder = null
+                        if (granted) viewModel.toggleDayReminder(pending)
+                    } else if (granted) {
+                        viewModel.setDailyReadingEnabled(true)
+                    }
                 }
+                fun notificationsAllowed(): Boolean =
+                    Build.VERSION.SDK_INT < 33 ||
+                        ContextCompat.checkSelfPermission(
+                            this, Manifest.permission.POST_NOTIFICATIONS
+                        ) == PackageManager.PERMISSION_GRANTED
 
                 Surface(color = MaterialTheme.colorScheme.background) {
                     HomeScreen(
@@ -57,6 +75,7 @@ class MainActivity : ComponentActivity() {
                         yearSign = state.yearSign,
                         birthDate = state.birthDate,
                         favourableDays = state.favourableDays,
+                        remindedDays = state.remindedDays,
                         freeReadingsLeft = state.freeReadingsLeft,
                         unlocked = state.unlocked,
                         notice = state.notice,
@@ -64,12 +83,7 @@ class MainActivity : ComponentActivity() {
                         onToggleNotify = {
                             if (state.notifyEnabled) {
                                 viewModel.setDailyReadingEnabled(false)
-                            } else if (
-                                Build.VERSION.SDK_INT >= 33 &&
-                                ContextCompat.checkSelfPermission(
-                                    this, Manifest.permission.POST_NOTIFICATIONS
-                                ) != PackageManager.PERMISSION_GRANTED
-                            ) {
+                            } else if (!notificationsAllowed()) {
                                 notifyPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
                             } else {
                                 viewModel.setDailyReadingEnabled(true)
@@ -80,6 +94,14 @@ class MainActivity : ComponentActivity() {
                         onSelectDate = viewModel::selectDate,
                         onSetYearSign = viewModel::setYearSign,
                         onSetBirthDate = viewModel::setBirthDate,
+                        onToggleReminder = { date ->
+                            if (date !in state.remindedDays && !notificationsAllowed()) {
+                                pendingReminder = date
+                                notifyPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            } else {
+                                viewModel.toggleDayReminder(date)
+                            }
+                        },
                         onDismissNotice = viewModel::dismissNotice,
                         onAbout = { viewModel.showAbout(true) }
                     )

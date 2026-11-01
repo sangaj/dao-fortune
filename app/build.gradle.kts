@@ -123,6 +123,7 @@ dependencies {
     implementation(libs.androidx.billing)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.glance.appwidget)
 
     debugImplementation(libs.androidx.ui.tooling)
 

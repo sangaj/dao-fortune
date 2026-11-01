@@ -321,6 +321,10 @@ the following still need a human pass:
   connection (§2 of `docs/TESTING.md`).
 * **Edge cases** — a device in a different time zone, a device set to a 12-hour clock, and a device
   whose clock is deliberately wrong.
+* **Notifications and the widget** — the daily reading notification, the favourable-day reminders and
+  the home-screen widget can only be exercised on a real device: the permission prompt, the 08:00
+  firing, the reboot reschedule, and the widget's rendering against a real launcher (§2.4a of
+  `docs/TESTING.md`).
 
 ---
 
