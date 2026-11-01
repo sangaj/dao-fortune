@@ -112,6 +112,14 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\qa\verify_release.ps1 
   the release gate also checks that git is not tracking them. `dist/` is ignored too — the bundle and
   the source zip are rebuilt, not committed. The repo is public, so GitHub's **secret scanning push
   protection** (Settings → Code security → Push protection) must stay enabled as the second net.
+- **Two builds of the same source do not produce the same AAB bytes.** An AAB is a zip of nested jars
+  and the nested jars are re-compressed on every build, so a few bytes of deflate stream differ; on top
+  of that AGP writes the current commit into
+  `base/root/META-INF/version-control-info.textproto`, and the jar signatures are derived from the
+  payload. So the gate compares **payloads** (`tools/qa/compare_bundles.py`: entry names, order and
+  CRC32, excluding the commit id and the three signature files) and never the whole-file hash. If you
+  ever see "dist bundle matches the freshly built one" fail, compare the payloads first — if the
+  payload matches, the file is right and only the zip bytes moved.
 - **Today's Fortune is drawn the moment the plate is known, and only that one.**
   `FortuneEngine.alwaysFree(date, snapshot, natal)` returns the single reading the home screen carries
   without asking for anything, and `MainViewModel` puts it in `UiState.readings` whenever the plate or

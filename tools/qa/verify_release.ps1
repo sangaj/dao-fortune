@@ -82,12 +82,20 @@ if (Test-Path $aab) {
     Check 'fresh bundle exists' $false $aab
 }
 
-# dist/ is what gets uploaded - it must be the bundle that was just verified.
+# dist/ is what gets uploaded - it must carry the bundle that was just
+# verified. The comparison is by content, not by file hash: an AAB is a zip of
+# nested jars and the nested jars are re-compressed on every build, so two
+# builds of the same source differ in a few bytes of zip stream while
+# carrying exactly the same payload.
 if ((Test-Path $aab) -and (Test-Path $distAab)) {
-    $fresh = (Get-FileHash $aab -Algorithm SHA256).Hash
-    $shipped = (Get-FileHash $distAab -Algorithm SHA256).Hash
-    Check 'dist bundle matches the freshly built one' ($fresh -eq $shipped) `
-        $(if ($fresh -eq $shipped) { $fresh.Substring(0, 16) } else { 'run package_release.ps1' })
+    $cmp = & python 'tools\qa\compare_bundles.py' $aab $distAab 2>&1 | Out-String
+    Check 'dist bundle matches the freshly built one' ($LASTEXITCODE -eq 0) $cmp.Trim()
+    $freshHash = (Get-FileHash $aab -Algorithm SHA256).Hash
+    $shippedHash = (Get-FileHash $distAab -Algorithm SHA256).Hash
+    Write-Output ("    shipped bundle sha256: " + $shippedHash)
+    if ($freshHash -ne $shippedHash) {
+        Write-Output ("    (build sha256 differs by zip bytes only: " + $freshHash + ")")
+    }
 } else {
     Check 'dist bundle exists' $false $distAab
 }
