@@ -185,7 +185,7 @@ fun PaywallSheet(
 
             Spacer(Modifier.height(8.dp))
             Text(
-                "Payments are handled by Google Play. The app works offline and stores no personal data.",
+                "Payments are handled by Google Play. Your anchor stays on this device and is never transmitted.",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center

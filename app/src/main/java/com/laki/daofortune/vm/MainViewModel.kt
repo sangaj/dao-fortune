@@ -133,7 +133,14 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             remindedDays = profile.remindedDays.filter { it >= today }.toSet(),
             freeReadingsLeft = access.freeReadingsLeft(),
             unlocked = access.isUnlocked
-        ).let { it.copy(previews = previewsFor(it.snapshot, it.natalBranch)) }
+        ).let {
+            it.copy(
+                previews = previewsFor(it.snapshot, it.natalBranch),
+                // Today's Fortune is free every day, in full: it is drawn as soon
+                // as the plate is known, so its card carries the score.
+                readings = FortuneEngine.alwaysFree(today, it.snapshot, it.natalBranch)
+            )
+        }
     }
 
     init {
@@ -175,7 +182,10 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 snapshot = fresh,
                 selectedDate = today,
                 isToday = true,
-                previews = previewsFor(fresh, it.natalBranch)
+                previews = previewsFor(fresh, it.natalBranch),
+                // The hour moved, so today's fortune is redrawn with it.
+                readings = it.readings +
+                    FortuneEngine.alwaysFree(today, fresh, it.natalBranch)
             )
         }
         rescanFavourableDays()
@@ -201,6 +211,10 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 selectedDate = date,
                 isToday = date == today,
                 previews = previewsFor(snapshot, it.natalBranch),
+                // A different day is a different plate: today's fortune is free,
+                // so it is drawn for that day too.
+                readings = it.readings +
+                    FortuneEngine.alwaysFree(date, snapshot, it.natalBranch),
                 selected = null
             )
         }
@@ -210,14 +224,20 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     fun setYearSign(sign: YearSign?) {
         profile.setYearSign(sign)
         val state = _ui.value
-        _ui.update {
-            val next = it.copy(yearSign = sign)
-            next.copy(previews = previewsFor(next.snapshot, next.natalBranch))
-        }
         // The readings drawn without the year sign are still true, but they are
         // no longer the readings the reader would get now.
-        if (sign != null || state.yearSign != null) {
-            _ui.update { it.copy(readings = emptyMap(), selected = null, dreamReading = null) }
+        val anchorChanged = sign != null || state.yearSign != null
+        _ui.update {
+            val next = it.copy(yearSign = sign)
+            next.copy(
+                previews = previewsFor(next.snapshot, next.natalBranch),
+                // Today's Fortune is free, so it is redrawn against the new
+                // anchor straight away; the rest go only when the anchor moved.
+                readings = FortuneEngine.alwaysFree(next.selectedDate, next.snapshot, next.natalBranch) +
+                    (if (anchorChanged) emptyMap() else next.readings),
+                selected = if (anchorChanged) null else next.selected,
+                dreamReading = if (anchorChanged) null else next.dreamReading
+            )
         }
         rescanFavourableDays()
     }
@@ -233,12 +253,17 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     fun setBirthDate(date: LocalDate?) {
         profile.setBirthDate(date)
         val state = _ui.value
+        val anchorChanged = date != null || state.birthDate != null
         _ui.update {
             val next = it.copy(birthDate = date)
-            next.copy(previews = previewsFor(next.snapshot, next.natalBranch))
-        }
-        if (date != null || state.birthDate != null) {
-            _ui.update { it.copy(readings = emptyMap(), selected = null, dreamReading = null) }
+            next.copy(
+                previews = previewsFor(next.snapshot, next.natalBranch),
+                // Same as the year sign: the free reading follows the anchor.
+                readings = FortuneEngine.alwaysFree(next.selectedDate, next.snapshot, next.natalBranch) +
+                    (if (anchorChanged) emptyMap() else next.readings),
+                selected = if (anchorChanged) null else next.selected,
+                dreamReading = if (anchorChanged) null else next.dreamReading
+            )
         }
         rescanFavourableDays()
     }

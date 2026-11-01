@@ -243,13 +243,37 @@ function Draw-Chevron($g, [single]$cx, [single]$cy, [single]$size, [System.Drawi
     $pen.Dispose()
 }
 
+function Draw-Bell($g, [single]$cx, [single]$cy, [single]$size, [System.Drawing.Color]$color) {
+    # The daily-reading bell in the app's top bar, and the small bell on each
+    # favourable day. Drawn from primitives so no icon font is needed.
+    $pen = New-Object System.Drawing.Pen($color, ($size * 0.10))
+    # the dome
+    $cap = New-Object System.Drawing.RectangleF(($cx - $size * 0.26), ($cy - $size * 0.42), ($size * 0.52), ($size * 0.52))
+    $g.DrawArc($pen, $cap, 180, 180)
+    # the sides, flaring out to the rim
+    $g.DrawLine($pen, ($cx - $size * 0.26), ($cy - $size * 0.16), ($cx - $size * 0.34), ($cy + $size * 0.06))
+    $g.DrawLine($pen, ($cx + $size * 0.26), ($cy - $size * 0.16), ($cx + $size * 0.34), ($cy + $size * 0.06))
+    # the rim
+    $g.DrawLine($pen, ($cx - $size * 0.38), ($cy + $size * 0.06), ($cx + $size * 0.38), ($cy + $size * 0.06))
+    # the clapper
+    $clapper = New-Object System.Drawing.RectangleF(($cx - $size * 0.10), ($cy + $size * 0.06), ($size * 0.20), ($size * 0.20))
+    $g.DrawArc($pen, $clapper, 0, 180)
+    # the stem
+    $g.DrawLine($pen, $cx, ($cy - $size * 0.42), $cx, ($cy - $size * 0.52))
+    $pen.Dispose()
+}
+
 # ------------------------------------------------------------ home screens
 
 # Shared chip fonts (used by every screen).
 $chipFont = F 'Segoe UI' 15
 $chipVal = F 'Segoe UI' 26 ([System.Drawing.FontStyle]::Bold)
 
-function Render-Home([string]$name, [bool]$withScores, [string]$natalPalace, [string]$natalLabel) {
+function Render-Home([string]$name, [string]$mode, [string]$natalPalace, [string]$natalLabel, [bool]$natalSet) {
+    # $mode is the state the reader is in:
+    #   'free'     - the first reading is still available
+    #   'used'     - the one free reading has been spent
+    #   'unlocked' - the one-off unlock has been bought
     $canvas = New-Canvas
     $bmp = $canvas[0]; $g = $canvas[1]
     $y = 70
@@ -257,6 +281,12 @@ function Render-Home([string]$name, [bool]$withScores, [string]$natalPalace, [st
     $titleFont = F 'Georgia' 62 ([System.Drawing.FontStyle]::Bold)
     $g.DrawString('Dao Fortune', $titleFont, (Brush $Gold), $Margin, $y)
     $titleFont.Dispose()
+    # the app's top bar carries the notification bell and the info button
+    Draw-Bell $g ($W - $Margin - 118) ($y + 34) 40 $Muted
+    $infoPen = New-Object System.Drawing.Pen($Muted, 3)
+    $g.DrawEllipse($infoPen, ($W - $Margin - 60), ($y + 20), 30, 30)
+    $g.DrawLine($infoPen, ($W - $Margin - 45), ($y + 35), ($W - $Margin - 45), ($y + 40))
+    $infoPen.Dispose()
     $y += 76
     $tagFont = F 'Segoe UI' 19
     $g.DrawString('D A I L Y   L U O P A N   W I S D O M', $tagFont, (Brush $Muted), $Margin, $y)
@@ -282,13 +312,19 @@ function Render-Home([string]$name, [bool]$withScores, [string]$natalPalace, [st
     Draw-Chevron $g (($W - $Margin) - 44) ($y + 42) 13 $Muted $false
     $y += $selH + 16
 
-    # the year sign
-    RoundRect $g $Margin $y ($W - 2 * $Margin) $selH 18 $Card $Outline
-    $g.DrawString('YEAR SIGN', $chipFont, (Brush $Muted), ($Margin + 24), ($y + 14))
-    $g.DrawString($natalLabel, $selFont, (Brush $Gold), ($Margin + 24), ($y + 40))
-    $g.DrawString('CHANGE', $chipFont, (Brush $Muted), (($W - $Margin) - 110), ($y + 40))
+    # the anchor row: the year sign, or the birth day when one is given
+    $anchorH = 108
+    RoundRect $g $Margin $y ($W - 2 * $Margin) $anchorH 18 $Card $Outline
+    $g.DrawString('YOUR ANCHOR', $chipFont, (Brush $Muted), ($Margin + 24), ($y + 14))
+    $anchorBrush = if ($natalSet) { Brush $Gold } else { Brush $Muted }
+    $g.DrawString($natalLabel, $selFont, $anchorBrush, ($Margin + 24), ($y + 40))
+    $anchorBrush.Dispose()
+    $g.DrawString('Add your birth day for a deeper reading', $selSmall, (Brush $Muted), ($Margin + 24), ($y + 74))
+    if ($natalSet) {
+        $g.DrawString('CHANGE', $chipFont, (Brush $Muted), (($W - $Margin) - 110), ($y + 40))
+    }
     $selFont.Dispose(); $selSmall.Dispose()
-    $y += $selH + 16
+    $y += $anchorH + 16
 
     # chips
     $chipW = 470
@@ -343,10 +379,16 @@ function Render-Home([string]$name, [bool]$withScores, [string]$natalPalace, [st
     $legendFont.Dispose()
     $y += $cardH + 34
 
-    # the free-reading note (first-run state only)
-    if (-not $withScores) {
+    # the free-reading note, exactly as the app words it
+    if ($mode -ne 'unlocked') {
         $bannerFont = F 'Segoe UI' 22
-        $banner = 'Your first reading is free - open any module below. After that, each reading needs the one-off unlock. The verdicts are free; the reasoning behind them is not.'
+        if ($mode -eq 'free') {
+            $banner = 'Today''s Fortune is free every day, in full. Your first reading is free too ' +
+                      $Dash + ' after that, each reading needs the one-off unlock.'
+        } else {
+            $banner = 'Today''s Fortune is free every day, in full. Your free reading has been used ' +
+                      $Dash + ' open another reading to unlock it.'
+        }
         $usedHeight = Wrap $g $banner $bannerFont (Brush $Muted) $Margin $y ($W - 2 * $Margin)
         $y += $usedHeight + 16
         $bannerFont.Dispose()
@@ -361,24 +403,29 @@ function Render-Home([string]$name, [bool]$withScores, [string]$natalPalace, [st
     $headlineFont = F 'Segoe UI' 21
     foreach ($m in $plate.modules) {
         $accent = Verdict-Color $m.verdict
+        # Today's Fortune is free every day, in full: it always carries its score.
+        $isOverall = ($m.title -eq "Today's Fortune")
+        $scored = $isOverall -or ($mode -eq 'unlocked')
         RoundRect $g $Margin $y ($W - 2 * $Margin) 104 20 $Card $Outline
         $g.DrawString($m.title, $modFont, (Brush $Parchment), ($Margin + 26), ($y + 18))
-        if ($withScores) {
+        if ($scored) {
             $g.DrawString($m.headline, $headlineFont, (Brush $Muted), ($Margin + 26), ($y + 58))
             $g.DrawString([string]$m.score, $scoreFont, (Brush $accent), (($W - $Margin) - 120), ($y + 26))
         } else {
             $g.DrawString('PREVIEW', $previewFont, (Brush $Muted), ($Margin + 26), ($y + 62))
             $g.DrawString($m.headline, $headlineFont, (Brush $Muted), ($Margin + 150), ($y + 56))
-            # small padlock
-            $lockX = $W - $Margin - 52
-            $lockY = $y + 46
-            $lockPen = New-Object System.Drawing.Pen($Muted, 3)
-            $g.DrawArc($lockPen, ($lockX + 6), ($lockY - 10), 16, 16, 180, 180)
-            $g.DrawLine($lockPen, ($lockX + 2), ($lockY + 4), ($lockX + 26), ($lockY + 4))
-            $g.DrawLine($lockPen, ($lockX + 2), ($lockY + 4), ($lockX + 2), ($lockY + 20))
-            $g.DrawLine($lockPen, ($lockX + 26), ($lockY + 4), ($lockX + 26), ($lockY + 20))
-            $g.DrawLine($lockPen, ($lockX + 2), ($lockY + 20), ($lockX + 26), ($lockY + 20))
-            $lockPen.Dispose()
+            if ($mode -eq 'used') {
+                # the padlock the app puts on a module the free reading no longer covers
+                $lockX = $W - $Margin - 52
+                $lockY = $y + 46
+                $lockPen = New-Object System.Drawing.Pen($Muted, 3)
+                $g.DrawArc($lockPen, ($lockX + 6), ($lockY - 10), 16, 16, 180, 180)
+                $g.DrawLine($lockPen, ($lockX + 2), ($lockY + 4), ($lockX + 26), ($lockY + 4))
+                $g.DrawLine($lockPen, ($lockX + 2), ($lockY + 4), ($lockX + 2), ($lockY + 20))
+                $g.DrawLine($lockPen, ($lockX + 26), ($lockY + 4), ($lockX + 26), ($lockY + 20))
+                $g.DrawLine($lockPen, ($lockX + 2), ($lockY + 20), ($lockX + 26), ($lockY + 20))
+                $lockPen.Dispose()
+            }
         }
         $y += 116
     }
@@ -386,8 +433,11 @@ function Render-Home([string]$name, [bool]$withScores, [string]$natalPalace, [st
     Save-Png $bmp $g $name
 }
 
-Render-Home '01_home.png' $false '' 'Set yours to personalise the plate'
-Render-Home '02_home_unlocked.png' $true 'Zi' "Rat $Dot Zi"
+# The first run: Today's Fortune shows its score, the other four show their
+# free headline, and the note says the first reading is free.
+Render-Home '01_home.png' 'free' '' 'Set yours to personalise the plate' $false
+# The same day after the one-off unlock.
+Render-Home '02_home_unlocked.png' 'unlocked' 'Zi' "Rat $Dot Zi" $true
 
 # ------------------------------------------------- screenshot 3: favourable days
 #
@@ -427,18 +477,20 @@ Draw-Chevron $g ($Margin + 44) ($y + 42) 13 $Muted $true
 Draw-Chevron $g (($W - $Margin) - 44) ($y + 42) 13 $Muted $false
 $y += $selH + 16
 
-# the year sign
-RoundRect $g $Margin $y ($W - 2 * $Margin) $selH 18 $Card $Outline
-$g.DrawString('YEAR SIGN', $chipFont, (Brush $Muted), ($Margin + 24), ($y + 14))
+# the anchor row
+$anchorH = 108
+RoundRect $g $Margin $y ($W - 2 * $Margin) $anchorH 18 $Card $Outline
+$g.DrawString('YOUR ANCHOR', $chipFont, (Brush $Muted), ($Margin + 24), ($y + 14))
 $g.DrawString("Rat $Dot Zi", $selFont, (Brush $Gold), ($Margin + 24), ($y + 40))
+$g.DrawString('Add your birth day for a deeper reading', $selSmall, (Brush $Muted), ($Margin + 24), ($y + 74))
 $g.DrawString('CHANGE', $chipFont, (Brush $Muted), (($W - $Margin) - 110), ($y + 40))
 $selFont.Dispose(); $selSmall.Dispose()
-$y += $selH + 30
+$y += $anchorH + 30
 
 $g.DrawString('FAVOURABLE DAYS AHEAD', $chipFont, (Brush $Gold), $Margin, $y)
 $y += 40
 $leadFont = F 'Segoe UI' 26
-$usedHeight = Wrap $g 'The next sixty days, ranked by the windfall reading. Tap a day to read its plate.' $leadFont (Brush $Muted) $Margin $y ($W - 2 * $Margin)
+$usedHeight = Wrap $g 'The next sixty days, ranked by the windfall reading. Tap a day to read its plate, the bell to be reminded on its morning.' $leadFont (Brush $Muted) $Margin $y ($W - 2 * $Margin)
 $y += $usedHeight + 26
 
 $dayFont = F 'Segoe UI' 34 ([System.Drawing.FontStyle]::Bold)
@@ -446,12 +498,18 @@ $dayMetaFont = F 'Segoe UI' 21
 $dayScoreFont = F 'Georgia' 52 ([System.Drawing.FontStyle]::Bold)
 foreach ($d in $sample.favourableDays) {
     $accent = Verdict-Color $d.verdict
-    RoundRect $g $Margin $y ($W - 2 * $Margin) 158 18 $Card $Outline
+    RoundRect $g $Margin $y ($W - 2 * $Margin) 148 18 $Card $Outline
     $g.DrawString($d.date, $dayFont, (Brush $Parchment), ($Margin + 28), ($y + 24))
-    $g.DrawString("$($d.dayPillar) $Dot $($d.term)", $dayMetaFont, (Brush $Muted), ($Margin + 28), ($y + 74))
-    $g.DrawString($d.headline, $dayMetaFont, (Brush $Muted), ($Margin + 28), ($y + 106))
-    $g.DrawString([string]$d.score, $dayScoreFont, (Brush $accent), (($W - $Margin) - 150), ($y + 44))
-    $y += 170
+    if ($d.isToday) {
+        $g.DrawString('TODAY', $chipFont, (Brush $Gold), ($Margin + 190), ($y + 34))
+    }
+    $g.DrawString("$($d.dayPillar) $Dot $($d.term) $Dot $($d.headline)", $dayMetaFont, (Brush $Muted), ($Margin + 28), ($y + 82))
+    if (-not $d.isToday) {
+        # the bell the app puts on every day but today
+        Draw-Bell $g (($W - $Margin) - 205) ($y + 72) 44 $Muted
+    }
+    $g.DrawString([string]$d.score, $dayScoreFont, (Brush $accent), (($W - $Margin) - 130), ($y + 48))
+    $y += 160
 }
 $y += 14
 
@@ -529,10 +587,12 @@ $bodyFont.Dispose(); $bulletFont.Dispose(); $hourFont.Dispose()
 Save-Png $bmp $g '04_windfall_reading.png'
 
 # --------------------------------------------------------- screenshot 5: paywall
+#
+# A bottom sheet sits at the foot of the screen, so the sheet starts low.
 
 $canvas = New-Canvas
 $bmp = $canvas[0]; $g = $canvas[1]
-$y = 240
+$y = 620
 
 $bigFont = F 'Georgia' 62 ([System.Drawing.FontStyle]::Bold)
 $hh = Wrap $g 'Unlock Full Access' $bigFont (Brush $Gold) $Margin $y ($W - 2 * $Margin)
@@ -541,9 +601,10 @@ $usedHeight = Wrap $g 'One payment. No subscription. Every module, every day, fo
 $y += $usedHeight + 44
 
 $benefits = @(
-  'All five modules: overall fortune, windfall, love, career and body',
+  # The parentheses matter: in PowerShell the comma operator binds tighter than
+  # '+', so an unbracketed concatenation swallows the rest of the list.
+  ('Windfall, love, career and body in full ' + $Dash + ' Today''s Fortune stays free'),
   'The complete luopan plate every day, with the sun''s mountain',
-  'Any day you choose, plus the next sixty days scanned and ranked',
   'Every favourable double-hour, with the reason for each score',
   'The full factor breakdown behind every reading',
   'No subscription, no ads, no account'
@@ -579,7 +640,7 @@ $g.DrawString('Not now', $smallFont, $mutedB,
 $y += 100
 
 $fine = F 'Segoe UI' 20
-$usedHeight = Wrap $g 'Payments are handled by Google Play. Your year sign is stored on this device only and is never transmitted.' $fine $mutedB $Margin $y ($W - 2 * $Margin)
+$usedHeight = Wrap $g 'Payments are handled by Google Play. Your anchor stays on this device and is never transmitted.' $fine $mutedB $Margin $y ($W - 2 * $Margin)
 $y += $usedHeight + 30
 $usedHeight = Wrap $g 'Dao Fortune is a cultural and entertainment product. It is not financial, medical, legal or psychological advice, and it does not predict events.' $fine $mutedB $Margin $y ($W - 2 * $Margin)
 
@@ -816,7 +877,7 @@ $summaryFont.Dispose()
 $y += $usedHeight + 90
 
 # the plate. The images sit outside the ring, so the plate needs room above it.
-$plateSize = 720
+$plateSize = 600
 $plateCx = $W / 2
 $plateCy = $y + ($plateSize / 2)
 Draw-DreamPlate $g $plateCx $plateCy ($plateSize / 2 - 30) $dream $dream.sunPalace $dream.wealthElement $dream.natalPalace
@@ -836,10 +897,38 @@ foreach ($line in $dream.insights) {
 }
 $dreamBullet.Dispose()
 
-# the privacy line the app shows at the foot of the sheet
+# what to do, the advice the app shows under the plate
+$adviceFont = F 'Segoe UI' 24
+$g.DrawString('WHAT TO DO', $chipFont, (Brush $Gold), $Margin, $y)
+$y += 36
+if ($dream.advice.Count -gt 0) {
+    $g.FillEllipse((Brush $Gold), ($Margin + 2), ($y + 11), 10, 10)
+    $usedHeight = Wrap $g $dream.advice[0] $adviceFont $body ($Margin + 30) $y ($W - 2 * $Margin - 30)
+    $y += $usedHeight + 20
+}
+$adviceFont.Dispose()
+
+# the share buttons the app puts under the reading
+$shareFont = F 'Segoe UI' 22
+$shareH = 62
+$shareW = ($W - 2 * $Margin - 16) / 2
+$clear = [System.Drawing.Color]::FromArgb(0, 0, 0, 0)
+RoundRect $g $Margin $y $shareW $shareH 18 $clear $Gold
+RoundRect $g ($Margin + $shareW + 16) $y $shareW $shareH 18 $clear $Gold
+$shareFmt = New-Object System.Drawing.StringFormat
+$shareFmt.Alignment = [System.Drawing.StringAlignment]::Center
+$shareFmt.LineAlignment = [System.Drawing.StringAlignment]::Center
+$g.DrawString('Share as image', $shareFont, (Brush $Gold),
+              (New-Object System.Drawing.RectangleF($Margin, $y, $shareW, $shareH)), $shareFmt)
+$g.DrawString('Save to gallery', $shareFont, (Brush $Gold),
+              (New-Object System.Drawing.RectangleF(($Margin + $shareW + 16), $y, $shareW, $shareH)), $shareFmt)
+$shareFmt.Dispose(); $shareFont.Dispose()
+$y += $shareH + 26
+
+# the line the app closes the sheet with
 $privacyFont = F 'Segoe UI' 20
-$privacy = 'Your words are read on this phone and never leave it. Nothing is stored, nothing is uploaded, and closing this sheet erases the dream.'
-$usedHeight = Wrap $g $privacy $privacyFont $mutedB $Margin ($y + 16) ($W - 2 * $Margin)
+$privacy = 'A cultural reading of a dream, in the classical luopan tradition. It is not psychology, and it does not predict events.'
+$usedHeight = Wrap $g $privacy $privacyFont $mutedB $Margin $y ($W - 2 * $Margin)
 $privacyFont.Dispose()
 
 Save-Png $bmp $g '06_dream.png'

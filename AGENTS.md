@@ -112,6 +112,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\qa\verify_release.ps1 
   the release gate also checks that git is not tracking them. `dist/` is ignored too — the bundle and
   the source zip are rebuilt, not committed. The repo is public, so GitHub's **secret scanning push
   protection** (Settings → Code security → Push protection) must stay enabled as the second net.
+- **Today's Fortune is drawn the moment the plate is known, and only that one.**
+  `FortuneEngine.alwaysFree(date, snapshot, natal)` returns the single reading the home screen carries
+  without asking for anything, and `MainViewModel` puts it in `UiState.readings` whenever the plate or
+  the anchor changes. That is why the card shows its score instead of a `PREVIEW` tag, and why opening
+  it never spends the free reading. The four other modules and the dream stay behind the unlock. If the
+  split changes, the listing, the paywall bullets, the home banner and the store screenshots change
+  with it.
 
 ## Store material
 
@@ -124,6 +131,15 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\store_assets\build_scr
 
 Screenshots read `docs/store/reading_sample.json`, which the `SampleReadingDump` test writes from
 real engine output — regenerate it by running the tests, not by editing it.
+
+**The screenshots are a re-implementation of the Compose layout in GDI+, not captures of it.** They do
+not follow the app: when a visible string or a row changes, `tools/store_assets/build_screenshots.ps1`
+has to be edited by hand and the six PNGs regenerated, or the store shows a product that no longer
+exists. The home shot in particular carries the free-reading banner, the anchor row and the five
+module cards — copy that text out of `ui/HomeScreen.kt` and `ui/DateAndYearSign.kt`, never from
+memory. Two traps in that script: PowerShell's comma operator binds tighter than `+`, so a
+concatenated array element needs its own parentheses; and `$h` clobbers `$H` because the shell is
+case-insensitive.
 
 `docs/store/screenshots/` must hold exactly the final PNGs — `01_home`, `02_home_unlocked`,
 `03_favourable_days`, `04_windfall_reading`, `05_unlock` and `06_dream` — that is the folder you upload

@@ -1,5 +1,6 @@
 package com.laki.daofortune.core
 
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -279,4 +280,19 @@ object FortuneEngine {
     } else {
         "Today · " + s.moment.format(DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH))
     }
+
+    /**
+     * The readings the home screen carries without asking for anything.
+     *
+     * Today's Fortune is free every day, in full: it is drawn as soon as the
+     * plate is known, so its card shows the score and never the preview teaser,
+     * and the one free reading is never spent on it. The other four modules and
+     * the dream are not here — they are what the unlock is for.
+     */
+    fun alwaysFree(
+        date: LocalDate,
+        s: LuopanSnapshot,
+        natal: Branch? = null
+    ): Map<ReadingKey, ModuleReading> =
+        mapOf(ReadingKey(date, FortuneModule.OVERALL) to reading(s, FortuneModule.OVERALL, natal))
 }

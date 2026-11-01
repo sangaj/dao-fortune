@@ -31,7 +31,7 @@ of them has drifted.
 ```powershell
 Set-Location E:\Minimax\dao-fortune
 python tools\reference\luopan_reference.py       # SELF-CHECK: ALL PASS, rewrites the golden TSVs
-.\gradlew.bat :app:testDebugUnitTest             # 51 tests
+.\gradlew.bat :app:testDebugUnitTest             # 55 tests
 ```
 
 `SampleReadingDump` also writes `docs/store/reading_sample.json` — the real output the store
@@ -110,6 +110,16 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\release\package_releas
 Produces `dist/app-release.aab` and `dist/dao-fortune-source-v1.0.0.zip`. The source zip must contain
 **no** `keystore.properties`, no `.jks` and no `__pycache__`.
 
+### 1.7 Store copy
+
+```powershell
+python tools\qa\check_listing_lengths.py
+```
+
+Play rejects an over-long listing before a human ever sees it, so the caps are checked here: app name
+30, short description 80, full description 4000, release notes 500. This runs inside the release
+gate.
+
 ---
 
 ## Layer 2 — On a real phone
@@ -156,7 +166,7 @@ production.
 
 | # | Action | Expected |
 |---|---|---|
-| 12 | Fresh install, before paying | All five cards show a verdict line and a `PREVIEW` tag |
+| 12 | Fresh install, before paying | The four paid modules show a verdict line and a `PREVIEW` tag; **Today's Fortune shows its score straight away** — it is free every day, in full |
 | 12a | Open **Today's Fortune** without paying | The full reading opens — score, factors, hours, advice — and the free-reading counter is untouched |
 | 13 | Locked cards (the other four, after the free reading is spent) | Lock icon, no score; Today's Fortune never locks |
 | 14 | After unlocking | Scores appear on every card, `PREVIEW` tag gone |
@@ -270,7 +280,7 @@ Everything below must be true before an upload. If any line is unchecked, stop.
 | Gate | How to verify | Status |
 |---|---|---|
 | Engine parity green | `python tools\reference\luopan_reference.py` → ALL PASS | ☐ |
-| Unit tests green | `:app:testDebugUnitTest` → 51/51 | ☐ |
+| Unit tests green | `:app:testDebugUnitTest` → 55/55 | ☐ |
 | Lint has zero errors | `:app:lintRelease` → `app/build/reports/lint-results-release.txt` | ☐ |
 | Bundle validates | `bundletool validate` → exit 0 | ☐ |
 | 16 KB page size | `python tools\qa\check_16kb_pages.py dist\app-release.aab` → PASSED | ☐ |

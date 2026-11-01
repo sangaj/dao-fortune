@@ -314,9 +314,10 @@ The reading is computed locally, so the only thing being sold is access to it. T
 `data/AccessState.kt` and `vm/MainViewModel.kt`:
 
 * **Today's Fortune is free every day, in full.** The overall module — score, factors, hours and
-  advice — never costs anything and never spends the free reading. It is the daily hook.
-* **The first full reading of each other module is free.** Windfall, love, career, body and the
-  dream: the first one is on the house.
+  advice — never costs anything and never spends the free reading. It is the daily hook, and it is
+  drawn as soon as the plate is known, so its card shows the score straight away.
+* **One free reading in total, not one per module.** Windfall, love, career, body and the dream share
+  a single free reading: the first one you open is on the house, and the next one needs the unlock.
 * **After that, every reading needs the one-off unlock** (`dao_fortune_full_access`, $9.99 in every
   market; the app reads the converted price straight from Play Billing).
 

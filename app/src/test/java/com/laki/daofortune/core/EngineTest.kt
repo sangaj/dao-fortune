@@ -441,4 +441,48 @@ class EngineTest {
             assertEquals("${day.date} headline", expected.headline, day.headline)
         }
     }
+
+    @Test
+    fun `today's fortune is always drawn, the other modules are not`() {
+        // Today's Fortune is free every day, in full: the home screen carries
+        // it as soon as the plate is known, so its card shows the score rather
+        // than the preview teaser. Nothing else comes for free.
+        val date = LocalDate.of(2026, 10, 31)
+        val plate = LuopanEngine.dayPlate(date, zone)
+
+        val free = FortuneEngine.alwaysFree(date, plate, Branch.ZI)
+        assertEquals("only today's fortune", 1, free.size)
+        val reading = free[ReadingKey(date, FortuneModule.OVERALL)]
+        assertTrue("today's fortune is in the free set", reading != null)
+        assertEquals(FortuneModule.OVERALL, reading!!.module)
+        assertEquals(
+            "the free reading is the real one",
+            FortuneEngine.reading(plate, FortuneModule.OVERALL, Branch.ZI).score,
+            reading.score
+        )
+
+        // The four modules behind the unlock, and the dream, are not in it.
+        FortuneModule.entries.filter { it != FortuneModule.OVERALL }.forEach { module ->
+            assertTrue("${module.title} is not free", free[ReadingKey(date, module)] == null)
+        }
+    }
+
+    @Test
+    fun `the free reading follows the anchor`() {
+        // Change the anchor and the free reading is redrawn against it, while
+        // the paid-for ones are the reader's to keep or lose.
+        val date = LocalDate.of(2026, 10, 31)
+        val plate = LuopanEngine.dayPlate(date, zone)
+        val withZi = FortuneEngine.alwaysFree(date, plate, Branch.ZI)[ReadingKey(date, FortuneModule.OVERALL)]!!
+        val withWu = FortuneEngine.alwaysFree(date, plate, Branch.WU)[ReadingKey(date, FortuneModule.OVERALL)]!!
+        assertEquals(
+            "the same anchor gives the same reading",
+            withZi.score,
+            FortuneEngine.alwaysFree(date, plate, Branch.ZI)[ReadingKey(date, FortuneModule.OVERALL)]!!.score
+        )
+        assertTrue(
+            "a different anchor moves the reading",
+            withZi.score != withWu.score || withZi.headline != withWu.headline
+        )
+    }
 }
