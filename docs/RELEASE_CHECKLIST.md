@@ -161,9 +161,9 @@ August 2026 — this build already complies. No action needed, but verify in Con
   | Privacy policy for Play | **https://sangaj.github.io/dao-fortune/privacy-policy.html** |
   | Pages source | branch `main`, folder `/docs` |
 
-  Paste the **sangaj.github.io** link into Play Console → App content → Privacy policy. (GitHub also
-  reports `http://gubingjing.com/dao-fortune/` as the canonical address; that one needs its own
-  certificate and DNS to work, so use the `github.io` link unless you have set the domain up.)
+  Paste the **sangaj.github.io** link into Play Console → App content → Privacy policy. The old
+  custom-domain binding (`gubingjing.com`) was removed from the Pages settings, so the github.io
+  address now serves the page directly over HTTPS with no redirect.
 
   If the policy text changes, regenerate and push:
   ```powershell
