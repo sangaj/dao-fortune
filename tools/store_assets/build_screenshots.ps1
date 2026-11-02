@@ -1,4 +1,4 @@
-﻿# Renders the Play Store phone screenshots from the real engine output.
+# Renders the Play Store phone screenshots from the real engine output.
 #
 # Input : docs\store\reading_sample.json  (written by the SampleReadingDump test)
 # Output: docs\store\screenshots\*.png
@@ -435,6 +435,11 @@ function Render-Home([string]$name, [string]$mode, [string]$natalPalace, [string
 
 # The first run: Today's Fortune shows its score, the other four show their
 # free headline, and the note says the first reading is free.
+#
+# The free-spend confirmation dialog ("Your one free reading") is deliberately
+# not in any shot: it is a modal that only appears on a tap, never part of a
+# screen's resting state. If its copy ever changes, nothing here drifts — but
+# the banner copy above and the paywall fine print must still match the app.
 Render-Home '01_home.png' 'free' '' 'Set yours to personalise the plate' $false
 # The same day after the one-off unlock.
 Render-Home '02_home_unlocked.png' 'unlocked' 'Zi' "Rat $Dot Zi" $true

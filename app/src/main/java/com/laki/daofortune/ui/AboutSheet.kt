@@ -142,12 +142,12 @@ fun AboutSheet(onDismiss: () -> Unit) {
             Spacer(Modifier.height(6.dp))
             Text(
                 "The app has no account, no analytics and no network calls of its own. Your reading is " +
-                    "computed on your device. Your year sign is stored on this device only — it is " +
-                    "excluded from Android's backup and is never transmitted, and you can clear it from " +
-                    "the home screen at any time. The dream you write is read on this device, drawn on " +
-                    "this device and erased when you close the sheet: it is never stored, never " +
-                    "transmitted and never seen by anyone. The only purchase data ever handled is what " +
-                    "Google Play Billing processes for the unlock.",
+                    "computed on your device. Your year sign — and your birth day, if you add one — is " +
+                    "stored on this device only: excluded from Android's backup, never transmitted, and " +
+                    "you can clear both from the home screen at any time. The dream you write is read on " +
+                    "this device, drawn on this device and erased when you close the sheet: it is never " +
+                    "stored, never transmitted and never seen by anyone. The only purchase data ever " +
+                    "handled is what Google Play Billing processes for the unlock.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
