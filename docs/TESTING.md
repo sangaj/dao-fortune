@@ -168,6 +168,8 @@ production.
 |---|---|---|
 | 12 | Fresh install, before paying | The four paid modules show a verdict line and a `PREVIEW` tag; **Today's Fortune shows its score straight away** — it is free every day, in full |
 | 12a | Open **Today's Fortune** without paying | The full reading opens — score, factors, hours, advice — and the free-reading counter is untouched |
+| 12b | Tap another module while the free reading is unspent | A dialog asks "Your one free reading" first; nothing is spent until it is confirmed |
+| 12c | Dismiss the dialog, then tap the module again | The dialog returns and the free reading is still there; confirming spends it and opens the reading |
 | 13 | Locked cards (the other four, after the free reading is spent) | Lock icon, no score; Today's Fortune never locks |
 | 14 | After unlocking | Scores appear on every card, `PREVIEW` tag gone |
 

@@ -62,6 +62,8 @@ data class UiState(
     /** True when the daily reading notification is switched on. */
     val notifyEnabled: Boolean = false,
     val selected: ReadingKey? = null,
+    /** The module waiting on the reader's yes before the one free reading is spent. */
+    val confirmFreeSpend: FortuneModule? = null,
     val pendingModule: FortuneModule? = null,
     val showPaywall: Boolean = false,
     val showAbout: Boolean = false,
@@ -308,7 +310,9 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
      *
      * Today's Fortune is always free — every day, in full. The other four
      * modules keep the old rule: the first reading is free, later ones need
-     * the unlock.
+     * the unlock. Because there is exactly ONE free reading, a tap that would
+     * spend it asks first ([confirmFreeSpend]); it should never be gone
+     * before the reader knew it was the only one.
      */
     fun open(module: FortuneModule) {
         val state = _ui.value
@@ -322,15 +326,38 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             _ui.update { current -> current.copy(pendingModule = module, showPaywall = true) }
             return
         }
+        val spendsFree = !alwaysFree && !access.isUnlocked && !access.freeReadingUsed
+        if (spendsFree) {
+            _ui.update { it.copy(confirmFreeSpend = module) }
+            return
+        }
+        produceReading(module, key, spendsFree = false)
+    }
+
+    /** Spends the one free reading the reader just confirmed. */
+    fun confirmFreeSpend() {
+        val module = _ui.value.confirmFreeSpend ?: return
+        _ui.update { it.copy(confirmFreeSpend = null) }
+        val key = ReadingKey(_ui.value.selectedDate, module)
+        produceReading(module, key, spendsFree = true)
+    }
+
+    /** Closes the free-reading confirmation without spending it. */
+    fun dismissFreeSpend() {
+        _ui.update { it.copy(confirmFreeSpend = null) }
+    }
+
+    /** Draws a reading and puts it on screen; consumes the free reading when asked. */
+    private fun produceReading(module: FortuneModule, key: ReadingKey, spendsFree: Boolean) {
+        val state = _ui.value
         val reading = FortuneEngine.reading(state.snapshot, module, state.natalBranch)
-        val spentFree = !alwaysFree && !access.isUnlocked && !access.freeReadingUsed
-        if (spentFree) access.consumeFreeReading()
+        if (spendsFree) access.consumeFreeReading()
         _ui.update { current ->
             current.copy(
                 readings = current.readings + (key to reading),
                 selected = key,
                 freeReadingsLeft = access.freeReadingsLeft(),
-                notice = if (spentFree) NOTICE_FREE_READING_USED else null
+                notice = if (spendsFree) NOTICE_FREE_READING_USED else null
             )
         }
     }

@@ -34,8 +34,6 @@ import com.laki.daofortune.core.LuopanEngine
 import com.laki.daofortune.data.ProfileState
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 /**
  * The home-screen widget: today's overall score, the verdict, the headline
@@ -54,6 +52,7 @@ class TodayWidget : GlanceAppWidget() {
         val natal = profile.birthDate?.let { CalendarEngine.dayGanZhi(it.atTime(12, 0)).branch }
             ?: profile.yearSign?.branch
         val reading = FortuneEngine.reading(snapshot, FortuneModule.OVERALL, natal)
+        val copy = widgetCopy(snapshot.moment.toLocalDate(), reading)
 
         provideContent {
             GlanceTheme {
@@ -67,12 +66,9 @@ class TodayWidget : GlanceAppWidget() {
                     verticalAlignment = Alignment.Vertical.CenterVertically
                 ) {
                     Text(
-                        // The date, not the pillar: String.format(DateTimeFormatter, …)
-                        // uses the receiver as the pattern, so formatting the
-                        // pillar's "WuYin" would print "WuYin" back verbatim.
-                        text = snapshot.moment.toLocalDate()
-                            .format(DateTimeFormatter.ofPattern("EEE d MMM", Locale.ENGLISH))
-                            .uppercase(Locale.ENGLISH),
+                        // The copy is assembled in WidgetCopy.kt — pure Kotlin,
+                        // so the JVM test in WidgetCopyTest locks every line.
+                        text = copy.dateLine,
                         style = TextStyle(
                             color = ColorProvider(MUTED),
                             fontSize = 11.sp,
@@ -82,7 +78,7 @@ class TodayWidget : GlanceAppWidget() {
                     Spacer(GlanceModifier.height(6.dp))
                     Row(verticalAlignment = Alignment.Vertical.CenterVertically) {
                         Text(
-                            text = "${reading.score}",
+                            text = copy.score,
                             style = TextStyle(
                                 color = ColorProvider(GOLD),
                                 fontSize = 34.sp,
@@ -92,16 +88,16 @@ class TodayWidget : GlanceAppWidget() {
                         Spacer(GlanceModifier.width(10.dp))
                         Column {
                             Text(
-                                text = reading.verdict.label,
+                                text = copy.verdict,
                                 style = TextStyle(
                                     color = ColorProvider(JADE),
                                     fontSize = 13.sp,
                                     fontWeight = FontWeight.Medium
                                 )
                             )
-                            reading.bestHours.firstOrNull()?.let { hour ->
+                            copy.bestWindow?.let { window ->
                                 Text(
-                                    text = "Best window ${hour.range}",
+                                    text = window,
                                     style = TextStyle(color = ColorProvider(MUTED), fontSize = 11.sp)
                                 )
                             }
@@ -109,7 +105,7 @@ class TodayWidget : GlanceAppWidget() {
                     }
                     Spacer(GlanceModifier.height(6.dp))
                     Text(
-                        text = reading.headline,
+                        text = copy.headline,
                         maxLines = 2,
                         style = TextStyle(color = ColorProvider(PARCHMENT), fontSize = 13.sp)
                     )

@@ -10,8 +10,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -110,6 +113,31 @@ class MainActivity : ComponentActivity() {
                     val reading = selected?.let { state.readings[it] }
                     if (reading != null) {
                         ReadingSheet(reading = reading, onClose = viewModel::closeReading)
+                    }
+
+                    // One free reading exists; it is never spent without asking.
+                    state.confirmFreeSpend?.let { module ->
+                        AlertDialog(
+                            onDismissRequest = viewModel::dismissFreeSpend,
+                            title = { Text("Your one free reading") },
+                            text = {
+                                Text(
+                                    "Open ${module.title} in full? This is the one free reading " +
+                                        "beyond Today's Fortune — after it, every reading needs " +
+                                        "the one-off unlock."
+                                )
+                            },
+                            confirmButton = {
+                                TextButton(onClick = viewModel::confirmFreeSpend) {
+                                    Text("Open it")
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = viewModel::dismissFreeSpend) {
+                                    Text("Not now")
+                                }
+                            }
+                        )
                     }
 
                     if (state.showDream) {

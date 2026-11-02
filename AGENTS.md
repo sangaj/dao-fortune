@@ -26,7 +26,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\qa\verify_release.ps1 
   Play Console product. The app is free to download. **Today's Fortune (`FortuneModule.OVERALL`) is
   free every day, in full** — it never spends the free reading and never hits the paywall. Of the
   other four modules and the dream, the **first full reading is free**, and every later reading
-  needs the one-off unlock (`data/AccessState.kt`, `vm/MainViewModel.kt`). If that split changes,
+  needs the one-off unlock (`data/AccessState.kt`, `vm/MainViewModel.kt`). There is exactly **one**
+  free reading, and a tap that would spend it asks first (`UiState.confirmFreeSpend`) — it must
+  never be spent silently. If that split changes,
   change `docs/PLAY_STORE_LISTING.md` with it — the listing describes the paywall model in its own
   words.
 - **The price is never hard-coded in the app.** It is $9.99 in every market, set once in Play

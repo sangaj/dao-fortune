@@ -318,6 +318,8 @@ The reading is computed locally, so the only thing being sold is access to it. T
   drawn as soon as the plate is known, so its card shows the score straight away.
 * **One free reading in total, not one per module.** Windfall, love, career, body and the dream share
   a single free reading: the first one you open is on the house, and the next one needs the unlock.
+  Because it is the only one, the app asks before spending it — a tap that would use it shows a
+  confirmation first.
 * **After that, every reading needs the one-off unlock** (`dao_fortune_full_access`, $9.99 in every
   market; the app reads the converted price straight from Play Billing).
 
