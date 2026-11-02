@@ -126,7 +126,8 @@ gate.
 
 This machine has no emulator (the CPU has no hardware virtualisation) and no device, so Layer 2 is a
 human pass. Install from Play (internal testing track) rather than sideloading — the Play build is
-the artifact that matters.
+the artifact that matters. The one-page working list for that evening is
+`docs/PRELAUNCH_DEVICE_PASS.md`; the rows below are the details it points back to.
 
 ### 2.1 Install and first run
 
