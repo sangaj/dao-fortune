@@ -160,6 +160,13 @@ $lengthCheck = & python 'tools\qa\check_listing_lengths.py' 2>&1 | Out-String
 Check 'store listing copy is within Play limits' ($LASTEXITCODE -eq 0) `
     (($lengthCheck.Trim() -split "`n" | Where-Object { $_ -match 'FAIL' }) -join ' ')
 
+# The paywall split, the one free reading, the birth-day storage promise and
+# the disclaimer appear in the app, the listing, the privacy policy and the
+# docs, and Play reads them side by side. Drift is caught here, not by review.
+$copyCheck = & python 'tools\qa\check_copy_consistency.py' 2>&1 | Out-String
+Check 'product copy agrees everywhere it is repeated' ($LASTEXITCODE -eq 0) `
+    (($copyCheck.Trim() -split "`n" | Where-Object { $_ -match 'FAIL' }) -join ' ')
+
 # The signing key must never be in git, not even in a private repository.
 $gitExe = 'E:\Minimax\toolchain\git\cmd\git.exe'
 if (Test-Path $gitExe) {

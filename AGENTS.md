@@ -31,6 +31,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\qa\verify_release.ps1 
   never be spent silently. If that split changes,
   change `docs/PLAY_STORE_LISTING.md` with it — the listing describes the paywall model in its own
   words.
+- **The repeated copy must agree everywhere.** The paywall split, the one free reading and its
+  confirm-first step, the birth-day storage promise, "no data collected" and the entertainment
+  disclaimer all appear in the app, the listing, the privacy policy and these docs. The agreement
+  is not left to memory: `tools/qa/check_copy_consistency.py` checks every pair in the release
+  gate. When any of that copy changes, change the rule's patterns in the same commit.
 - **The price is never hard-coded in the app.** It is $9.99 in every market, set once in Play
   Console; the paywall reads `formattedPrice` from Play Billing. The only literal `$9.99` in the
   repo is in the store screenshot generator and the screenshot test.
