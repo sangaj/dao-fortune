@@ -190,6 +190,15 @@ fun PaywallSheet(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
+            Spacer(Modifier.height(6.dp))
+            // The entertainment disclaimer, where the money changes hands.
+            Text(
+                "Dao Fortune is a cultural and entertainment product. It is not financial, medical, " +
+                    "legal, investment or psychological advice, and it does not predict events.",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }

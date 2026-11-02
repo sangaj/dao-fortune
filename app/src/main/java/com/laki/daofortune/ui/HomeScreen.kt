@@ -272,8 +272,8 @@ fun HomeScreen(
                     Text(
                         "Dao Fortune is a cultural tool built on the classical Chinese luopan tradition. " +
                             "It is offered for entertainment and reflection. It is not financial, medical, " +
-                            "legal or psychological advice, and it does not predict events. You are always " +
-                            "responsible for your own decisions.",
+                            "legal, investment or psychological advice, and it does not predict events. " +
+                            "You are always responsible for your own decisions.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

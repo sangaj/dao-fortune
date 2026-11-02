@@ -155,6 +155,7 @@ adb logcat -c            # clear the log before the run
 | 9 | Buy | Purchase completes, sheet closes, the module you wanted opens |
 | 10 | Open every module | No paywall anywhere |
 | 11 | Restore purchase | After uninstalling and reinstalling, **Restore purchase** brings the unlock back |
+| 11a | Read the paywall's small print | The entertainment disclaimer sits under the buttons, and it names **investment** among the things this is not advice on |
 
 For step 11, reinstalling does **not** reset the unlock: Play owns the entitlement. The local
 "free reading" flag is a separate thing and *does* reset when app data is cleared — that is by

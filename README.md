@@ -342,9 +342,9 @@ local model, and it is noted here so you are not surprised.
   numbers, hours and the sign of money — the images a classical reading can actually work with. A dream
   written in words the lexicon does not hold is reported as a dream with no usable image rather than
   being interpreted anyway.
-* The app is explicitly **not** financial, medical, legal or psychological advice, and the listing and
-  the in-app copy both say so, because Google Play's deceptive-behaviour policy applies to fortune
-  telling that promises outcomes.
+* The app is explicitly **not** financial, medical, legal, investment or psychological advice, and the
+  listing and the in-app copy both say so, because Google Play's deceptive-behaviour policy applies to
+  fortune telling that promises outcomes.
 
 ---
 

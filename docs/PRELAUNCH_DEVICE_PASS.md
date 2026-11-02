@@ -21,6 +21,7 @@ build from Play **internal testing**, not by sideloading: the Play build is the 
 ## 3. The paywall and the purchase — rows 6–11, 43–51
 
 - ☐ Open a second module → the paywall; the price is your **local currency**, never a hard-coded figure
+- ☐ The paywall's small print carries the entertainment disclaimer, with "investment" in it
 - ☐ Buy → sheet closes, the module you wanted opens; afterwards no paywall anywhere
 - ☐ Uninstall, reinstall → **Restore purchase** brings the unlock back
 - ☐ Airplane mode: the paywall says Play could not be reached — it must never pretend "no purchase"

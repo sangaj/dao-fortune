@@ -520,7 +520,7 @@ $y += 14
 
 # the disclaimer, where the app puts it
 $discFont = F 'Segoe UI' 21
-$discText = 'Dao Fortune is a cultural tool built on the classical Chinese luopan tradition. It is offered for entertainment and reflection. It is not financial, medical, legal or psychological advice, and it does not predict events. You are always responsible for your own decisions.'
+$discText = 'Dao Fortune is a cultural tool built on the classical Chinese luopan tradition. It is offered for entertainment and reflection. It is not financial, medical, legal, investment or psychological advice, and it does not predict events. You are always responsible for your own decisions.'
 RoundRect $g $Margin $y ($W - 2 * $Margin) 190 22 $Card $Outline
 $g.DrawString('DISCLAIMER', $chipFont, (Brush $Muted), ($Margin + 28), ($y + 24))
 Wrap $g $discText $discFont (Brush $Muted) ($Margin + 28) ($y + 58) ($W - 2 * $Margin - 56) | Out-Null
@@ -647,7 +647,7 @@ $y += 84
 $fine = F 'Segoe UI' 20
 $usedHeight = Wrap $g 'Payments are handled by Google Play. Your anchor stays on this device and is never transmitted.' $fine $mutedB $Margin $y ($W - 2 * $Margin)
 $y += $usedHeight + 30
-$usedHeight = Wrap $g 'Dao Fortune is a cultural and entertainment product. It is not financial, medical, legal or psychological advice, and it does not predict events.' $fine $mutedB $Margin $y ($W - 2 * $Margin)
+$usedHeight = Wrap $g 'Dao Fortune is a cultural and entertainment product. It is not financial, medical, legal, investment or psychological advice, and it does not predict events.' $fine $mutedB $Margin $y ($W - 2 * $Margin)
 
 $bigFont.Dispose(); $btnFont.Dispose(); $smallFont.Dispose(); $fine.Dispose(); $benefitFont.Dispose()
 Save-Png $bmp $g '05_unlock.png'

@@ -43,6 +43,14 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\qa\verify_release.ps1 
   disclaimer all appear in the app, the listing, the privacy policy and these docs. The agreement
   is not left to memory: `tools/qa/check_copy_consistency.py` checks every pair in the release
   gate. When any of that copy changes, change the rule's patterns in the same commit.
+  The rules have **two halves**: what must be there, and what must **not** be there — the forbidden
+  half catches the old sentence still sitting two paragraphs below the new one, which a
+  presence-only check cannot see. A line that quotes the wrong wording on purpose (the "never say
+  ..." warnings) is exempt, so the docs may still name the phrasing they warn against.
+  The **entertainment disclaimer is one sentence** and it must carry the word **investment**
+  everywhere it appears — the app talks about windfall, so the money word has to stay in. The home
+  screen, the paywall, the About sheet, the listing, the policy, the README and the screenshot
+  script all say the same thing, and the gate checks all seven.
 - **The price is never hard-coded in the app.** It is $9.99 in every market, set once in Play
   Console; the paywall reads `formattedPrice` from Play Billing. The only literal `$9.99` in the
   repo is in the store screenshot generator and the screenshot test.
