@@ -299,6 +299,7 @@ Everything below must be true before an upload. If any line is unchecked, stop.
 | Real-device pass done | Layer 2 complete, including the purchase | ☐ |
 | Keystore safe | `dao-fortune-release.jks` + `keystore.properties` backed up **off this machine** | ☐ |
 | Play App Signing | enrolled in Play Console → App integrity | ☐ |
+| Console products created | `dao_fortune_full_access` (one-off) is live; `dao_fortune_tip` (consumable) created too — or deliberately skipped, which simply hides the tip row | ☐ |
 | Everything committed | `git status` clean, `git push` done | ☐ |
 
 ---
