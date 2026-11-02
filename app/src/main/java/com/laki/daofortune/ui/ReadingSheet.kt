@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -31,6 +32,7 @@ import android.widget.Toast
 import com.laki.daofortune.core.ModuleReading
 import com.laki.daofortune.ui.share.ShareCard
 import com.laki.daofortune.ui.share.ShareImage
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -175,6 +177,7 @@ fun ReadingSheet(
 
             item {
                 val context = LocalContext.current
+                val scope = rememberCoroutineScope()
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
@@ -190,7 +193,8 @@ fun ReadingSheet(
                                 summary = reading.summary
                             )
                         }
-                        ShareImage.share(context, bitmap)
+                        // The PNG is written off the main thread.
+                        scope.launch { ShareImage.share(context, bitmap) }
                     }) {
                         Text("Share as image", color = MaterialTheme.colorScheme.primary)
                     }
@@ -206,15 +210,17 @@ fun ReadingSheet(
                                     summary = reading.summary
                                 )
                             }
-                            val saved = ShareImage.saveToGallery(
-                                context, bitmap,
-                                "DaoFortune_${reading.module.name.lowercase()}"
-                            )
-                            Toast.makeText(
-                                context,
-                                if (saved) "Saved to gallery" else "Could not save the image",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            scope.launch {
+                                val saved = ShareImage.saveToGallery(
+                                    context, bitmap,
+                                    "DaoFortune_${reading.module.name.lowercase()}"
+                                )
+                                Toast.makeText(
+                                    context,
+                                    if (saved) "Saved to gallery" else "Could not save the image",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }) {
                             Text("Save image", color = MaterialTheme.colorScheme.primary)
                         }

@@ -156,6 +156,17 @@ fun PaywallSheet(
                     }
                 }
 
+                is BillingUiState.Pending -> {
+                    // Not a failure and not an unlock: Play is still settling
+                    // the payment. The app unlocks on its own once it does.
+                    Text(
+                        state.message,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
                 is BillingUiState.Failed -> {
                     Text(
                         state.message,

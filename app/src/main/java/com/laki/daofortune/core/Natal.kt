@@ -1,5 +1,7 @@
 package com.laki.daofortune.core
 
+import java.time.LocalDate
+
 /**
  * The querent's year branch — the *nian ming*.
  *
@@ -107,4 +109,16 @@ object Natal {
         dayElement.controls() == yearElement -> "is cut by"
         else -> "stands apart from"
     }
+
+    /**
+     * The birth day the app is willing to anchor a reading on.
+     *
+     * A birth day in the future is not a birth day: it would tie every
+     * reading — in the app, in the home-screen widget and in the morning
+     * notification — to a day that has not happened yet. So the rule is
+     * written once, here: the value is refused when it is set and dropped
+     * when it is read, and the places that read it cannot disagree about it.
+     */
+    fun birthDayOrNull(date: LocalDate?, today: LocalDate): LocalDate? =
+        date?.takeIf { !it.isAfter(today) }
 }

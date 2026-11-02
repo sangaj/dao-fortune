@@ -121,6 +121,25 @@ class EngineTest {
         }
     }
 
+    /**
+     * A birth day in the future is not a birth day.
+     *
+     * It would anchor every reading — in the app, in the widget and in the
+     * morning notification — on a day that has not happened yet, so it is
+     * refused.
+     */
+    @Test
+    fun `a birth day in the future is refused`() {
+        val today = LocalDate.of(2026, 10, 31)
+        assertEquals(
+            LocalDate.of(1990, 4, 17),
+            Natal.birthDayOrNull(LocalDate.of(1990, 4, 17), today)
+        )
+        assertEquals(today, Natal.birthDayOrNull(today, today))
+        assertEquals(null, Natal.birthDayOrNull(LocalDate.of(2026, 11, 1), today))
+        assertEquals(null, Natal.birthDayOrNull(null, today))
+    }
+
     @Test
     fun `the day turns over at 23 00`() {
         val justBefore = LocalDateTime.of(2026, 5, 5, 22, 59)

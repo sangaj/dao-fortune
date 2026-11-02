@@ -25,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -138,15 +139,42 @@ fun DateSelector(
     }
 }
 
+/**
+ * The day picker.
+ *
+ * [maxDate] and [minDate] bound what can be chosen. The reading-date picker
+ * leaves both open — a reader may look at yesterday or at next month — while
+ * the birth day is bounded, because a birth day in the future is not a birth
+ * day and would anchor every reading to a day that has not happened.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DayPickerDialog(
     initial: LocalDate,
     onPick: (LocalDate) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    maxDate: LocalDate? = null,
+    minDate: LocalDate? = null
 ) {
+    val selectableDates = remember(maxDate, minDate) {
+        object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                val date = Instant.ofEpochMilli(utcTimeMillis).atZone(ZoneOffset.UTC).toLocalDate()
+                if (minDate != null && date.isBefore(minDate)) return false
+                if (maxDate != null && date.isAfter(maxDate)) return false
+                return true
+            }
+
+            override fun isSelectableYear(year: Int): Boolean {
+                if (minDate != null && year < minDate.year) return false
+                if (maxDate != null && year > maxDate.year) return false
+                return true
+            }
+        }
+    }
     val state = rememberDatePickerState(
-        initialSelectedDateMillis = initial.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
+        initialSelectedDateMillis = initial.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli(),
+        selectableDates = selectableDates
     )
     Dialog(onDismissRequest = onDismiss) {
         Surface(
@@ -375,13 +403,19 @@ private fun YearSignDialog(
     }
 
     if (showBirthPicker) {
+        val today = LocalDate.now()
         DayPickerDialog(
-            initial = birthDate ?: LocalDate.now().minusYears(30),
+            // A birth day already stored in the future would be a broken
+            // anchor, so the picker opens on a day that can actually be picked.
+            initial = birthDate?.takeIf { !it.isAfter(today) } ?: today.minusYears(30),
             onPick = {
                 onPickBirthDate(it)
                 showBirthPicker = false
             },
-            onDismiss = { showBirthPicker = false }
+            onDismiss = { showBirthPicker = false },
+            // A birth day is in the past, and not in the deep past either.
+            maxDate = today,
+            minDate = today.minusYears(120)
         )
     }
 }

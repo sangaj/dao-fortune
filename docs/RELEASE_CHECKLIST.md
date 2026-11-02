@@ -325,7 +325,8 @@ the following still need a human pass:
 * **Notifications and the widget** — the daily reading notification, the favourable-day reminders and
   the home-screen widget can only be exercised on a real device: the permission prompt, the 08:00
   firing, the reboot reschedule, and the widget's rendering against a real launcher (§2.4a of
-  `docs/TESTING.md`).
+  `docs/TESTING.md`). The widget's own refresh no longer depends on any of that — the launcher asks
+  for an update every 30 minutes — but the rendering still needs a real launcher to be seen.
 
 ---
 

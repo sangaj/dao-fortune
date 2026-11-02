@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- No updatePeriodMillis: the widget is refreshed by the app itself —
-     when it opens, and each morning from the daily-reading worker. -->
+<!-- The launcher asks for an update every 30 minutes - the shortest period
+     the platform allows - so the score on the home screen is never stale,
+     even for a reader who declined the notifications and never opens the
+     app. The app also refreshes the widget whenever it opens, and the
+     daily-reading worker refreshes it each morning. -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:minWidth="180dp"
     android:minHeight="110dp"
     android:targetCellWidth="3"
     android:targetCellHeight="2"
-    android:updatePeriodMillis="0"
+    android:updatePeriodMillis="1800000"
     android:initialLayout="@layout/glance_default_loading_layout"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen" />

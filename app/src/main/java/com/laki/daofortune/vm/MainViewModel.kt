@@ -17,6 +17,7 @@ import com.laki.daofortune.core.FortuneModule
 import com.laki.daofortune.core.LuopanEngine
 import com.laki.daofortune.core.LuopanSnapshot
 import com.laki.daofortune.core.ModuleReading
+import com.laki.daofortune.core.Natal
 import com.laki.daofortune.core.ReadingKey
 import com.laki.daofortune.core.YearSign
 import com.laki.daofortune.data.AccessState
@@ -132,6 +133,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             selectedDate = today,
             isToday = true,
             yearSign = profile.yearSign,
+            // ProfileState never hands out a birth day in the future.
             birthDate = profile.birthDate,
             notifyEnabled = profile.dailyReadingEnabled,
             remindedDays = profile.remindedDays.filter { it >= today }.toSet(),
@@ -255,11 +257,14 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
      * year sign.
      */
     fun setBirthDate(date: LocalDate?) {
-        profile.setBirthDate(date)
+        // A birth day in the future is not a birth day: it would anchor every
+        // reading to a day that has not happened yet.
+        val safe = Natal.birthDayOrNull(date, LocalDate.now())
+        profile.setBirthDate(safe)
         val state = _ui.value
-        val anchorChanged = date != null || state.birthDate != null
+        val anchorChanged = safe != null || state.birthDate != null
         _ui.update {
-            val next = it.copy(birthDate = date)
+            val next = it.copy(birthDate = safe)
             next.copy(
                 previews = previewsFor(next.snapshot, next.natalBranch),
                 // Same as the year sign: the free reading follows the anchor.
@@ -503,12 +508,28 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         _ui.update { it.copy(notice = null) }
     }
 
+    /** Puts one of the NOTICE_ banners on screen. */
+    fun showNotice(code: String) {
+        _ui.update { it.copy(notice = code) }
+    }
+
     companion object {
         /** Shown after the free reading has been spent. */
         const val NOTICE_FREE_READING_USED = "FREE_READING_USED"
 
         /** Shown when "Restore purchase" finds nothing on the account. */
         const val NOTICE_NO_PURCHASE = "NO_PURCHASE_FOUND"
+
+        /**
+         * Shown when the notification permission is missing.
+         *
+         * Without it nothing can be delivered, so the app says so instead of
+         * leaving a bell that promises a reminder which never arrives.
+         */
+        const val NOTICE_NOTIFICATIONS_BLOCKED = "NOTIFICATIONS_BLOCKED"
+
+        /** Shown when a marked day cannot be reminded because notifications are off. */
+        const val NOTICE_REMINDER_BLOCKED = "REMINDER_BLOCKED"
     }
 
     fun dismissPaywall() {
@@ -593,8 +614,26 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     /** Play reports an existing purchase — the app is unlocked. */
     private fun onOwnershipConfirmed() {
         access.unlock()
+        val state = _ui.value
+        val pending = state.pendingModule
+        val pendingDream = state.pendingDream
         _ui.update {
-            it.copy(unlocked = true, freeReadingsLeft = access.freeReadingsLeft())
+            it.copy(
+                unlocked = true,
+                freeReadingsLeft = access.freeReadingsLeft(),
+                // A purchase that was still settling has now settled: the
+                // paywall steps aside and the reading the reader was after
+                // arrives without them having to ask again.
+                showPaywall = false,
+                pendingModule = null,
+                showDream = pendingDream,
+                pendingDream = false
+            )
+        }
+        if (pending != null) {
+            open(pending)
+        } else if (pendingDream) {
+            produceDream()
         }
     }
 }

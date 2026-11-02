@@ -40,8 +40,11 @@ import java.time.ZoneId
  * and the best double-hour, at a glance.
  *
  * Everything is computed on the device at update time; the widget never
- * touches the network. It refreshes itself through [updateAll], called when
- * the app opens and from the daily-reading worker each morning.
+ * touches the network. It refreshes itself three ways: the launcher asks for
+ * an update every 30 minutes (the platform's shortest period), the app
+ * refreshes it when it opens, and the daily-reading worker refreshes it each
+ * morning. So the widget stays true even for a reader who declined the
+ * notifications and never opens the app.
  */
 class TodayWidget : GlanceAppWidget() {
 

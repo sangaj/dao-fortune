@@ -40,21 +40,25 @@ build from Play **internal testing**, not by sideloading: the Play build is the 
 - ☐ Privacy: the text is in no file under the app's storage; closing the sheet erases it
 - ☐ Free reading spent → the dream goes to the paywall; buying reads it with your words still there
 
-## 5. Personalisation — rows 22–27
+## 5. Personalisation — rows 22–27, 25c
 
 - ☐ Pick / change / clear the year sign; the hollow ring follows on the plate
 - ☐ Add a birth day → the readings re-anchor on its pillar; the birth day wins over the year sign,
   and removing it falls back
+- ☐ Birth-day calendar: today and the past can be picked, **the future cannot**
 - ☐ Stored locally only; excluded from backup — a device transfer drops them, the unlock survives
 
-## 6. Notifications, the widget and reminders — rows 21a–21f
+## 6. Notifications, the widget and reminders — rows 21a–21h
 
 - ☐ Top-bar bell → permission ask on Android 13+ → one silent notification next morning ~08:00;
   tapping it opens the app
 - ☐ Reboot the phone → the daily work is rescheduled
 - ☐ Bell on a favourable day → reminder that morning; the mark clears itself
 - ☐ Home-screen widget: today's score, verdict, headline and best window; it refreshes
-- ☐ Revoke the permission → no crash, the bells still toggle
+- ☐ Widget with notifications denied and the app never opened → the score still moves
+- ☐ Revoke the permission in Settings → the bell turns **itself off** and a banner says why
+- ☐ Deny the permission at the prompt → the bell stays off, and a banner explains where to turn
+  notifications on
 
 ## 7. Looking ahead — rows 15–21
 
@@ -70,7 +74,13 @@ build from Play **internal testing**, not by sideloading: the Play build is the 
 - ☐ Resize on a foldable or tablet — the layout holds
 - ☐ Clear app data → the free reading comes back (expected, documented)
 
-## 9. Console gates before the upload
+## 9. Sharing a card — rows 52–53
+
+- ☐ **Share as image** → the share sheet opens with the card; the screen does not freeze
+- ☐ Share twice → two different files; the second share must not hand out the first picture
+- ☐ **Save image** → the card lands in `Pictures/DaoFortune`
+
+## 10. Console gates before the upload
 
 - ☐ `dao_fortune_full_access` (one-off) is live — it is the only product the app knows about
 - ☐ Privacy policy on a public URL, linked in App content; Data safety answered "no data collected,

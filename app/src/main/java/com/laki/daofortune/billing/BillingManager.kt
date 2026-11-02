@@ -43,6 +43,15 @@ sealed interface BillingUiState {
     data class Ready(val price: String, val title: String, val description: String) : BillingUiState
     data object Flowing : BillingUiState
     data class Purchased(val restored: Boolean) : BillingUiState
+
+    /**
+     * Play is still settling the payment.
+     *
+     * Not a failure and not an unlock: the reader is told to wait, and the app
+     * unlocks on its own once Google Play confirms the purchase.
+     */
+    data class Pending(val message: String) : BillingUiState
+
     data class Failed(val message: String) : BillingUiState
 }
 
@@ -79,6 +88,18 @@ class BillingManager(
     private var reconnectAttempt = 0
     private var reconnectJob: Job? = null
     private var purchaseContinuation: CancellableContinuation<Boolean>? = null
+
+    /** The job that looks again for a pending purchase that has settled. */
+    private var ownershipRecheckJob: Job? = null
+
+    /**
+     * The last product details Play gave us.
+     *
+     * Kept so the paywall can go back to showing the real price when the
+     * reader closes the purchase sheet — a cancelled purchase must not leave
+     * the button without its price.
+     */
+    private var lastDetails: ProductDetails? = null
 
     /**
      * Opens the connection and pre-loads the product details.
@@ -211,6 +232,7 @@ class BillingManager(
             billingClient.queryProductDetailsAsync(params) { result, detailsResult ->
                 val details = detailsResult?.productDetailsList?.firstOrNull()
                 if (result.responseCode == BillingClient.BillingResponseCode.OK && details != null) {
+                    lastDetails = details
                     _state.value = BillingUiState.Ready(
                         price = details.oneTimePurchaseOfferDetails?.formattedPrice ?: "",
                         title = details.title,
@@ -297,10 +319,7 @@ class BillingManager(
                     cont.resume(false)
                     return@queryPurchasesAsync
                 }
-                val owned = purchases.any {
-                    it.products.contains(PRODUCT_ID) &&
-                        it.purchaseState == Purchase.PurchaseState.PURCHASED
-                }
+                val owned = ownsProduct(purchases)
                 if (owned) {
                     acknowledge(purchases)
                     onOwnershipConfirmed()
@@ -333,10 +352,7 @@ class BillingManager(
                         cont.resume(false)
                         return@queryPurchasesAsync
                     }
-                    val mine = purchases.any {
-                        it.products.contains(PRODUCT_ID) &&
-                            it.purchaseState == Purchase.PurchaseState.PURCHASED
-                    }
+                    val mine = ownsProduct(purchases)
                     if (mine) acknowledge(purchases)
                     cont.resume(mine)
                 }
@@ -350,38 +366,103 @@ class BillingManager(
         }
     }
 
+    /**
+     * What Play told us about a purchase.
+     *
+     * The decision itself is made by [PurchaseClassifier], which is pure and
+     * unit tested; this method only turns Play's objects into the facts it
+     * needs and then acts on the answer.
+     */
     private fun onPurchasesUpdated(result: BillingResult, purchases: List<Purchase>?) {
-        val purchase = purchases?.firstOrNull {
-            it.products.contains(PRODUCT_ID) && it.purchaseState == Purchase.PurchaseState.PURCHASED
+        val facts = purchases.orEmpty().facts()
+        val callback = when (result.responseCode) {
+            BillingClient.BillingResponseCode.OK -> CallbackResult.Ok
+            BillingClient.BillingResponseCode.USER_CANCELED -> CallbackResult.Cancelled
+            else -> CallbackResult.Error
         }
-        if (purchase != null && result.responseCode == BillingClient.BillingResponseCode.OK) {
-            acknowledge(purchases.orEmpty())
-            purchaseContinuation?.resume(true)
-            purchaseContinuation = null
-            _state.value = BillingUiState.Purchased(restored = false)
-            return
-        }
-        // A purchase can still be pending (some payment methods settle late).
-        // It is not a failure, but it is not an unlock either.
-        val pending = purchases?.firstOrNull {
-            it.products.contains(PRODUCT_ID) && it.purchaseState == Purchase.PurchaseState.PENDING
-        }
-        purchaseContinuation?.resume(false)
-        purchaseContinuation = null
-        when {
-            pending != null ->
-                _state.value = BillingUiState.Failed(
+
+        when (PurchaseClassifier.classify(PRODUCT_ID, callback, facts)) {
+            PurchaseOutcome.Purchased -> {
+                acknowledge(purchases.orEmpty())
+                purchaseContinuation?.resume(true)
+                purchaseContinuation = null
+                _state.value = BillingUiState.Purchased(restored = false)
+            }
+
+            PurchaseOutcome.Pending -> {
+                purchaseContinuation?.resume(false)
+                purchaseContinuation = null
+                _state.value = BillingUiState.Pending(
                     "The payment is still processing. It will unlock on its own once Google Play confirms it."
                 )
+                // "On its own" has to be true: look again a little later, so a
+                // purchase that settles while the app is open unlocks without
+                // the reader doing anything.
+                scheduleOwnershipRecheck()
+            }
 
-            result.responseCode != BillingClient.BillingResponseCode.USER_CANCELED ->
+            PurchaseOutcome.Cancelled -> {
+                purchaseContinuation?.resume(false)
+                purchaseContinuation = null
+                // The reader changed their mind; nothing is broken, and the
+                // price must still be on the button.
+                _state.value = readyState() ?: BillingUiState.Idle
+            }
+
+            PurchaseOutcome.Failed -> {
+                purchaseContinuation?.resume(false)
+                purchaseContinuation = null
                 _state.value = BillingUiState.Failed(
                     result.debugMessage ?: "The purchase could not be completed."
                 )
-
-            else ->
-                _state.value = BillingUiState.Idle
+            }
         }
+    }
+
+    /** The paywall state with the real price, when Play has given us one. */
+    private fun readyState(): BillingUiState.Ready? {
+        val details = lastDetails ?: return null
+        return BillingUiState.Ready(
+            price = details.oneTimePurchaseOfferDetails?.formattedPrice ?: "",
+            title = details.title,
+            description = details.description
+        )
+    }
+
+    /**
+     * Looks again for a pending purchase that has since settled.
+     *
+     * Some payment methods take days. The promise in the message is that the
+     * app unlocks on its own, so the app has to come back and look.
+     */
+    private fun scheduleOwnershipRecheck() {
+        ownershipRecheckJob?.cancel()
+        ownershipRecheckJob = scope.launch {
+            delay(OWNERSHIP_RECHECK_MS)
+            if (connected) checkOwnership()
+        }
+    }
+
+    /**
+     * Whether Play holds a **paid** purchase of our product.
+     *
+     * The same rule as [PurchaseClassifier] decides this, so there is exactly
+     * one definition of "the reader owns it" in the app.
+     */
+    private fun ownsProduct(purchases: List<Purchase>): Boolean =
+        PurchaseClassifier.classify(PRODUCT_ID, CallbackResult.Ok, purchases.facts()) ==
+            PurchaseOutcome.Purchased
+
+    /** Copies the two facts the decision needs out of Play's purchase objects. */
+    private fun List<Purchase>.facts(): List<PurchaseFacts> = map { purchase ->
+        PurchaseFacts(
+            products = purchase.products,
+            status = when (purchase.purchaseState) {
+                Purchase.PurchaseState.PURCHASED -> PurchaseStatus.Purchased
+                Purchase.PurchaseState.PENDING -> PurchaseStatus.Pending
+                else -> PurchaseStatus.Other
+            }
+        )
     }
 
     private fun acknowledge(purchases: List<Purchase>) {
@@ -403,5 +484,8 @@ class BillingManager(
 
         /** Must match the product id created in the Play Console. */
         const val PRODUCT_ID = "dao_fortune_full_access"
+
+        /** How long to wait before looking again for a settling purchase. */
+        private const val OWNERSHIP_RECHECK_MS = 15 * 60 * 1000L
     }
 }

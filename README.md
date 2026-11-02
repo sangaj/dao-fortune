@@ -34,10 +34,10 @@ Every reading shows **the factors that produced its score**, so the number is ne
 | **Any date** | Step day by day or open the calendar. A day that is not today is read as a **day plate** — no hour is involved, because a day that has not happened yet has no hour. |
 | **Your year sign** | Choose your zodiac branch once and every reading is measured against your own position on the plate: harmony, three-harmony, clash or harm against the day's branch, and the element tone between your branch and the day's. |
 | **Your birth day (optional)** | For a deeper anchor, add the day you were born: every reading is then measured against that day's own pillar. A birth day is optional, lives only on your device, and is excluded from backup. |
-| **Daily reading notification** | The bell in the top bar switches on one local notification each morning at eight — the day's score and headline. Scheduled with WorkManager, computed on the device, no network. |
-| **Home-screen widget** | A Glance widget shows today's score, verdict, headline and best window. It refreshes when the app opens and from the daily-reading worker each morning. |
+| **Daily reading notification** | The bell in the top bar switches on one local notification each morning at eight — the day's score and headline. Scheduled with WorkManager, computed on the device, no network. If you decline the permission the bell stays off and the app says why. |
+| **Home-screen widget** | A Glance widget shows today's score, verdict, headline and best window. The launcher asks it to refresh every 30 minutes, so it stays true even if you never open the app. |
 | **Day reminders** | Each favourable day in the forward scan has a bell: tap it and a one-off WorkManager task posts a reminder at eight on that morning. No exact-alarm permission is used — a reminder is a nudge, not a medicine dose. |
-| **Share a reading** | Any reading or dream reading can be shared or saved as a 1080×1920 card, rendered on the device. Saving to the gallery uses MediaStore and needs no permission on Android 10+. |
+| **Share a reading** | Any reading or dream reading can be shared or saved as a 1080×1920 card, rendered on the device. Each share gets its own file, and the image is written off the main thread. Saving to the gallery uses MediaStore and needs no permission on Android 10+. |
 | **Dream & Omens (梦占)** | Write what you remember of a dream. The app finds the classical images in your own words and reads them against the plate of the night they belong to. |
 
 The anchors are **not** a birth chart or a BaZi reading. There is no day-master strength analysis, no

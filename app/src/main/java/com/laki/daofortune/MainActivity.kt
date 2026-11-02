@@ -37,7 +37,21 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         viewModel.refresh()
+        // The permission can be taken back in Settings while the app is
+        // closed. The bell must not go on promising a reminder that can never
+        // arrive.
+        if (viewModel.ui.value.notifyEnabled && !notificationsAllowed()) {
+            viewModel.setDailyReadingEnabled(false)
+            viewModel.showNotice(MainViewModel.NOTICE_NOTIFICATIONS_BLOCKED)
+        }
     }
+
+    /** Whether the app may post a notification right now. */
+    private fun notificationsAllowed(): Boolean =
+        Build.VERSION.SDK_INT < 33 ||
+            ContextCompat.checkSelfPermission(
+                this, Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,16 +71,23 @@ class MainActivity : ComponentActivity() {
                     val pending = pendingReminder
                     if (pending != null) {
                         pendingReminder = null
-                        if (granted) viewModel.toggleDayReminder(pending)
+                        if (granted) {
+                            viewModel.toggleDayReminder(pending)
+                        } else {
+                            // The day was not marked, and the reminder cannot
+                            // fire: say so instead of leaving a silent no.
+                            viewModel.showNotice(MainViewModel.NOTICE_REMINDER_BLOCKED)
+                        }
                     } else if (granted) {
                         viewModel.setDailyReadingEnabled(true)
+                    } else {
+                        // The reader said no. The bell goes back to "off" and
+                        // the app says why, rather than leaving a switch that
+                        // silently does nothing.
+                        viewModel.setDailyReadingEnabled(false)
+                        viewModel.showNotice(MainViewModel.NOTICE_NOTIFICATIONS_BLOCKED)
                     }
                 }
-                fun notificationsAllowed(): Boolean =
-                    Build.VERSION.SDK_INT < 33 ||
-                        ContextCompat.checkSelfPermission(
-                            this, Manifest.permission.POST_NOTIFICATIONS
-                        ) == PackageManager.PERMISSION_GRANTED
 
                 Surface(color = MaterialTheme.colorScheme.background) {
                     HomeScreen(

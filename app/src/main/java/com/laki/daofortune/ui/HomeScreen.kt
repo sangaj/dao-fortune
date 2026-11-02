@@ -392,6 +392,10 @@ private fun noticeText(notice: String): String = when (notice) {
         "That was your free reading. Any reading after this one needs the one-off unlock."
     "NO_PURCHASE_FOUND" ->
         "No previous purchase found on this Google account."
+    "NOTIFICATIONS_BLOCKED" ->
+        "Notifications are off, so no reminder can reach you. Turn them on in Settings to get it."
+    "REMINDER_BLOCKED" ->
+        "Notifications are off, so the reminder for that day cannot fire. Turn them on in Settings to get it."
     else -> notice
 }
 

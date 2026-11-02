@@ -31,15 +31,16 @@ of them has drifted.
 ```powershell
 Set-Location E:\Minimax\dao-fortune
 python tools\reference\luopan_reference.py       # SELF-CHECK: ALL PASS, rewrites the golden TSVs
-.\gradlew.bat :app:testDebugUnitTest             # 55 tests
+.\gradlew.bat :app:testDebugUnitTest             # 69 tests
 ```
 
 `SampleReadingDump` also writes `docs/store/reading_sample.json` — the real output the store
 screenshots are rendered from. Run the tests before regenerating the screenshots, never edit that file
 by hand.
 
-**Expected:** `EngineTest` 26, `DreamTest` 12, `ScreenshotTest` 6, `ReconnectPolicyTest` 6,
-`SampleReadingDump` 1, zero failures.
+**Expected:** `EngineTest` 29, `DreamTest` 12, `ScreenshotTest` 6, `ReconnectPolicyTest` 6,
+`PurchaseClassifierTest` 10, `WidgetCopyTest` 4, `ShareCardTest` 1, `SampleReadingDump` 1,
+zero failures.
 
 ### 1.2 Lint
 
@@ -120,6 +121,23 @@ Play rejects an over-long listing before a human ever sees it, so the caps are c
 30, short description 80, full description 4000, release notes 500. This runs inside the release
 gate.
 
+### 1.8 The money path
+
+The one place where a reader who has **paid** can be left locked out is the decision made when Google
+Play reports a purchase. That decision is therefore written as a pure function —
+`app/src/main/java/com/laki/daofortune/billing/PurchaseOutcome.kt` — with no Android and no Play
+types in it, and it is tested on the JVM:
+
+```powershell
+.\gradlew.bat :app:testDebugUnitTest --tests 'com.laki.daofortune.billing.PurchaseClassifierTest'
+```
+
+The rules it pins down: a purchase in the state *Purchased* unlocks the app **whatever** the callback
+code says (the money is in the bank); a purchase in the state *Pending* is reported as still settling,
+not as a failure; a cancelled callback is not an error; and a purchase of some **other** product never
+unlocks anything. `BillingManager` uses the same function to decide whether it already owns the
+product, so the app has exactly one definition of "the reader owns it".
+
 ---
 
 ## Layer 2 — On a real phone
@@ -195,8 +213,10 @@ production.
 | 21b | Next morning at ~08:00 | One silent notification with the day's score and headline; tapping it opens the app |
 | 21c | Reboot the phone | The daily work is rescheduled by the boot receiver |
 | 21d | Tap the bell on a favourable day | The bell fills in; on that morning a reminder notification posts, and the mark clears itself |
-| 21e | Place the home-screen widget | Today's score, verdict, headline and best window; it refreshes when the app opens and each morning |
-| 21f | Revoke the notification permission | The app stops posting; no crash, and the bells still toggle |
+| 21e | Place the home-screen widget | Today's score, verdict, headline and best window; the launcher refreshes it every 30 minutes, and the app refreshes it whenever it opens |
+| 21f | Revoke the notification permission in Settings, then reopen the app | The bell turns **itself off** and a banner says the reminder cannot reach you — the app must not go on promising a reminder it cannot deliver |
+| 21g | Tap the bell and **deny** the permission | The bell stays off and a banner explains that notifications are off and where to turn them on |
+| 21h | Mark a day for a reminder and deny the permission | The day is not marked and a banner says the reminder cannot fire |
 
 ### 2.5 The year sign
 
@@ -208,6 +228,7 @@ production.
 | 25 | Clear it | The ring disappears and the readings return to the unpersonalised form |
 | 25a | Add a birth day | The readings re-anchor on the birth day's pillar; the home row shows the birth day instead of the animal |
 | 25b | Set both a year sign and a birth day | The birth day wins; removing it falls back to the year sign |
+| 25c | Open the birth-day calendar | Today and the past are selectable, **the future is greyed out** — a birth day in the future would anchor every reading on a day that has not happened |
 | 26 | Check what was stored | One integer and an optional ISO date in `dao_fortune_profile.xml`; nothing in `dao_fortune_access.xml` |
 | 27 | Check the backup | The year sign and the birth day are **not** in the allow-list: after a device-to-device transfer they are gone, while the purchase unlock survives |
 
@@ -255,6 +276,14 @@ its keep.
 | 50 | Read the first free reading | A banner appears on the home screen saying the free reading has been used — and it can be dismissed |
 | 51 | Airplane mode, then try to buy | The purchase sheet does not open; the failure is reported |
 
+### 2.9 Sharing a card
+
+| # | Action | Expected |
+|---|---|---|
+| 52 | Open a reading and tap **Share as image** | The share sheet opens with the card as a PNG; the screen does not freeze while the image is written |
+| 52a | Share the same reading twice, and share a different reading | Each share gets its **own** file — the second share must not hand out the first picture |
+| 53 | Tap **Save image** | The card lands in `Pictures/DaoFortune`; a toast says so |
+
 ---
 
 ## Layer 3 — Google Play internal testing
@@ -286,7 +315,7 @@ Everything below must be true before an upload. If any line is unchecked, stop.
 | Gate | How to verify | Status |
 |---|---|---|
 | Engine parity green | `python tools\reference\luopan_reference.py` → ALL PASS | ☐ |
-| Unit tests green | `:app:testDebugUnitTest` → 55/55 | ☐ |
+| Unit tests green | `:app:testDebugUnitTest` → 69/69 | ☐ |
 | Lint has zero errors | `:app:lintRelease` → `app/build/reports/lint-results-release.txt` | ☐ |
 | Bundle validates | `bundletool validate` → exit 0 | ☐ |
 | 16 KB page size | `python tools\qa\check_16kb_pages.py dist\app-release.aab` → PASSED | ☐ |

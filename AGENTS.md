@@ -127,6 +127,38 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\qa\verify_release.ps1 
 - **The ownership check runs on every connection.** `BillingManager.checkOwnership()` is what makes a
   purchase that completed while the app was closed still unlock the app. Do not remove it as
   "redundant" — it is the only path that catches a settled pending purchase.
+- **The purchase decision is a pure function, and it is unit tested.**
+  `billing/PurchaseOutcome.kt` holds `PurchaseClassifier.classify()`: it takes the product id, how the
+  Play callback went and the facts of each purchase, and returns `Purchased` / `Pending` /
+  `Cancelled` / `Failed`. No Android and no Play types in it, so `PurchaseClassifierTest` can pin the
+  rules down on the JVM — a reader who has **paid** must never be left locked out, and that is not
+  something to re-verify by hand on a phone every time. Two rules matter most: a purchase in the
+  state *Purchased* unlocks the app whatever the callback code says, and a purchase of some **other**
+  product never unlocks anything. `BillingManager` uses the same function to decide whether it already
+  owns the product, so there is exactly one definition of "the reader owns it" in the app.
+- **A pending payment is not a failure.** It has its own `BillingUiState.Pending` and its own wording
+  ("still processing… it will unlock on its own once Google Play confirms it"). Do not fold it back
+  into `Failed` — a red error on a payment that is still settling is a lie to the reader. "On its own"
+  has to be true, so the manager looks again 15 minutes later (`scheduleOwnershipRecheck`).
+- **A cancelled purchase must not lose the price.** The paywall goes back to `Ready` with the real
+  price from Play, so the button never drops back to an unpriced "Unlock Full Access".
+- **The app must not promise a notification it cannot deliver.** If the reader declines the
+  notification permission, or takes it away in Settings later, the bell turns **itself off** and the
+  app says why (`MainViewModel.NOTICE_NOTIFICATIONS_BLOCKED` / `NOTICE_REMINDER_BLOCKED`). A switch
+  that lies about a reminder is worse than no switch.
+- **The home-screen widget refreshes itself.** `today_widget_info.xml` asks the launcher for an
+  update every 30 minutes (the platform's shortest period) and the widget recomputes the plate at
+  update time, so the score is never stale for a reader who declined the notifications and never
+  opens the app. Do not set `updatePeriodMillis` back to 0 and do not make the widget's freshness
+  depend on the notification permission.
+- **Each share gets its own file, and the PNG is written off the main thread.**
+  `ui/share/ShareImage.kt` writes into the cache under a name with a timestamp and a counter, so two
+  shares in a row cannot overwrite each other, and old cards are swept away. The compression and the
+  file write happen on `Dispatchers.IO`; only `startActivity` stays on the main thread. Rendering
+  itself has to happen on the main thread — Compose needs a window.
+- **The birth day cannot be in the future.** The picker bounds it to today (`DayPickerDialog`'s
+  `maxDate`), and `MainViewModel.setBirthDate` refuses a future date even if it is handed one — a
+  future birth day would anchor every reading on a day that has not happened yet.
 - **The privacy policy has two forms and they must agree.** `docs/PRIVACY_POLICY.md` is the source;
   `docs/privacy-policy.html` is what gets hosted. After editing the Markdown run
   `python tools/docs/make_privacy_html.py`; the release gate fails if the HTML is stale.

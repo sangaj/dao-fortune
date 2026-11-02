@@ -2,6 +2,7 @@ package com.laki.daofortune.data
 
 import android.content.Context
 import androidx.core.content.edit
+import com.laki.daofortune.core.Natal
 import com.laki.daofortune.core.YearSign
 import java.time.LocalDate
 
@@ -52,14 +53,27 @@ class ProfileState(context: Context) {
      * which is excluded from backup, so it never leaves the device. When set,
      * readings anchor on the day pillar of the birth day instead of the year
      * sign — the classical day-master anchor, which is more personal.
+     *
+     * A date in the future is never returned: a birth day that has not
+     * happened yet would anchor the app, the widget and the morning
+     * notification on a day that does not exist.
      */
     val birthDate: LocalDate?
-        get() = prefs.getString(KEY_BIRTH_DATE, null)?.let {
-            runCatching { LocalDate.parse(it) }.getOrNull()
+        get() {
+            val stored = prefs.getString(KEY_BIRTH_DATE, null)?.let {
+                runCatching { LocalDate.parse(it) }.getOrNull()
+            } ?: return null
+            return Natal.birthDayOrNull(stored, LocalDate.now())
         }
 
-    /** Sets or clears the birth day. */
+    /**
+     * Sets or clears the birth day.
+     *
+     * A date in the future is refused: nothing is written, and the value that
+     * was there before is left alone.
+     */
     fun setBirthDate(date: LocalDate?) {
+        if (date != null && Natal.birthDayOrNull(date, LocalDate.now()) == null) return
         prefs.edit {
             if (date == null) remove(KEY_BIRTH_DATE) else putString(KEY_BIRTH_DATE, date.toString())
         }

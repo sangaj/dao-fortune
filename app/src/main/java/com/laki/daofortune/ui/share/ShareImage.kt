@@ -25,7 +25,10 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.findViewTreeSavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.laki.daofortune.ui.DaoFortuneTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
+import java.util.concurrent.atomic.AtomicLong
 
 /**
  * Renders a composable off-screen to a Bitmap, then hands it to the share
@@ -35,11 +38,27 @@ import java.io.File
  * designed at 360×640 dp always produces a 1080×1920 px bitmap no matter
  * which device it runs on. The view is measured and laid out manually and
  * never attached to a window.
+ *
+ * Rendering needs a window, so it happens on the main thread; the PNG is
+ * compressed and written to disk **off** the main thread, because a 1080×1920
+ * image takes long enough to be felt as a stutter.
  */
 object ShareImage {
 
     private const val WIDTH_PX = 1080
     private const val HEIGHT_PX = 1920
+
+    /** The cache folder the share cards live in. */
+    private const val SHARE_DIR = "share"
+
+    /** Every card gets its own name, so no two shares share a file. */
+    private const val FILE_PREFIX = "dao_fortune_card_"
+
+    /** A card older than this is swept away. */
+    private const val MAX_CARD_AGE_MS = 2 * 60 * 60 * 1000L
+
+    /** Makes the file names unique even inside the same millisecond. */
+    private val shareCounter = AtomicLong(0)
 
     /** Walks the wrapper chain to the hosting activity, if there is one. */
     private tailrec fun Context.findActivity(): Activity? = when (this) {
@@ -98,18 +117,48 @@ object ShareImage {
     }
 
     /** Opens the system share sheet with the card as a PNG. */
-    fun share(context: Context, bitmap: Bitmap) {
-        val dir = File(context.cacheDir, "share")
-        dir.mkdirs()
-        val file = File(dir, "dao_fortune_card.png")
-        file.outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+    suspend fun share(context: Context, bitmap: Bitmap) {
+        val file = withContext(Dispatchers.IO) { writeCard(context, bitmap) }
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
         val send = Intent(Intent.ACTION_SEND).apply {
             type = "image/png"
             putExtra(Intent.EXTRA_STREAM, uri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        context.startActivity(Intent.createChooser(send, null).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        // The share sheet has to be opened on the main thread.
+        withContext(Dispatchers.Main) {
+            context.startActivity(Intent.createChooser(send, null).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        }
+    }
+
+    /**
+     * Writes the card into the cache under a name of its own.
+     *
+     * Every share gets a **fresh file name**: two shares in a row must not
+     * overwrite each other, or the second share would hand out the first
+     * picture. The counter makes the name unique even inside the same
+     * millisecond.
+     */
+    private fun writeCard(context: Context, bitmap: Bitmap): File {
+        val dir = File(context.cacheDir, SHARE_DIR)
+        dir.mkdirs()
+        sweepOldCards(dir)
+        val file = File(dir, "$FILE_PREFIX${System.currentTimeMillis()}_${shareCounter.incrementAndGet()}.png")
+        file.outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+        return file
+    }
+
+    /**
+     * Throws away the cards that are old enough that nobody is still sharing
+     * them, so the cache does not grow without end.
+     */
+    private fun sweepOldCards(dir: File) {
+        val cutoff = System.currentTimeMillis() - MAX_CARD_AGE_MS
+        dir.listFiles()?.forEach { file ->
+            if (file.isFile && file.lastModified() < cutoff) {
+                file.delete()
+            }
+        }
     }
 
     /**
@@ -117,7 +166,10 @@ object ShareImage {
      * permission on API 29+; on older versions it returns false and the caller
      * hides the button.
      */
-    fun saveToGallery(context: Context, bitmap: Bitmap, title: String): Boolean {
+    suspend fun saveToGallery(context: Context, bitmap: Bitmap, title: String): Boolean =
+        withContext(Dispatchers.IO) { saveToGalleryNow(context, bitmap, title) }
+
+    private fun saveToGalleryNow(context: Context, bitmap: Bitmap, title: String): Boolean {
         if (Build.VERSION.SDK_INT < 29) return false
         val values = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, "$title.png")
