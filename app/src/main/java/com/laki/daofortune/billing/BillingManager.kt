@@ -8,6 +8,7 @@ import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.ConsumeParams
 import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
@@ -79,6 +80,19 @@ class BillingManager(
     private var reconnectAttempt = 0
     private var reconnectJob: Job? = null
     private var purchaseContinuation: CancellableContinuation<Boolean>? = null
+
+    /**
+     * The tip jar, as Play describes it. Null when Play does not know the
+     * product — the paywall then simply does not offer it.
+     */
+    private var tipDetails: ProductDetails? = null
+
+    private val _tipPrice = MutableStateFlow<String?>(null)
+
+    /** The localised tip price, when the tip jar exists in the Play Console. */
+    val tipPrice: StateFlow<String?> = _tipPrice.asStateFlow()
+
+    private var tipContinuation: CancellableContinuation<Boolean>? = null
 
     /**
      * Opens the connection and pre-loads the product details.
@@ -193,23 +207,29 @@ class BillingManager(
         return null
     }
 
-    /** Loads the product price so the paywall can show a real localised price. */
+    /** Loads the product prices so the paywall can show real localised prices. */
     suspend fun refreshProduct(): ProductDetails? {
         val billingClient = client ?: return null
         if (!connected) return null
         return suspendCancellableCoroutine { cont ->
             val params = QueryProductDetailsParams.newBuilder()
                 .setProductList(
-                    listOf(
+                    listOf(PRODUCT_ID, TIP_PRODUCT_ID).map { id ->
                         QueryProductDetailsParams.Product.newBuilder()
-                            .setProductId(PRODUCT_ID)
+                            .setProductId(id)
                             .setProductType(BillingClient.ProductType.INAPP)
                             .build()
-                    )
+                    }
                 )
                 .build()
             billingClient.queryProductDetailsAsync(params) { result, detailsResult ->
-                val details = detailsResult?.productDetailsList?.firstOrNull()
+                val list = detailsResult?.productDetailsList.orEmpty()
+                // The tip jar is optional: when it has not been created in the
+                // Play Console the query just does not return it, and the
+                // paywall hides it.
+                tipDetails = list.firstOrNull { it.productId == TIP_PRODUCT_ID }
+                _tipPrice.value = tipDetails?.oneTimePurchaseOfferDetails?.formattedPrice
+                val details = list.firstOrNull { it.productId == PRODUCT_ID }
                 if (result.responseCode == BillingClient.BillingResponseCode.OK && details != null) {
                     _state.value = BillingUiState.Ready(
                         price = details.oneTimePurchaseOfferDetails?.formattedPrice ?: "",
@@ -264,6 +284,52 @@ class BillingManager(
         return suspendCancellableCoroutine { cont ->
             purchaseContinuation = cont
             cont.invokeOnCancellation { purchaseContinuation = null }
+        }
+    }
+
+    /**
+     * Launches the Play sheet for the tip jar and suspends until the result is known.
+     *
+     * A tip is a **consumable**: it unlocks nothing, it is consumed the moment
+     * it lands (see [onPurchasesUpdated]) and it can be given again. It is
+     * offered only when Play knows the product.
+     */
+    suspend fun purchaseTip(activity: Activity): Boolean {
+        val billingClient = awaitConnection()
+        if (billingClient == null) {
+            _state.value = BillingUiState.Failed(
+                "Google Play could not be reached. Check your connection and try again."
+            )
+            return false
+        }
+        refreshProduct()
+        val details = tipDetails
+        if (details == null) {
+            _state.value = BillingUiState.Failed(
+                "The tip jar is not available right now. Try again in a moment."
+            )
+            return false
+        }
+        val flowParams = BillingFlowParams.newBuilder()
+            .setProductDetailsParamsList(
+                listOf(
+                    BillingFlowParams.ProductDetailsParams.newBuilder()
+                        .setProductDetails(details)
+                        .build()
+                )
+            )
+            .build()
+        _state.value = BillingUiState.Flowing
+        val launched = billingClient.launchBillingFlow(activity, flowParams)
+        if (launched.responseCode != BillingClient.BillingResponseCode.OK) {
+            _state.value = BillingUiState.Failed(
+                launched.debugMessage ?: "The purchase sheet could not be opened."
+            )
+            return false
+        }
+        return suspendCancellableCoroutine { cont ->
+            tipContinuation = cont
+            cont.invokeOnCancellation { tipContinuation = null }
         }
     }
 
@@ -333,6 +399,12 @@ class BillingManager(
                         cont.resume(false)
                         return@queryPurchasesAsync
                     }
+                    // A tip that was paid for but never consumed (the app died
+                    // in between) is consumed now, so the jar can be filled again.
+                    purchases.filter {
+                        it.products.contains(TIP_PRODUCT_ID) &&
+                            it.purchaseState == Purchase.PurchaseState.PURCHASED
+                    }.forEach { consume(it) }
                     val mine = purchases.any {
                         it.products.contains(PRODUCT_ID) &&
                             it.purchaseState == Purchase.PurchaseState.PURCHASED
@@ -351,6 +423,19 @@ class BillingManager(
     }
 
     private fun onPurchasesUpdated(result: BillingResult, purchases: List<Purchase>?) {
+        // A tip is consumed the moment it lands: it unlocks nothing and it can
+        // be given again. It never touches the unlock, and it never sets the
+        // Purchased state — that state belongs to the full-access unlock.
+        val tip = purchases?.firstOrNull {
+            it.products.contains(TIP_PRODUCT_ID) && it.purchaseState == Purchase.PurchaseState.PURCHASED
+        }
+        if (tip != null && result.responseCode == BillingClient.BillingResponseCode.OK) {
+            consume(tip)
+            tipContinuation?.resume(true)
+            tipContinuation = null
+            _state.value = BillingUiState.Idle
+            return
+        }
         val purchase = purchases?.firstOrNull {
             it.products.contains(PRODUCT_ID) && it.purchaseState == Purchase.PurchaseState.PURCHASED
         }
@@ -366,12 +451,22 @@ class BillingManager(
         val pending = purchases?.firstOrNull {
             it.products.contains(PRODUCT_ID) && it.purchaseState == Purchase.PurchaseState.PENDING
         }
+        val pendingTip = purchases?.firstOrNull {
+            it.products.contains(TIP_PRODUCT_ID) && it.purchaseState == Purchase.PurchaseState.PENDING
+        }
         purchaseContinuation?.resume(false)
         purchaseContinuation = null
+        tipContinuation?.resume(false)
+        tipContinuation = null
         when {
             pending != null ->
                 _state.value = BillingUiState.Failed(
                     "The payment is still processing. It will unlock on its own once Google Play confirms it."
+                )
+
+            pendingTip != null ->
+                _state.value = BillingUiState.Failed(
+                    "The payment is still processing. Google Play will confirm it on its own."
                 )
 
             result.responseCode != BillingClient.BillingResponseCode.USER_CANCELED ->
@@ -381,6 +476,24 @@ class BillingManager(
 
             else ->
                 _state.value = BillingUiState.Idle
+        }
+    }
+
+    /**
+     * Consumes a tip so it can be given again.
+     *
+     * Consuming also acknowledges the purchase, so a consumed tip never shows
+     * up in the ownership check afterwards.
+     */
+    private fun consume(purchase: Purchase) {
+        val billingClient = client ?: return
+        val params = ConsumeParams.newBuilder()
+            .setPurchaseToken(purchase.purchaseToken)
+            .build()
+        billingClient.consumeAsync(params) { result, _ ->
+            if (result.responseCode != BillingClient.BillingResponseCode.OK) {
+                Log.w(TAG, "tip consume failed: ${result.debugMessage}")
+            }
         }
     }
 
@@ -403,5 +516,13 @@ class BillingManager(
 
         /** Must match the product id created in the Play Console. */
         const val PRODUCT_ID = "dao_fortune_full_access"
+
+        /**
+         * The tip jar — a **consumable** product in the Play Console. It
+         * unlocks nothing; it exists so a reader who enjoys the app can leave
+         * something behind. When the product is not created, the paywall
+         * simply does not offer it.
+         */
+        const val TIP_PRODUCT_ID = "dao_fortune_tip"
     }
 }

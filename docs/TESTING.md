@@ -154,6 +154,8 @@ adb logcat -c            # clear the log before the run
 | 9 | Buy | Purchase completes, sheet closes, the module you wanted opens |
 | 10 | Open every module | No paywall anywhere |
 | 11 | Restore purchase | After uninstalling and reinstalling, **Restore purchase** brings the unlock back |
+| 11a | Look at the paywall (with the tip jar created in the Console) | A "leave a tip" row sits below **Restore purchase**, priced in your local currency, saying plainly that it unlocks nothing |
+| 11b | Leave a tip | Play's sheet takes the payment, the paywall closes on a thank-you banner; nothing unlocks — locked cards stay locked — and the jar can be filled again |
 
 For step 11, reinstalling does **not** reset the unlock: Play owns the entitlement. The local
 "free reading" flag is a separate thing and *does* reset when app data is cleared — that is by
@@ -273,7 +275,7 @@ its keep.
 - Data safety form filled in (see `docs/PLAY_STORE_LISTING.md`)
 - Content rating questionnaire completed
 - An in-app product with the id `dao_fortune_full_access`, priced once and left to Play's automatic
-  currency conversion
+  currency conversion — and, if the tip jar is wanted, the consumable `dao_fortune_tip` alongside it
 
 ---
 

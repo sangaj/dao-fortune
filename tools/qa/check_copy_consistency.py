@@ -31,6 +31,7 @@ AGENTS = "AGENTS.md"
 TESTING = "docs/TESTING.md"
 VM = "app/src/main/java/com/laki/daofortune/vm/MainViewModel.kt"
 ACTIVITY = "app/src/main/java/com/laki/daofortune/MainActivity.kt"
+PAYWALL = "app/src/main/java/com/laki/daofortune/ui/PaywallSheet.kt"
 
 # Each rule: (name, why it matters, [(file, pattern), ...]).
 RULES = [
@@ -58,10 +59,22 @@ RULES = [
         "the confirm-before-spend step is part of the product promise and must be documented with the code",
         [
             (VM, r"confirmFreeSpend"),
+            (VM, r"confirmFreeDream"),
             (ACTIVITY, r"Your one free reading"),
+            (ACTIVITY, r"Read your dream in full"),
             (README, r"asks before spending"),
             (AGENTS, r"asks first"),
+            (AGENTS, r"confirmFreeDream"),
             (TESTING, r"Your one free reading"),
+            (TESTING, r"Read the dream\*\* while the one free reading is unspent"),
+        ],
+    ),
+    (
+        "The tip jar unlocks nothing",
+        "a donation that implies an unlock is a deceptive-behaviour risk; the paywall must say it plainly",
+        [
+            (PAYWALL, r"unlocks nothing"),
+            (AGENTS, r"dao_fortune_tip"),
         ],
     ),
     (

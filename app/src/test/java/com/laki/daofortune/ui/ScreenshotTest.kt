@@ -156,8 +156,10 @@ class ScreenshotTest {
                             title = "Full Access",
                             description = "Every reading, every day"
                         ),
+                        tipPrice = "$1.99",
                         onBuy = {},
                         onRestore = {},
+                        onTip = {},
                         onDismiss = {}
                     )
                 }

@@ -290,7 +290,9 @@ A validity of 10950 days (30 years) is required: Play requires the signing key t
    `Dao Fortune: Luopan Wisdom` (26 characters — Play's title limit is 30, and the full brand line
    *Dao Fortune — Daily Luopan Wisdom* is 32, so it lives in the icon and the feature graphic instead).
 2. **Create the one-off product** `dao_fortune_full_access` (in-app products, not a subscription).
-   The id must match `BillingManager.PRODUCT_ID`.
+   The id must match `BillingManager.PRODUCT_ID`. Optionally also create the **consumable** tip jar
+   `dao_fortune_tip` (`BillingManager.TIP_PRODUCT_ID`) — when it exists, the paywall offers a
+   "leave a tip" row that unlocks nothing; when it does not, the row simply never appears.
 3. **Target API 36** is mandatory for new listings since August 2026 — this project already targets it.
 4. **Enrol for Play App Signing** (App integrity → App signing key). Google then holds the app
    signing key and can reset your upload key if it is ever lost — which removes the single worst
