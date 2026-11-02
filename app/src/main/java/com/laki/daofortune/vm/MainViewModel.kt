@@ -122,9 +122,6 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     val billingState: StateFlow<BillingUiState> get() = billing.state
 
-    /** The localised tip price, when the tip jar exists in the Play Console. */
-    val tipPrice: StateFlow<String?> get() = billing.tipPrice
-
     private val zone: ZoneId get() = ZoneId.systemDefault()
 
     private fun initialState(): UiState {
@@ -512,9 +509,6 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
         /** Shown when "Restore purchase" finds nothing on the account. */
         const val NOTICE_NO_PURCHASE = "NO_PURCHASE_FOUND"
-
-        /** Shown after a tip has been given. */
-        const val NOTICE_TIP_THANKED = "TIP_THANKED"
     }
 
     fun dismissPaywall() {
@@ -567,23 +561,6 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                     open(pending)
                 } else if (pendingDream) {
                     produceDream()
-                }
-            }
-        }
-    }
-
-    /**
-     * Leaves a tip.
-     *
-     * A tip unlocks nothing and changes no state but the notice: the paywall
-     * closes on a thank-you, and whatever was locked stays locked.
-     */
-    fun tip(activity: Activity) {
-        viewModelScope.launch {
-            val given = billing.purchaseTip(activity)
-            if (given) {
-                _ui.update {
-                    it.copy(showPaywall = false, notice = NOTICE_TIP_THANKED)
                 }
             }
         }

@@ -33,10 +33,8 @@ import com.laki.daofortune.billing.BillingUiState
 @Composable
 fun PaywallSheet(
     billingState: BillingUiState,
-    tipPrice: String?,
     onBuy: () -> Unit,
     onRestore: () -> Unit,
-    onTip: () -> Unit,
     onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -183,35 +181,6 @@ fun PaywallSheet(
             }
             TextButton(onClick = onDismiss) {
                 Text("Not now", color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-
-            // The tip jar: only offered when Play knows the product, and always
-            // plainly a tip — it unlocks nothing.
-            if (tipPrice != null) {
-                Spacer(Modifier.height(4.dp))
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(
-                            1.dp,
-                            MaterialTheme.colorScheme.outlineVariant,
-                            RoundedCornerShape(16.dp)
-                        )
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        "Enjoying the readings? Leave a tip — it unlocks nothing, " +
-                            "it just keeps the ink wet.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    OutlinedButton(onClick = onTip, modifier = Modifier.fillMaxWidth()) {
-                        Text("Leave a $tipPrice tip", color = Gold)
-                    }
-                }
             }
 
             Spacer(Modifier.height(8.dp))

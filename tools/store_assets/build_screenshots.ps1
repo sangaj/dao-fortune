@@ -593,12 +593,11 @@ Save-Png $bmp $g '04_windfall_reading.png'
 
 # --------------------------------------------------------- screenshot 5: paywall
 #
-# A bottom sheet sits at the foot of the screen, so the sheet starts low — but
-# it now carries the tip jar as well, so it starts a touch higher than it did.
+# A bottom sheet sits at the foot of the screen, so the sheet starts low.
 
 $canvas = New-Canvas
 $bmp = $canvas[0]; $g = $canvas[1]
-$y = 560
+$y = 620
 
 $bigFont = F 'Georgia' 62 ([System.Drawing.FontStyle]::Bold)
 $hh = Wrap $g 'Unlock Full Access' $bigFont (Brush $Gold) $Margin $y ($W - 2 * $Margin)
@@ -644,25 +643,6 @@ $y += 92 + 22
 $g.DrawString('Not now', $smallFont, $mutedB,
               (New-Object System.Drawing.RectangleF($Margin, $y, ($W - 2 * $Margin), 70)), $fmt)
 $y += 84
-
-# The tip jar, drawn exactly as the paywall words it: plainly a tip that
-# unlocks nothing, in its own bordered card under the purchase buttons.
-$tipPad = 26
-$tipTextFont = F 'Segoe UI' 22
-$tipCopy = 'Enjoying the readings? Leave a tip ' + $Dash +
-           ' it unlocks nothing, it just keeps the ink wet.'
-$tipTextH = $g.MeasureString($tipCopy, $tipTextFont, ($W - 2 * $Margin - 2 * $tipPad)).Height
-$tipBtnH = 66
-$tipCardH = $tipPad + $tipTextH + 16 + $tipBtnH + $tipPad
-RoundRect $g $Margin $y ($W - 2 * $Margin) $tipCardH 22 $Card $Outline
-Wrap $g $tipCopy $tipTextFont $mutedB ($Margin + $tipPad) ($y + $tipPad) ($W - 2 * $Margin - 2 * $tipPad) | Out-Null
-$tipBtnY = $y + $tipPad + $tipTextH + 16
-RoundRect $g ($Margin + $tipPad) $tipBtnY ($W - 2 * $Margin - 2 * $tipPad) $tipBtnH 18 ([System.Drawing.Color]::FromArgb(0, 0, 0, 0)) $Gold
-$tipBtnFont = F 'Segoe UI' 24
-$g.DrawString('Leave a $1.99 tip', $tipBtnFont, (Brush $Gold),
-              (New-Object System.Drawing.RectangleF(($Margin + $tipPad), $tipBtnY, ($W - 2 * $Margin - 2 * $tipPad), $tipBtnH)), $fmt)
-$tipTextFont.Dispose(); $tipBtnFont.Dispose()
-$y += $tipCardH + 26
 
 $fine = F 'Segoe UI' 20
 $usedHeight = Wrap $g 'Payments are handled by Google Play. Your anchor stays on this device and is never transmitted.' $fine $mutedB $Margin $y ($W - 2 * $Margin)

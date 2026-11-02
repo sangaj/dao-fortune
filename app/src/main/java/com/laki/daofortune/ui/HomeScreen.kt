@@ -392,8 +392,6 @@ private fun noticeText(notice: String): String = when (notice) {
         "That was your free reading. Any reading after this one needs the one-off unlock."
     "NO_PURCHASE_FOUND" ->
         "No previous purchase found on this Google account."
-    "TIP_THANKED" ->
-        "Thank you — the tip keeps the ink wet."
     else -> notice
 }
 

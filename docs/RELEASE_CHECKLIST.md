@@ -113,20 +113,11 @@ cd E:\Minimax\dao-fortune
   * The app's paywall copy says "One payment. No subscription." — keep the $9.99 figure out of the
     listing description, because the displayed price varies by buyer's currency and a hard-coded
     number in the description can read as misleading.
-
-### 2.2a Optional: the tip jar
-
-* Console → **Monetize → Products → Create product**
-* **Product ID:** `dao_fortune_tip`  *(must match `BillingManager.TIP_PRODUCT_ID`)*
-* **Type:** One-time product — the app consumes each purchase, so it can be given again
-* **Name:** `Tip the ink`
-* **Description:** A small thank-you. It unlocks nothing — it just keeps the ink wet.
-* **Price:** something small, e.g. **$1.99**, converted per market like the unlock.
-  If this product is never created, the paywall simply never offers the tip row — nothing breaks.
   * The number used in the store screenshots is `$9.99` (`tools/store_assets/build_screenshots.ps1`).
 
 > Use an **in-app product**, not a subscription. The listing copy in `docs/PLAY_STORE_LISTING.md` says
-> "no subscription" — keep that promise or change the copy.
+> "no subscription" — keep that promise or change the copy. `dao_fortune_full_access` is the only
+> product the app knows about; there is no second SKU.
 
 ### 2.3 Play App Signing — turn this on at the first upload
 

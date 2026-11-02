@@ -45,7 +45,6 @@ class MainActivity : ComponentActivity() {
         setContent {            DaoFortuneTheme {
                 val state by viewModel.ui.collectAsStateWithLifecycle()
                 val billingState by viewModel.billingState.collectAsStateWithLifecycle()
-                val tipPrice by viewModel.tipPrice.collectAsStateWithLifecycle()
 
                 // Android 13+ asks for the notification permission at runtime;
                 // older versions only need the toggle. One launcher serves both
@@ -166,10 +165,8 @@ class MainActivity : ComponentActivity() {
                     if (state.showPaywall) {
                         PaywallSheet(
                             billingState = billingState,
-                            tipPrice = tipPrice,
                             onBuy = { viewModel.purchase(this) },
                             onRestore = { viewModel.restore() },
-                            onTip = { viewModel.tip(this) },
                             onDismiss = viewModel::dismissPaywall
                         )
                     }

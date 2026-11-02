@@ -31,7 +31,7 @@ AGENTS = "AGENTS.md"
 TESTING = "docs/TESTING.md"
 VM = "app/src/main/java/com/laki/daofortune/vm/MainViewModel.kt"
 ACTIVITY = "app/src/main/java/com/laki/daofortune/MainActivity.kt"
-PAYWALL = "app/src/main/java/com/laki/daofortune/ui/PaywallSheet.kt"
+BILLING = "app/src/main/java/com/laki/daofortune/billing/BillingManager.kt"
 
 # Each rule: (name, why it matters, [(file, pattern), ...]).
 RULES = [
@@ -70,11 +70,16 @@ RULES = [
         ],
     ),
     (
-        "The tip jar unlocks nothing",
-        "a donation that implies an unlock is a deceptive-behaviour risk; the paywall must say it plainly",
+        "One in-app product only",
+        "the tip jar was removed on purpose: a second product id would bring it back, and a consumable "
+        "whose purchase can be lost in the same callback as the real unlock is a money bug waiting "
+        "to happen",
         [
-            (PAYWALL, r"unlocks nothing"),
-            (AGENTS, r"dao_fortune_tip"),
+            (AGENTS, r"exactly one in-app product"),
+            # The lookahead is the whole point: the billing code must not name a
+            # second product at all.
+            (BILLING, r"(?s)(?!.*TIP_PRODUCT_ID).*const val PRODUCT_ID = \"dao_fortune_full_access\""),
+            (LISTING, r"In-app purchases \| \*\*Yes\*\*.*`dao_fortune_full_access`"),
         ],
     ),
     (

@@ -155,8 +155,6 @@ adb logcat -c            # clear the log before the run
 | 9 | Buy | Purchase completes, sheet closes, the module you wanted opens |
 | 10 | Open every module | No paywall anywhere |
 | 11 | Restore purchase | After uninstalling and reinstalling, **Restore purchase** brings the unlock back |
-| 11a | Look at the paywall (with the tip jar created in the Console) | A "leave a tip" row sits below **Restore purchase**, priced in your local currency, saying plainly that it unlocks nothing |
-| 11b | Leave a tip | Play's sheet takes the payment, the paywall closes on a thank-you banner; nothing unlocks — locked cards stay locked — and the jar can be filled again |
 
 For step 11, reinstalling does **not** reset the unlock: Play owns the entitlement. The local
 "free reading" flag is a separate thing and *does* reset when app data is cleared — that is by
@@ -276,7 +274,7 @@ its keep.
 - Data safety form filled in (see `docs/PLAY_STORE_LISTING.md`)
 - Content rating questionnaire completed
 - An in-app product with the id `dao_fortune_full_access`, priced once and left to Play's automatic
-  currency conversion — and, if the tip jar is wanted, the consumable `dao_fortune_tip` alongside it
+  currency conversion
 
 ---
 
@@ -300,7 +298,7 @@ Everything below must be true before an upload. If any line is unchecked, stop.
 | Real-device pass done | Layer 2 complete, including the purchase | ☐ |
 | Keystore safe | `dao-fortune-release.jks` + `keystore.properties` backed up **off this machine** | ☐ |
 | Play App Signing | enrolled in Play Console → App integrity | ☐ |
-| Console products created | `dao_fortune_full_access` (one-off) is live; `dao_fortune_tip` (consumable) created too — or deliberately skipped, which simply hides the tip row | ☐ |
+| Console products created | `dao_fortune_full_access` (one-off) is live — it is the only product the app knows about | ☐ |
 | Everything committed | `git status` clean, `git push` done | ☐ |
 
 ---

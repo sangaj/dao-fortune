@@ -32,11 +32,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\qa\verify_release.ps1 
   never be spent silently. If that split changes,
   change `docs/PLAY_STORE_LISTING.md` with it — the listing describes the paywall model in its own
   words.
-- **The tip jar (`dao_fortune_tip`)** is a **consumable** in-app product (`BillingManager.TIP_PRODUCT_ID`).
-  It unlocks nothing: it is consumed the moment it lands so it can be given again, and the paywall
-  only offers it when Play knows the product — an app sold before the product exists in the Console
-  simply never shows it. It must never grant access; a donation that implies an unlock is a Play
-  deceptive-behaviour risk.
+- **There is exactly one in-app product: `dao_fortune_full_access`.** No tip jar, no subscription,
+  no second SKU. A voluntary tip inside the paywall was tried and removed: it put a donation in
+  front of a reader who had just been stopped by the paywall, it made the store screenshot promise
+  a feature that only existed when the Console product did, and it added a consumable whose
+  purchase could be lost in the same callback as the real unlock. Do not reintroduce one without a
+  fresh look at Play's payments policy.
 - **The repeated copy must agree everywhere.** The paywall split, the one free reading and its
   confirm-first step, the birth-day storage promise, "no data collected" and the entertainment
   disclaimer all appear in the app, the listing, the privacy policy and these docs. The agreement

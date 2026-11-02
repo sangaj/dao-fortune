@@ -29,15 +29,7 @@ build from Play **internal testing**, not by sideloading: the Play build is the 
 - ☐ Buy, force-stop, reopen → still unlocked; install on a second device → unlocked on first launch
 - ☐ After the free reading is spent, the home banner says so and can be dismissed
 
-## 4. The tip jar — rows 11a–11b
-
-*(Needs `dao_fortune_tip` created in the Console; without it the row must simply not appear.)*
-
-- ☐ The tip row sits under **Restore purchase**, priced locally, saying plainly it unlocks nothing
-- ☐ Leave a tip → payment completes → thank-you banner; locked cards stay locked; the jar can be
-  filled again
-
-## 5. Dream & Omens — rows 28–34, 29a–29b
+## 4. Dream & Omens — rows 28–34, 29a–29b
 
 - ☐ Write a dream, tap **Read the dream** → the same "Your one free reading" dialog asks first;
   dismiss → nothing spent; confirm → the reading appears
@@ -47,14 +39,14 @@ build from Play **internal testing**, not by sideloading: the Play build is the 
 - ☐ Privacy: the text is in no file under the app's storage; closing the sheet erases it
 - ☐ Free reading spent → the dream goes to the paywall; buying reads it with your words still there
 
-## 6. Personalisation — rows 22–27
+## 5. Personalisation — rows 22–27
 
 - ☐ Pick / change / clear the year sign; the hollow ring follows on the plate
 - ☐ Add a birth day → the readings re-anchor on its pillar; the birth day wins over the year sign,
   and removing it falls back
 - ☐ Stored locally only; excluded from backup — a device transfer drops them, the unlock survives
 
-## 7. Notifications, the widget and reminders — rows 21a–21f
+## 6. Notifications, the widget and reminders — rows 21a–21f
 
 - ☐ Top-bar bell → permission ask on Android 13+ → one silent notification next morning ~08:00;
   tapping it opens the app
@@ -63,13 +55,13 @@ build from Play **internal testing**, not by sideloading: the Play build is the 
 - ☐ Home-screen widget: today's score, verdict, headline and best window; it refreshes
 - ☐ Revoke the permission → no crash, the bells still toggle
 
-## 8. Looking ahead — rows 15–21
+## 7. Looking ahead — rows 15–21
 
 - ☐ Chevrons and the calendar walk the days; a future or past day reads as a day plate
 - ☐ Favourable Days: five days, ranked, each with pillar, term, score and verdict
 - ☐ Pick the top day → the plate matches the list; a chosen day has **no hour**
 
-## 9. Edge cases — rows 35–42
+## 8. Edge cases — rows 35–42
 
 - ☐ Airplane mode: everything works except the purchase
 - ☐ Another time zone; the 12-hour clock; the clock set a day forward — the pillars follow
@@ -77,10 +69,9 @@ build from Play **internal testing**, not by sideloading: the Play build is the 
 - ☐ Resize on a foldable or tablet — the layout holds
 - ☐ Clear app data → the free reading comes back (expected, documented)
 
-## 10. Console gates before the upload
+## 9. Console gates before the upload
 
-- ☐ `dao_fortune_full_access` (one-off) is live; `dao_fortune_tip` (consumable) created — or
-  deliberately skipped, which simply hides the tip row
+- ☐ `dao_fortune_full_access` (one-off) is live — it is the only product the app knows about
 - ☐ Privacy policy on a public URL, linked in App content; Data safety answered "no data collected,
   no data shared"; content rating questionnaire done
 - ☐ `dao-fortune-release.jks` and `keystore.properties` backed up **off this machine**;
