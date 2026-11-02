@@ -27,7 +27,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\qa\verify_release.ps1 
   free every day, in full** — it never spends the free reading and never hits the paywall. Of the
   other four modules and the dream, the **first full reading is free**, and every later reading
   needs the one-off unlock (`data/AccessState.kt`, `vm/MainViewModel.kt`). There is exactly **one**
-  free reading, and a tap that would spend it asks first (`UiState.confirmFreeSpend`) — it must
+  free reading, and a tap that would spend it asks first (`UiState.confirmFreeSpend` for a module,
+  `UiState.confirmFreeDream` for a dream) — it must
   never be spent silently. If that split changes,
   change `docs/PLAY_STORE_LISTING.md` with it — the listing describes the paywall model in its own
   words.

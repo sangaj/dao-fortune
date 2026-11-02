@@ -115,21 +115,29 @@ class MainActivity : ComponentActivity() {
                         ReadingSheet(reading = reading, onClose = viewModel::closeReading)
                     }
 
-                    // One free reading exists; it is never spent without asking.
-                    state.confirmFreeSpend?.let { module ->
+                    // One free reading exists; it is never spent without asking,
+                    // whether it would be spent on a module or on a dream.
+                    val confirmModule = state.confirmFreeSpend
+                    if (confirmModule != null || state.confirmFreeDream) {
                         AlertDialog(
                             onDismissRequest = viewModel::dismissFreeSpend,
                             title = { Text("Your one free reading") },
                             text = {
                                 Text(
-                                    "Open ${module.title} in full? This is the one free reading " +
-                                        "beyond Today's Fortune — after it, every reading needs " +
-                                        "the one-off unlock."
+                                    if (confirmModule != null) {
+                                        "Open ${confirmModule.title} in full? This is the one free reading " +
+                                            "beyond Today's Fortune — after it, every reading needs " +
+                                            "the one-off unlock."
+                                    } else {
+                                        "Read your dream in full? This is the one free reading " +
+                                            "beyond Today's Fortune — after it, every reading needs " +
+                                            "the one-off unlock."
+                                    }
                                 )
                             },
                             confirmButton = {
                                 TextButton(onClick = viewModel::confirmFreeSpend) {
-                                    Text("Open it")
+                                    Text(if (confirmModule != null) "Open it" else "Read it")
                                 }
                             },
                             dismissButton = {

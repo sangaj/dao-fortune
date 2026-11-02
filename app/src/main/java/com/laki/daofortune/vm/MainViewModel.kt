@@ -64,6 +64,8 @@ data class UiState(
     val selected: ReadingKey? = null,
     /** The module waiting on the reader's yes before the one free reading is spent. */
     val confirmFreeSpend: FortuneModule? = null,
+    /** True when a dream reading waits on the same yes. */
+    val confirmFreeDream: Boolean = false,
     val pendingModule: FortuneModule? = null,
     val showPaywall: Boolean = false,
     val showAbout: Boolean = false,
@@ -334,17 +336,23 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         produceReading(module, key, spendsFree = false)
     }
 
-    /** Spends the one free reading the reader just confirmed. */
+    /** Spends the one free reading the reader just confirmed — module or dream. */
     fun confirmFreeSpend() {
-        val module = _ui.value.confirmFreeSpend ?: return
-        _ui.update { it.copy(confirmFreeSpend = null) }
-        val key = ReadingKey(_ui.value.selectedDate, module)
-        produceReading(module, key, spendsFree = true)
+        val state = _ui.value
+        val module = state.confirmFreeSpend
+        if (module != null) {
+            _ui.update { it.copy(confirmFreeSpend = null) }
+            val key = ReadingKey(state.selectedDate, module)
+            produceReading(module, key, spendsFree = true)
+        } else if (state.confirmFreeDream) {
+            _ui.update { it.copy(confirmFreeDream = false) }
+            produceDream()
+        }
     }
 
     /** Closes the free-reading confirmation without spending it. */
     fun dismissFreeSpend() {
-        _ui.update { it.copy(confirmFreeSpend = null) }
+        _ui.update { it.copy(confirmFreeSpend = null, confirmFreeDream = false) }
     }
 
     /** Draws a reading and puts it on screen; consumes the free reading when asked. */
@@ -419,7 +427,9 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
      * Reads the dream.
      *
      * The first reading is free; a later one needs the unlock, exactly as the
-     * five modules do. When the unlock is bought, the dream is read again.
+     * five modules do. Because there is exactly ONE free reading, a tap that
+     * would spend it asks first ([confirmFreeDream]) — the same courtesy the
+     * modules get. When the unlock is bought, the dream is read again.
      */
     fun readDream() {
         val state = _ui.value
@@ -431,6 +441,10 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             _ui.update {
                 it.copy(pendingDream = true, showDream = false, showPaywall = true)
             }
+            return
+        }
+        if (!access.isUnlocked && !access.freeReadingUsed) {
+            _ui.update { it.copy(confirmFreeDream = true) }
             return
         }
         produceDream()

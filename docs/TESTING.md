@@ -215,6 +215,8 @@ production.
 |---|---|---|
 | 28 | Tap the Dream & Omens card | The sheet opens empty; the card is labelled "Dream & Omens / 梦占" |
 | 29 | Write a dream with a direction, an animal and a colour, then tap **Read the dream** | A reading appears: score, headline, the ink-wash plate, the insights, the advice and the factors behind the score |
+| 29a | Tap **Read the dream** while the one free reading is unspent | A dialog asks "Your one free reading" first; nothing is spent until it is confirmed |
+| 29b | Dismiss the dialog, then tap **Read the dream** again | The dialog returns and the free reading is still there; confirming spends it and the reading appears |
 | 30 | Look at the plate | The images you wrote sit on the mountains they belong to; the sun of the day is marked; your year sign is ringed if you set one |
 | 31 | Read the same dream again | The plate is **identical** — the drawing is seeded by the text, not random |
 | 32 | Write something the vocabulary cannot read ("a grey feeling of dread") | The reading says the dream held no image the plate could use — it must not invent an interpretation |
