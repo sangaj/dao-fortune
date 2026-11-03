@@ -40,6 +40,7 @@ Every reading shows **the factors that produced its score**, so the number is ne
 | **Home-screen widget** | A Glance widget shows today's score, verdict, headline and best window. The launcher asks it to refresh every 30 minutes, so it stays true even if you never open the app. |
 | **Day reminders** | Each favourable day in the forward scan has a bell: tap it and a one-off WorkManager task posts a reminder at eight on that morning. No exact-alarm permission is used — a reminder is a nudge, not a medicine dose. |
 | **The first-run introduction** | Three short pages, shown once: what the plate is, your anchor (the year sign can be set right there), and the morning bell. Everything on them is skippable, and the flag lives in the device-local profile file. |
+| **The review ask** | Once the app has been opened on five days, it may ask for a Play review — only on an exceptional day, and at most once every thirty days. Whether the card appears is Google's quota to decide. |
 | **Share a reading** | Any reading or dream reading can be shared or saved as a 1080×1920 card, rendered on the device. Each share gets its own file, and the image is written off the main thread. Saving to the gallery uses MediaStore and needs no permission on Android 10+. |
 | **Dream & Omens (梦占)** | Write what you remember of a dream. The app finds the classical images in your own words and reads them against the plate of the night they belong to. |
 

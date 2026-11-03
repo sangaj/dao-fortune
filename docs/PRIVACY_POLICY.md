@@ -40,10 +40,11 @@ The only data handled by a third party is the purchase itself: if you unlock the
 processed by **Google Play Billing**, and Google Play handles the payment details, your Google account
 and the receipt. Dao Fortune never sees or stores your card details.
 
-The app bundles Google's Play Billing library, which brings a small number of Google Play services
-components with it. Those components are Google's code, operate under Google's own privacy policy, and
-can transmit technical diagnostics to Google in the ordinary course of talking to the Play Store. The
-app does not use them for analytics and does not read anything they collect.
+The app bundles Google's Play Billing and Play In-App Review libraries, which bring a small number
+of Google Play services components with them. Those components are Google's code, operate under
+Google's own privacy policy, and can transmit technical diagnostics to Google in the ordinary course
+of talking to the Play Store. The app does not use them for analytics and does not read anything
+they collect.
 
 ## 2. What the app stores on your device
 

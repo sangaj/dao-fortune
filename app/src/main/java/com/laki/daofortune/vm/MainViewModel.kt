@@ -20,6 +20,7 @@ import com.laki.daofortune.core.ModuleReading
 import com.laki.daofortune.core.Natal
 import com.laki.daofortune.core.PickActivity
 import com.laki.daofortune.core.ReadingKey
+import com.laki.daofortune.core.ReviewPrompt
 import com.laki.daofortune.core.YearSign
 import com.laki.daofortune.data.AccessState
 import com.laki.daofortune.data.ProfileState
@@ -67,6 +68,14 @@ data class UiState(
     val notifyEnabled: Boolean = false,
     /** True on the first run, until the three-page introduction is seen. */
     val showOnboarding: Boolean = false,
+    /**
+     * True while the app would like to ask for a Play review.
+     *
+     * The flag only goes up on a day the rule in [ReviewPrompt] allows; the
+     * ask itself is a one-shot — the flag comes down the moment the ask has
+     * been made, whether Google's quota then shows the card or not.
+     */
+    val showReviewPrompt: Boolean = false,
     val selected: ReadingKey? = null,
     /** The module waiting on the reader's yes before the one free reading is spent. */
     val confirmFreeSpend: FortuneModule? = null,
@@ -159,6 +168,46 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         billing.start()
         rescanFavourableDays()
         updateWidgets()
+        maybeAskForReview()
+    }
+
+    /**
+     * Counts today as an open day, and asks for a Play review when the day
+     * earns it.
+     *
+     * The rule (see [ReviewPrompt]): the app has been opened on enough
+     * distinct days, today's fortune is exceptional, and a long cooldown has
+     * passed since the last ask. Only ever evaluated against the day the
+     * reader is living in — looking at another day's plate never triggers it.
+     */
+    private fun maybeAskForReview() {
+        val state = _ui.value
+        if (!state.isToday) return
+        val today = LocalDate.now()
+        profile.noteAppOpened(today)
+        val score = state.readings[ReadingKey(today, FortuneModule.OVERALL)]?.score ?: return
+        if (ReviewPrompt.shouldPrompt(
+                daysOpened = profile.daysOpened,
+                todayScore = score,
+                lastPrompt = profile.lastReviewPromptDay,
+                today = today
+            )
+        ) {
+            _ui.update { it.copy(showReviewPrompt = true) }
+        }
+    }
+
+    /**
+     * Records that the review ask has been made.
+     *
+     * Called by MainActivity as soon as the flow has been launched — whether
+     * Google then showed the card or not. The Play API is quota-based and
+     * deliberately silent about what happened, so the cooldown is the only
+     * honest answer to "did we ask already?".
+     */
+    fun reviewPromptShown() {
+        profile.setLastReviewPromptDay(LocalDate.now())
+        _ui.update { it.copy(showReviewPrompt = false) }
     }
 
     /** Refreshes the home-screen widget, if the reader has placed one. */
@@ -202,6 +251,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         }
         rescanFavourableDays()
         updateWidgets()
+        maybeAskForReview()
     }
 
     /**

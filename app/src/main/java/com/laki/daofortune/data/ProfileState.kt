@@ -105,6 +105,45 @@ class ProfileState(context: Context) {
         prefs.edit { putStringSet(KEY_REMINDED_DAYS, current) }
     }
 
+    /**
+     * On how many distinct days the app has been opened.
+     *
+     * It exists for one purpose only: the Play review ask waits until the
+     * reader has actually lived with the app for a while.
+     */
+    val daysOpened: Int get() = prefs.getInt(KEY_DAYS_OPENED, 0)
+
+    /**
+     * Counts the app being opened today.
+     *
+     * One day counts once, no matter how often the app is opened within it:
+     * the counter measures how long the reader has had the app, not how
+     * busy a day they had.
+     */
+    fun noteAppOpened(today: LocalDate) {
+        val last = prefs.getString(KEY_LAST_OPEN_DAY, null)
+        if (last == today.toString()) return
+        prefs.edit {
+            putInt(KEY_DAYS_OPENED, daysOpened + 1)
+            putString(KEY_LAST_OPEN_DAY, today.toString())
+        }
+    }
+
+    /**
+     * The day the app last asked for a Play review, or null when it never has.
+     *
+     * Written the moment the app asks — whether Google then shows the card or
+     * not — so the quota-gated API is never retried in a loop.
+     */
+    val lastReviewPromptDay: LocalDate?
+        get() = prefs.getString(KEY_LAST_REVIEW_PROMPT, null)
+            ?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+
+    /** Records that the app asked for a Play review on [day]. */
+    fun setLastReviewPromptDay(day: LocalDate) {
+        prefs.edit { putString(KEY_LAST_REVIEW_PROMPT, day.toString()) }
+    }
+
     companion object {
         private const val PREFS_NAME = "dao_fortune_profile"
         private const val KEY_YEAR_SIGN = "year_sign_branch"
@@ -112,5 +151,8 @@ class ProfileState(context: Context) {
         private const val KEY_BIRTH_DATE = "birth_date"
         private const val KEY_REMINDED_DAYS = "reminded_days"
         private const val KEY_ONBOARDING_DONE = "onboarding_done"
+        private const val KEY_DAYS_OPENED = "days_opened"
+        private const val KEY_LAST_OPEN_DAY = "last_open_day"
+        private const val KEY_LAST_REVIEW_PROMPT = "last_review_prompt_day"
     }
 }

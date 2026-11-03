@@ -16,11 +16,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.play.core.review.ReviewManagerFactory
 import java.time.LocalDate
 import com.laki.daofortune.ui.AboutSheet
 import com.laki.daofortune.ui.DaoFortuneTheme
@@ -87,6 +89,22 @@ class MainActivity : ComponentActivity() {
                         // silently does nothing.
                         viewModel.setDailyReadingEnabled(false)
                         viewModel.showNotice(MainViewModel.NOTICE_NOTIFICATIONS_BLOCKED)
+                    }
+                }
+
+                // The Play review ask is a one-shot, and only ever raised by
+                // the view model on a day the rule allows. Google's quota
+                // decides whether the card actually appears; the cooldown is
+                // recorded either way, so a quota-silent day is never retried
+                // in a loop.
+                val reviewManager = remember { ReviewManagerFactory.create(this) }
+                LaunchedEffect(state.showReviewPrompt) {
+                    if (!state.showReviewPrompt) return@LaunchedEffect
+                    reviewManager.requestReviewFlow().addOnCompleteListener { request ->
+                        viewModel.reviewPromptShown()
+                        if (request.isSuccessful) {
+                            reviewManager.launchReviewFlow(this@MainActivity, request.result)
+                        }
                     }
                 }
 

@@ -31,15 +31,16 @@ of them has drifted.
 ```powershell
 Set-Location E:\Minimax\dao-fortune
 python tools\reference\luopan_reference.py       # SELF-CHECK: ALL PASS, rewrites the golden TSVs
-.\gradlew.bat :app:testDebugUnitTest             # 69 tests
+.\gradlew.bat :app:testDebugUnitTest             # 93 tests
 ```
 
 `SampleReadingDump` also writes `docs/store/reading_sample.json` — the real output the store
 screenshots are rendered from. Run the tests before regenerating the screenshots, never edit that file
 by hand.
 
-**Expected:** `EngineTest` 29, `DreamTest` 12, `ScreenshotTest` 6, `ReconnectPolicyTest` 6,
-`PurchaseClassifierTest` 10, `WidgetCopyTest` 4, `ShareCardTest` 1, `SampleReadingDump` 1,
+**Expected:** `EngineTest` 30, `DreamTest` 12, `ScreenshotTest` 6, `ReconnectPolicyTest` 6,
+`PurchaseClassifierTest` 10, `WidgetCopyTest` 4, `ShareCardTest` 1, `GlanceAndYearTest` 10,
+`PickActivityTest` 6, `ReviewPromptTest` 7, `SampleReadingDump` 1,
 zero failures.
 
 ### 1.2 Lint
@@ -308,6 +309,18 @@ its keep.
 | 50 | Read the first free reading | A banner appears on the home screen saying the free reading has been used — and it can be dismissed |
 | 51 | Airplane mode, then try to buy | The purchase sheet does not open; the failure is reported |
 
+### 2.8a The Play review ask
+
+The app asks for a review only after it has been opened on five distinct days, only on a day whose
+fortune is *Exceptional*, and at most once every thirty days. Google's quota decides whether the
+card actually appears.
+
+| # | Action | Expected |
+|---|---|---|
+| 51a | Open the app on five distinct days, on a day with an exceptional score | The Play review card may appear; if Google's quota is spent, nothing shows — both are correct |
+| 51b | Keep opening the app afterwards | The ask does not repeat within thirty days of the last one |
+| 51c | Try the same on a **sideloaded** build | The flow is prepared but Google never shows the card — expected; the review API only displays for Play-installed apps |
+
 ### 2.9 Sharing a card
 
 | # | Action | Expected |
@@ -347,7 +360,7 @@ Everything below must be true before an upload. If any line is unchecked, stop.
 | Gate | How to verify | Status |
 |---|---|---|
 | Engine parity green | `python tools\reference\luopan_reference.py` → ALL PASS | ☐ |
-| Unit tests green | `:app:testDebugUnitTest` → 69/69 | ☐ |
+| Unit tests green | `:app:testDebugUnitTest` → 93/93 | ☐ |
 | Lint has zero errors | `:app:lintRelease` → `app/build/reports/lint-results-release.txt` | ☐ |
 | Bundle validates | `bundletool validate` → exit 0 | ☐ |
 | 16 KB page size | `python tools\qa\check_16kb_pages.py dist\app-release.aab` → PASSED | ☐ |
