@@ -181,7 +181,10 @@ adb logcat -c            # clear the log before the run
 
 | # | Check | Expected |
 |---|---|---|
-| 1 | App launches | No crash in logcat; the plate renders |
+| 1 | App launches | No crash in logcat; on a **fresh install** the three-page introduction shows first; dismissing it lands on the plate, and it never shows again |
+| 1a | Introduction, page two | Picking an animal sets the year sign straight away; the Year Officer card on the home screen reflects it |
+| 1b | Introduction, page three | "Turn on the morning bell" asks the notification permission on Android 13+ and switches the bell on; skipping leaves it off |
+| 1c | Clear app data and reopen | The introduction shows once more (the flag lives in the profile file, by design) |
 | 2 | Date and time line | Today's real date, local time, correct time zone |
 | 3 | Solar term | Matches an independent source for today |
 | 4 | Four pillars | Year / month / day / hour, non-empty, sensible |

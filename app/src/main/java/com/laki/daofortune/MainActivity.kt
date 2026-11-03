@@ -26,6 +26,7 @@ import com.laki.daofortune.ui.AboutSheet
 import com.laki.daofortune.ui.DaoFortuneTheme
 import com.laki.daofortune.ui.DreamSheet
 import com.laki.daofortune.ui.HomeScreen
+import com.laki.daofortune.ui.OnboardingSheet
 import com.laki.daofortune.ui.PaywallSheet
 import com.laki.daofortune.ui.ReadingSheet
 import com.laki.daofortune.vm.MainViewModel
@@ -196,6 +197,22 @@ class MainActivity : ComponentActivity() {
 
                     if (state.showAbout) {
                         AboutSheet(onDismiss = { viewModel.showAbout(false) })
+                    }
+
+                    if (state.showOnboarding) {
+                        OnboardingSheet(
+                            yearSign = state.yearSign,
+                            notifyEnabled = state.notifyEnabled,
+                            onSetYearSign = viewModel::setYearSign,
+                            onEnableNotify = {
+                                if (!notificationsAllowed()) {
+                                    notifyPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                } else {
+                                    viewModel.setDailyReadingEnabled(true)
+                                }
+                            },
+                            onDone = viewModel::dismissOnboarding
+                        )
                     }
                 }
             }

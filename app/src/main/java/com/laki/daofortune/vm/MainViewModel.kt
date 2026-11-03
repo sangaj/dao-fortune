@@ -65,6 +65,8 @@ data class UiState(
     val remindedDays: Set<LocalDate> = emptySet(),
     /** True when the daily reading notification is switched on. */
     val notifyEnabled: Boolean = false,
+    /** True on the first run, until the three-page introduction is seen. */
+    val showOnboarding: Boolean = false,
     val selected: ReadingKey? = null,
     /** The module waiting on the reader's yes before the one free reading is spent. */
     val confirmFreeSpend: FortuneModule? = null,
@@ -139,6 +141,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             // ProfileState never hands out a birth day in the future.
             birthDate = profile.birthDate,
             notifyEnabled = profile.dailyReadingEnabled,
+            showOnboarding = !profile.onboardingDone,
             remindedDays = profile.remindedDays.filter { it >= today }.toSet(),
             freeReadingsLeft = access.freeReadingsLeft(),
             unlocked = access.isUnlocked
@@ -516,6 +519,12 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     fun closeReading() {
         _ui.update { it.copy(selected = null, notice = null) }
+    }
+
+    /** Closes the first-run introduction and does not show it again. */
+    fun dismissOnboarding() {
+        profile.setOnboardingDone()
+        _ui.update { it.copy(showOnboarding = false) }
     }
 
     /** Takes the banner down once the reader has read it. */

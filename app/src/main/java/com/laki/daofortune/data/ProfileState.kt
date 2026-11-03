@@ -46,6 +46,14 @@ class ProfileState(context: Context) {
         prefs.edit { putBoolean(KEY_DAILY_READING, enabled) }
     }
 
+    /** True when the first-run introduction has been seen. */
+    val onboardingDone: Boolean get() = prefs.getBoolean(KEY_ONBOARDING_DONE, false)
+
+    /** Marks the first-run introduction as seen. */
+    fun setOnboardingDone() {
+        prefs.edit { putBoolean(KEY_ONBOARDING_DONE, true) }
+    }
+
     /**
      * The reader's birth day, or null when they have not given one.
      *
@@ -103,5 +111,6 @@ class ProfileState(context: Context) {
         private const val KEY_DAILY_READING = "daily_reading_enabled"
         private const val KEY_BIRTH_DATE = "birth_date"
         private const val KEY_REMINDED_DAYS = "reminded_days"
+        private const val KEY_ONBOARDING_DONE = "onboarding_done"
     }
 }
