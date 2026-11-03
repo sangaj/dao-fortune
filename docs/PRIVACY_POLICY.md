@@ -56,6 +56,8 @@ they collect.
 | Your birth day (optional) | The same separate preferences file (private storage) | To anchor readings on the pillar of your birth day | Until you remove it, clear app data, or uninstall |
 | The days you marked for a reminder | The same separate preferences file (private storage) | To post one local notification on the morning of a marked day | Until the day passes, you unmark it, clear app data, or uninstall |
 | Whether the daily reading notification is on | The same separate preferences file (private storage) | To honour your toggle | Until you switch it off, clear app data, or uninstall |
+| The kind of thing you are planning (a financial move, a wedding, a signing) | The same separate preferences file (private storage) | To rank the forward scan for it, so the list is ranked the same way tomorrow | Until you change it, clear app data, or uninstall |
+| The number of days you have opened the app, and the day it last asked you for a review | The same separate preferences file (private storage) | To keep the review request rare | Until you clear app data or uninstall |
 
 ### Notifications
 
