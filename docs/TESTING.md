@@ -31,7 +31,7 @@ of them has drifted.
 ```powershell
 Set-Location E:\Minimax\dao-fortune
 python tools\reference\luopan_reference.py       # SELF-CHECK: ALL PASS, rewrites the golden TSVs
-.\gradlew.bat :app:testDebugUnitTest             # 93 tests
+.\gradlew.bat :app:testDebugUnitTest             # 101 tests
 ```
 
 `SampleReadingDump` also writes `docs/store/reading_sample.json` — the real output the store
@@ -40,7 +40,7 @@ by hand.
 
 **Expected:** `EngineTest` 30, `DreamTest` 12, `ScreenshotTest` 6, `ReconnectPolicyTest` 6,
 `PurchaseClassifierTest` 10, `WidgetCopyTest` 4, `ShareCardTest` 1, `GlanceAndYearTest` 10,
-`PickActivityTest` 6, `ReviewPromptTest` 7, `SampleReadingDump` 1,
+`PickActivityTest` 6, `ReviewPromptTest` 7, `WeekAheadTest` 8, `SampleReadingDump` 1,
 zero failures.
 
 ### 1.2 Lint
@@ -250,6 +250,7 @@ production.
 | 21f | Revoke the notification permission in Settings, then reopen the app | The bell turns **itself off** and a banner says the reminder cannot reach you — the app must not go on promising a reminder it cannot deliver |
 | 21g | Tap the bell and **deny** the permission | The bell stays off and a banner explains that notifications are off and where to turn them on |
 | 21h | Mark a day for a reminder and deny the permission | The day is not marked and a banner says the reminder cannot fire |
+| 21i | Wait for Sunday evening (~20:00) with the bell on | One silent notification names the best day of the coming week, with its score and verdict; the same bell governs it — turning the bell off cancels it too |
 
 ### 2.5 The year sign
 
@@ -360,7 +361,7 @@ Everything below must be true before an upload. If any line is unchecked, stop.
 | Gate | How to verify | Status |
 |---|---|---|
 | Engine parity green | `python tools\reference\luopan_reference.py` → ALL PASS | ☐ |
-| Unit tests green | `:app:testDebugUnitTest` → 93/93 | ☐ |
+| Unit tests green | `:app:testDebugUnitTest` → 101/101 | ☐ |
 | Lint has zero errors | `:app:lintRelease` → `app/build/reports/lint-results-release.txt` | ☐ |
 | Bundle validates | `bundletool validate` → exit 0 | ☐ |
 | 16 KB page size | `python tools\qa\check_16kb_pages.py dist\app-release.aab` → PASSED | ☐ |

@@ -6,8 +6,8 @@ import android.content.Intent
 import com.laki.daofortune.data.ProfileState
 
 /**
- * Puts the daily notification back after a reboot. WorkManager survives a
- * reboot on its own on most devices, but not when the app is force-stopped
+ * Puts the standing notifications back after a reboot. WorkManager survives
+ * a reboot on its own on most devices, but not when the app is force-stopped
  * and the vendor kills the work; this receiver is the belt to that brace.
  */
 class BootReceiver : BroadcastReceiver() {

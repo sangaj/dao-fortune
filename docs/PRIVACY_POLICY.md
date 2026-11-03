@@ -30,11 +30,11 @@ accompanies the reading is drawn on the device by the app itself — it is not u
 service or AI model is involved. Closing the dream sheet erases the text; there is nothing left behind
 to delete.
 
-The app can post notifications — a daily reading each morning, and a reminder on a day you marked.
-They are computed on your device at the moment they fire and are never sent from a server. The
-home-screen widget shows the same reading, also computed locally. If you share a reading, the app
-draws a picture on your device and hands it to the app you chose; the picture never passes through
-us.
+The app can post notifications — a daily reading each morning, a look at the week ahead on Sunday
+evening, and a reminder on a day you marked. They are computed on your device at the moment they
+fire and are never sent from a server. The home-screen widget shows the same reading, also computed
+locally. If you share a reading, the app draws a picture on your device and hands it to the app you
+chose; the picture never passes through us.
 
 The only data handled by a third party is the purchase itself: if you unlock the app, the transaction is
 processed by **Google Play Billing**, and Google Play handles the payment details, your Google account
