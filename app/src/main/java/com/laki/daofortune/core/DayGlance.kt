@@ -5,9 +5,9 @@ package com.laki.daofortune.core
  *
  * The full readings carry the reasoning; this card is the ten-second version
  * for the reader who opens the app with their morning tea. Everything on it
- * is derived from the same plate the readings use — the direction labels are
- * the very strings [FortuneEngine] puts in a full reading, so the glance can
- * never disagree with the detail.
+ * is derived from the same plate the readings use — the colour and the
+ * direction come from the same [FortuneEngine] helpers the readings use, so
+ * the glance can never disagree with the detail.
  *
  * The colour is the classical five-phase colour of the day's **wealth
  * element** — the element the day master controls, which is the element the
@@ -16,8 +16,8 @@ package com.laki.daofortune.core
 data class DayGlance(
     val colour: String,
     val colourNote: String,
-    val face: String,
-    val faceNote: String,
+    val direction: String,
+    val directionNote: String,
     val bestHourRange: String,
     val bestHourLabel: String
 ) {
@@ -35,12 +35,12 @@ data class DayGlance(
         /** Reads the glance off the plate. */
         fun of(s: LuopanSnapshot): DayGlance {
             val best = s.bestHours.first()
-            val primary = FortuneEngine.primaryWealthPalace(s.wealthElement)
+            val direction = FortuneEngine.wealthDirection(s)
             return DayGlance(
                 colour = colourOf(s.wealthElement),
-                colourNote = "today's ${s.wealthElement.en} wealth",
-                face = "${Palace.directionName(primary.bearing)} · ${primary.pinyin}",
-                faceNote = FortuneEngine.wealthDirectionLabel(s),
+                colourNote = "the ${s.wealthElement.en} phase of your wealth",
+                direction = direction.short,
+                directionNote = direction.role,
                 bestHourRange = best.range,
                 bestHourLabel = "${best.branch.pinyin} hour · ${best.officer.en}"
             )

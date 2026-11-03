@@ -1,6 +1,7 @@
 package com.laki.daofortune.core
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.LocalDateTime
@@ -81,12 +82,25 @@ class GlanceAndYearTest {
     @Test
     fun `the glance can never disagree with the full reading on direction`() {
         val glance = DayGlance.of(snapshot)
-        // The note is the very string the reading sheet shows.
-        assertEquals(FortuneEngine.wealthDirectionLabel(snapshot), glance.faceNote)
-        // And the short form names the same primary mountain.
-        val primary = FortuneEngine.primaryWealthPalace(snapshot.wealthElement)
-        assertTrue(glance.face.contains(primary.pinyin))
-        assertTrue(glance.face.contains(Palace.directionName(primary.bearing)))
+        val direction = FortuneEngine.wealthDirection(snapshot)
+        // Both surfaces are built from one source.
+        assertEquals(direction.short, glance.direction)
+        assertEquals(direction.role, glance.directionNote)
+        // And the reading's own line names the same bearing and phase.
+        val label = FortuneEngine.wealthDirectionLabel(snapshot)
+        assertTrue(label.contains(direction.compass))
+        assertTrue(label.contains(direction.pinyin))
+        assertTrue(label.contains(direction.element.en))
+    }
+
+    @Test
+    fun `the glance never says the same thing twice`() {
+        val glance = DayGlance.of(snapshot)
+        // The value names the thing; the note says what it is for. A glance
+        // that repeats itself is a glance the reader reads twice.
+        assertFalse(glance.directionNote.contains(glance.direction))
+        assertFalse(glance.colourNote.contains(glance.colour))
+        assertFalse(glance.bestHourLabel.contains(glance.bestHourRange))
     }
 
     @Test
@@ -96,5 +110,16 @@ class GlanceAndYearTest {
         assertEquals(best.range, glance.bestHourRange)
         assertTrue(glance.bestHourLabel.contains(best.branch.pinyin))
         assertTrue(glance.bestHourLabel.contains(best.officer.en))
+    }
+
+    @Test
+    fun `the year the card names turns at Li Chun, not on New Year's Day`() {
+        // 2026 is a Horse year; it runs from Li Chun 2026 to Li Chun 2027.
+        assertEquals(2026, CalendarEngine.yearNumber(LocalDateTime.of(2026, 10, 31, 12, 0), zone))
+        assertEquals(2026, snapshot.yearNumber)
+        // Still the old year in early February, before the new one begins.
+        assertEquals(2026, CalendarEngine.yearNumber(LocalDateTime.of(2027, 1, 20, 12, 0), zone))
+        // And the new one once Li Chun has passed.
+        assertEquals(2027, CalendarEngine.yearNumber(LocalDateTime.of(2027, 2, 10, 12, 0), zone))
     }
 }

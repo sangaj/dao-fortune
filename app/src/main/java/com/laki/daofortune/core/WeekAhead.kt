@@ -5,6 +5,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.TextStyle
+import java.time.temporal.TemporalAdjusters
 import java.util.Locale
 
 /**
@@ -34,6 +35,20 @@ object WeekAhead {
         var next = today.plusDays(daysAhead.toLong()).atTime(FIRE_AT)
         if (!next.isAfter(now)) next = next.plusWeeks(1)
         return next
+    }
+
+    /**
+     * The seven days of the coming calendar week, Monday to Sunday.
+     *
+     * A **calendar** week, not "the next seven days": WorkManager does not
+     * fire exactly when it is asked to, and if the note slipped from Sunday
+     * to Monday then "the next seven days" would run from Tuesday to Monday —
+     * a week that is not the week the note talks about. Anchoring on the
+     * Monday keeps the promise true however late the note arrives.
+     */
+    fun weekDays(today: LocalDate): List<LocalDate> {
+        val monday = today.with(TemporalAdjusters.next(DayOfWeek.MONDAY))
+        return (0 until LOOK_AHEAD_DAYS).map { monday.plusDays(it.toLong()) }
     }
 
     /**

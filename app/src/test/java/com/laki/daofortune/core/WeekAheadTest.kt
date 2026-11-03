@@ -77,6 +77,30 @@ class WeekAheadTest {
     }
 
     @Test
+    fun `the outlook covers the coming calendar week, Monday to Sunday`() {
+        // 2026-11-01 is a Sunday, so the week ahead is the next seven days.
+        val days = WeekAhead.weekDays(LocalDate.of(2026, 11, 1))
+        assertEquals(7, days.size)
+        assertEquals(LocalDate.of(2026, 11, 2), days.first())
+        assertEquals(LocalDate.of(2026, 11, 8), days.last())
+        assertEquals(DayOfWeek.MONDAY, days.first().dayOfWeek)
+        assertEquals(DayOfWeek.SUNDAY, days.last().dayOfWeek)
+    }
+
+    @Test
+    fun `a note that slipped to Monday still names a whole week`() {
+        // WorkManager does not fire exactly when it is asked to. If the note
+        // arrives on the Monday, "the next seven days" would run from Tuesday
+        // to Monday - a week that is not the week the note talks about. The
+        // outlook stays a calendar week: the one that is coming.
+        val days = WeekAhead.weekDays(LocalDate.of(2026, 11, 2))
+        assertEquals(DayOfWeek.MONDAY, days.first().dayOfWeek)
+        assertEquals(DayOfWeek.SUNDAY, days.last().dayOfWeek)
+        assertEquals(LocalDate.of(2026, 11, 9), days.first())
+        assertEquals(LocalDate.of(2026, 11, 15), days.last())
+    }
+
+    @Test
     fun `the notification line names the day, the score and the verdict`() {
         // 2026-11-10 is a Tuesday; 87 sits in the Exceptional band.
         assertEquals(

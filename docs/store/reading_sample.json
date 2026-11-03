@@ -9,6 +9,8 @@
     "officer": "Stabilise",
     "officerDeity": "Golden Cabinet",
     "year": "BingWu",
+    "yearNumber": 2026,
+    "yearAnimal": "Horse",
     "month": "WuXu",
     "day": "WuYin",
     "hour": "WuWu",
@@ -20,6 +22,14 @@
     "avoidDirection": "South-West — Shen (clashes your day branch)",
     "strength": "Flourishing",
     "withHour": true,
+    "glance": {
+      "colour": "Black",
+      "colourNote": "the Water phase of your wealth",
+      "direction": "Due North",
+      "directionNote": "the Water direction of your wealth",
+      "bestHourRange": "23:00 – 01:00",
+      "bestHourLabel": "Zi hour · Golden Cabinet"
+    },
     "modules": [
       {
         "title": "Today's Fortune",
@@ -84,6 +94,8 @@
     "officer": "Level",
     "officerDeity": "Vermilion Bird",
     "year": "BingWu",
+    "yearNumber": 2026,
+    "yearAnimal": "Horse",
     "month": "JiHai",
     "day": "GengYin",
     "hour": "RenWu",
@@ -95,6 +107,14 @@
     "avoidDirection": "South-West — Shen (clashes your day branch)",
     "strength": "Supported",
     "withHour": false,
+    "glance": {
+      "colour": "Green",
+      "colourNote": "the Wood phase of your wealth",
+      "direction": "Due East",
+      "directionNote": "the Wood direction of your wealth",
+      "bestHourRange": "05:00 – 07:00",
+      "bestHourLabel": "Mao hour · Golden Cabinet"
+    },
     "modules": [
       {
         "title": "Today's Fortune",
@@ -160,6 +180,7 @@
       "score": 92,
       "verdict": "Exceptional",
       "headline": "Money has a way in.",
+      "module": "Windfall",
       "dayPillar": "GengZi",
       "term": "Beginning of Winter",
       "isToday": false
@@ -170,6 +191,7 @@
       "score": 92,
       "verdict": "Exceptional",
       "headline": "Money has a way in.",
+      "module": "Windfall",
       "dayPillar": "GengShen",
       "term": "Major Snow",
       "isToday": false
@@ -180,6 +202,7 @@
       "score": 92,
       "verdict": "Exceptional",
       "headline": "Money has a way in.",
+      "module": "Windfall",
       "dayPillar": "XinYou",
       "term": "Major Snow",
       "isToday": false
@@ -190,6 +213,7 @@
       "score": 91,
       "verdict": "Exceptional",
       "headline": "Money has a way in.",
+      "module": "Windfall",
       "dayPillar": "JiSi",
       "term": "Major Snow",
       "isToday": false
@@ -200,6 +224,7 @@
       "score": 81,
       "verdict": "Favorable",
       "headline": "The door to gain is ajar.",
+      "module": "Windfall",
       "dayPillar": "JiHai",
       "term": "Beginning of Winter",
       "isToday": false

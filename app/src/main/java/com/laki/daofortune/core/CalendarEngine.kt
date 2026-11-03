@@ -40,11 +40,23 @@ object CalendarEngine {
         return GanzhiIndex.of(Math.floorMod(days, 60).toInt())
     }
 
-    fun yearGanZhi(dateTime: LocalDateTime, zone: ZoneId): GanZhi {
+    /**
+     * The Chinese year the moment falls in.
+     *
+     * The year turns at Li Chun, not on 1 January: a day in early February
+     * still belongs to the year that began the previous February. The number
+     * is what the year officer card names, so the reader can tell which year
+     * "the year of the Goat" refers to.
+     */
+    fun yearNumber(dateTime: LocalDateTime, zone: ZoneId): Int {
         val lichun = SolarTerms.momentsForYear(dateTime.year)
             .first { it.term.longitude == 315 }
         val instant = dateTime.atZone(zone).toInstant()
-        val year = if (!instant.isBefore(lichun.instant)) dateTime.year else dateTime.year - 1
+        return if (!instant.isBefore(lichun.instant)) dateTime.year else dateTime.year - 1
+    }
+
+    fun yearGanZhi(dateTime: LocalDateTime, zone: ZoneId): GanZhi {
+        val year = yearNumber(dateTime, zone)
         return GanzhiIndex.of(Math.floorMod(year - 1984, 60))
     }
 

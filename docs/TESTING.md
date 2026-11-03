@@ -31,7 +31,7 @@ of them has drifted.
 ```powershell
 Set-Location E:\Minimax\dao-fortune
 python tools\reference\luopan_reference.py       # SELF-CHECK: ALL PASS, rewrites the golden TSVs
-.\gradlew.bat :app:testDebugUnitTest             # 101 tests
+.\gradlew.bat :app:testDebugUnitTest             # 110 tests
 ```
 
 `SampleReadingDump` also writes `docs/store/reading_sample.json` — the real output the store
@@ -163,6 +163,35 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\store_assets\build_scr
 Both directions were verified with a negative control: a script that draws `Save to gallery` instead
 of the app's `Save image` fails, and so does an app whose banner no longer matches the store.
 
+### 1.10 The home-screen cards
+
+The three cards the home screen grew this round — the year officer, the day glance and the
+activity-ranked forward scan — are plain Kotlin over the same plate the readings use, so they are
+pinned down on the JVM:
+
+```powershell
+.\gradlew.bat :app:testDebugUnitTest --tests 'com.laki.daofortune.core.PickActivityTest' `
+                                    --tests 'com.laki.daofortune.core.GlanceAndYearTest' `
+                                    --tests 'com.laki.daofortune.core.WeekAheadTest' `
+                                    --tests 'com.laki.daofortune.core.ReviewPromptTest'
+```
+
+The rules they lock down:
+
+* **The list shows the lead module's own score**, with the module's name under the number, and the
+  **order** comes from the activity's weighted rank. The two numbers are deliberately different, and
+  a test asserts that they differ — a list whose number is not the number the reader meets in the
+  reading is the one bug a screenshot cannot show.
+* **The year turns at Li Chun.** `CalendarEngine.yearNumber` is the single source for the year on
+  the card, and a test pins the turn to the solar year rather than 1 January.
+* **The week ahead is a calendar week** — `WeekAhead.weekDays(today)` finds the coming Monday, so the
+  Sunday-evening note names Monday to Sunday.
+* **The review ask depends on the reader using the app, not on the day's luck**: five days opened
+  **and** an unlock, with a thirty-day cooldown. The day's score is not even a parameter of the
+  rule, so the ask cannot depend on how good the day happened to be.
+* **A glance never says the same thing twice** — the value names the thing, the note says what it is
+  for, and both come from one source, so the ten-second read cannot drift from the long one.
+
 ---
 
 ## Layer 2 — On a real phone
@@ -232,9 +261,11 @@ production.
 | 16 | Tap ◀ repeatedly | The plate walks back day by day; a past date is read the same way as a future one |
 | 17 | Open the calendar | A date picker opens; picking any date loads that day's plate |
 | 18 | Tap a day in **Favourable Days** | That date is selected and its plate is drawn |
-| 19 | Check the list itself | Five days, ranked best first, each with its day pillar, solar term, score and one-line verdict |
-| 19a | Pick another activity (signing, love & weddings, moving, body, launches) | The list re-ranks for it; the lead line under the section title says what the days are ranked for; the day scores follow the weighted modules |
+| 19 | Check the list itself | Five days, ranked best first, each with its day pillar, solar term, score, one-line verdict and **the name of the module the score belongs to** |
+| 19a | Pick another activity (signing, love & weddings, moving, body, launches) | The list re-ranks for it; the lead line under the section title says what the days are ranked for; the row still shows the **lead module's** own score, with that module's name under it |
 | 19b | Return to "a financial move" | The ranking is exactly the windfall ranking again |
+| 19c | Open the day at the top of the list | The score on the plate is **the same number** the list showed — the list never quotes a number the reading does not carry |
+| 19d | Close the app and open it again | The activity is still the one you picked — it is remembered, so the list is ranked the same way tomorrow |
 | 20 | Pick the top day (with "a financial move" selected) | The date selector jumps to it; the windfall score on the plate matches the list |
 | 21 | Check the hour | On a chosen date the reading has **no hour** — no hour pillar, no hour-officers, no hour windows |
 
@@ -250,7 +281,19 @@ production.
 | 21f | Revoke the notification permission in Settings, then reopen the app | The bell turns **itself off** and a banner says the reminder cannot reach you — the app must not go on promising a reminder it cannot deliver |
 | 21g | Tap the bell and **deny** the permission | The bell stays off and a banner explains that notifications are off and where to turn them on |
 | 21h | Mark a day for a reminder and deny the permission | The day is not marked and a banner says the reminder cannot fire |
-| 21i | Wait for Sunday evening (~20:00) with the bell on | One silent notification names the best day of the coming week, with its score and verdict; the same bell governs it — turning the bell off cancels it too |
+| 21i | Wait for Sunday evening (~20:00) with the bell on | One silent notification names the best day of the **coming calendar week** — Monday to Sunday — with its score and verdict; the same bell governs it, so turning the bell off cancels it too |
+
+### 2.4b The day at a glance
+
+The three chips under the plate: the ten-second read for the reader who opens the app with their
+morning tea.
+
+| # | Action | Expected |
+|---|---|---|
+| 21j | Read the glance row | Three chips — **COLOUR**, **DIRECTION**, **BEST HOUR**; each has a value and a note under it |
+| 21k | Compare the colour note with the windfall reading | The colour is the five-phase colour of the day's wealth element, and the note says which phase it is — the listing must not call it a lucky colour |
+| 21l | Compare the direction with the windfall reading | The same bearing and the same phase; the note says *why* that direction, and never repeats the value above it |
+| 21m | Rotate the device / change the font size | Nothing in the glance is clipped |
 
 ### 2.5 The year sign
 
@@ -263,6 +306,8 @@ production.
 | 25a | Add a birth day | The readings re-anchor on the birth day's pillar; the home row shows the birth day instead of the animal |
 | 25b | Set both a year sign and a birth day | The birth day wins; removing it falls back to the year sign |
 | 25c | Open the birth-day calendar | Today and the past are selectable, **the future is greyed out** — a birth day in the future would anchor every reading on a day that has not happened |
+| 25d | Read the **year officer** card on the home screen | It names the year — "Year of the Horse · 2026" — and offers to set the sign |
+| 25e | Check that year in late January | The card still says the **old** year: the year turns at Li Chun, not on 1 January |
 | 26 | Check what was stored | One integer and an optional ISO date in `dao_fortune_profile.xml`; nothing in `dao_fortune_access.xml` |
 | 27 | Check the backup | The year sign and the birth day are **not** in the allow-list: after a device-to-device transfer they are gone, while the purchase unlock survives |
 
@@ -312,13 +357,16 @@ its keep.
 
 ### 2.8a The Play review ask
 
-The app asks for a review only after it has been opened on five distinct days, only on a day whose
-fortune is *Exceptional*, and at most once every thirty days. Google's quota decides whether the
-card actually appears.
+The app asks for a review only after it has been opened on five distinct days **and** the reader has
+unlocked the app, and at most once every thirty days. The day's own score plays **no** part: an app
+that asks for a review on a lucky day and never on an ordinary one is asking the reader to rate the
+plate. Google's quota decides whether the card actually appears.
 
 | # | Action | Expected |
 |---|---|---|
-| 51a | Open the app on five distinct days, on a day with an exceptional score | The Play review card may appear; if Google's quota is spent, nothing shows — both are correct |
+| 51a | Open the app on five distinct days and unlock it | The Play review card may appear; if Google's quota is spent, nothing shows — both are correct |
+| 51a1 | Open the app on five distinct days but never unlock it | **No** review ask — the reader has not used the thing they would be reviewing |
+| 51a2 | Open the app on an ordinary day, with the unlock bought | The ask may still appear — the day's luck is not the trigger |
 | 51b | Keep opening the app afterwards | The ask does not repeat within thirty days of the last one |
 | 51c | Try the same on a **sideloaded** build | The flow is prepared but Google never shows the card — expected; the review API only displays for Play-installed apps |
 
@@ -361,7 +409,7 @@ Everything below must be true before an upload. If any line is unchecked, stop.
 | Gate | How to verify | Status |
 |---|---|---|
 | Engine parity green | `python tools\reference\luopan_reference.py` → ALL PASS | ☐ |
-| Unit tests green | `:app:testDebugUnitTest` → 101/101 | ☐ |
+| Unit tests green | `:app:testDebugUnitTest` → 110/110 | ☐ |
 | Lint has zero errors | `:app:lintRelease` → `app/build/reports/lint-results-release.txt` | ☐ |
 | Bundle validates | `bundletool validate` → exit 0 | ☐ |
 | 16 KB page size | `python tools\qa\check_16kb_pages.py dist\app-release.aab` → PASSED | ☐ |
@@ -390,3 +438,4 @@ Everything below must be true before an upload. If any line is unchecked, stop.
 | Play's own validation | Only runs after upload |
 | The Data safety form wording | The form's exact options and their labels change; the answer is "no data collected, no data shared", but read the form itself before submitting |
 | Behaviour on Android 7.x | The app now requires API 26; Android 8.0 (2017) is the floor |
+

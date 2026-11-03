@@ -151,6 +151,9 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             birthDate = profile.birthDate,
             notifyEnabled = profile.dailyReadingEnabled,
             showOnboarding = !profile.onboardingDone,
+            // The activity the scan was last ranked for, so the reader does
+            // not pick it again every morning.
+            activity = profile.lastActivity,
             remindedDays = profile.remindedDays.filter { it >= today }.toSet(),
             freeReadingsLeft = access.freeReadingsLeft(),
             unlocked = access.isUnlocked
@@ -172,23 +175,23 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /**
-     * Counts today as an open day, and asks for a Play review when the day
-     * earns it.
+     * Counts today as an open day, and asks for a Play review when the
+     * relationship allows it.
      *
      * The rule (see [ReviewPrompt]): the app has been opened on enough
-     * distinct days, today's fortune is exceptional, and a long cooldown has
-     * passed since the last ask. Only ever evaluated against the day the
-     * reader is living in — looking at another day's plate never triggers it.
+     * distinct days, the reader has used it for real — the full readings are
+     * behind the unlock — and a long cooldown has passed since the last ask.
+     * It is **never** about the day's score: asking for a review because the
+     * reading happened to be excellent trades a good day for a rating.
      */
     private fun maybeAskForReview() {
         val state = _ui.value
         if (!state.isToday) return
         val today = LocalDate.now()
         profile.noteAppOpened(today)
-        val score = state.readings[ReadingKey(today, FortuneModule.OVERALL)]?.score ?: return
         if (ReviewPrompt.shouldPrompt(
                 daysOpened = profile.daysOpened,
-                todayScore = score,
+                hasUnlocked = access.isUnlocked,
                 lastPrompt = profile.lastReviewPromptDay,
                 today = today
             )
@@ -439,11 +442,13 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     /**
      * Ranks the forward scan for something the reader wants to do.
      *
-     * The choice is kept in memory only: it is a question being asked, not a
-     * preference to store.
+     * The choice is remembered, so the reader does not pick it again every
+     * morning: it is the question they are asking, and asking it once a day
+     * is enough. It lives in the profile file, which is excluded from backup.
      */
     fun setActivity(activity: PickActivity) {
         if (activity == _ui.value.activity) return
+        profile.setActivity(activity)
         _ui.update { it.copy(activity = activity) }
         rescanFavourableDays()
     }

@@ -59,12 +59,20 @@ build from Play **internal testing**, not by sideloading: the Play build is the 
 - ☐ Revoke the permission in Settings → the bell turns **itself off** and a banner says why
 - ☐ Deny the permission at the prompt → the bell stays off, and a banner explains where to turn
   notifications on
+- ☐ Sunday evening ~20:00 → one notification names the best day of the **coming calendar week**
+  (Monday to Sunday), and the same bell governs it
 
-## 7. Looking ahead — rows 15–21
+## 7. Looking ahead — rows 15–21, 19a–19d
 
 - ☐ Chevrons and the calendar walk the days; a future or past day reads as a day plate
-- ☐ Favourable Days: five days, ranked, each with pillar, term, score and verdict
+- ☐ Favourable Days: five days, ranked, each with pillar, term, score, verdict **and the name of
+  the module the score belongs to**
+- ☐ Pick another activity → the list re-ranks, the lead line says what it is ranked for, and the
+  rows still show the lead module's own score
 - ☐ Pick the top day → the plate matches the list; a chosen day has **no hour**
+- ☐ Close and reopen the app → the activity is still the one you picked
+- ☐ The day at a glance: COLOUR / DIRECTION / BEST HOUR, none of them repeating itself
+- ☐ The Year Officer card names the year ("Year of the Horse · 2026")
 
 ## 8. Edge cases — rows 35–42
 

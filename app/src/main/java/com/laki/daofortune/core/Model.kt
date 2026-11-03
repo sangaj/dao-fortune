@@ -242,7 +242,17 @@ enum class FortuneModule(val title: String, val blurb: String) {
     WINDFALL("Windfall & Wealth", "Whether unexpected money is likely to arrive, and how to catch it."),
     LOVE("Love & Bonds", "Affinity, attachment and the emotional weather of the day."),
     CAREER("Career & Ambition", "Whether this is a day to push, pitch, sign, or hold."),
-    HEALTH("Body & Balance", "Which element is overworked today — and how to settle it.")
+    HEALTH("Body & Balance", "Which element is overworked today — and how to settle it.");
+
+    /** The short name, for the places where the full title will not fit. */
+    val short: String
+        get() = when (this) {
+            OVERALL -> "Today"
+            WINDFALL -> "Windfall"
+            LOVE -> "Love"
+            CAREER -> "Career"
+            HEALTH -> "Body"
+        }
 }
 
 /**

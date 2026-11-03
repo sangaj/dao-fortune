@@ -27,7 +27,7 @@ Ancient Chinese luopan divination. Is today a day for a lucky windfall?
 ## Full description (4000 characters max)
 
 ```
-Dao Fortune reads your day through the twenty-four mountains of the ancient Chinese luopan — the compass of the Daoist tradition — and tells you what the plate says.
+Dao Fortune reads your day through the twenty-four mountains of the ancient Chinese luopan — the compass of the Daoist tradition.
 
 Is today a day to expect an unexpected gain, push a deal, open a conversation, or hold still and keep your hands off the purse?
 
@@ -39,27 +39,31 @@ FIVE READINGS, ONE PLATE
 • Body & Balance — which of the five phases is loudest in your body today, and how to settle it.
 
 LOOK AHEAD
-• Favourable Days — the next sixty days scored on the same rules and ranked, so you see which dates the plate favours.
+• Favourable Days — the next sixty days, ranked for what you are planning.
 • Any date you choose — open the calendar, and that day's plate is drawn for you.
-• Your year sign — pick your zodiac branch once; every reading is measured against your position.
+
+AT A GLANCE, AND THE YEAR
+• The day in one row: its five-phase colour, the direction wealth comes from, the best double-hour.
+• The Year Officer — your year sign against the year's branch, and the year named.
+• Pick your zodiac branch once; every reading is measured against your position on the plate.
 
 DREAM & OMENS (梦占)
 • Write what you remember of a dream, and the plate reads it against the night it belongs to.
 • The classical images are found in your own words: the direction you walked, the animal that followed you, the number, the colour, the hour you woke.
-• The reading asks whether the omen answers the day or argues with it — the same branch relations, elements and rules as the modules above.
-• The picture is drawn on your phone in ink wash, on the mountains where those images belong. Your words never leave the device — nothing uploaded, nothing stored, no AI service involved.
+• The reading asks whether the omen answers the day or argues with it.
+• The picture is drawn on your phone in ink wash, on the mountains where those images belong. Your words never leave the device — nothing uploaded, nothing stored.
 
 A REAL ENGINE, NOT A RANDOM NUMBER
 Everything is computed on your device from the classical rules:
-• The sun's true position on the twenty-four mountains, for your exact date and time.
-• The four pillars of the day — year, month, day and hour — from the sixty-cycle, with the year turning at Li Chun, the day at 23:00.
+• The sun's true position on the mountains, for your exact date and time.
+• The four pillars — year, month, day, hour — from the sixty-cycle; the year turns at Li Chun, the day at 23:00.
 • The twelve day-officers (Jian, Chu, Man, Ping, Ding, Zhi, Po, Wei, Cheng, Shou, Kai, Bi) that set the day's tone.
 • The twelve hour-officers, so you get the exact good windows, not a vague verdict.
-• Your wealth element against the day's element, the sun's mountain, and the mountain opposite your day branch.
+• Your wealth element against the day's, the sun's mountain, and the mountain opposite your branch.
 • Nobleman stars, the Star of Motion, Peach Blossom, the void of the ten-day frame, and your day element's strength.
 
 EVERY READING SHOWS ITS WORKING
-Each score comes with the factors behind it — you see which rule moved the number, and by how much. Never a number without its reason.
+Each score comes with the factors behind it — which rule moved the number, and by how much.
 
 BUILT FOR THE ENGLISH-SPEAKING READER
 Every term keeps the classical vocabulary: English rendering, original transliteration. The tradition is not flattened into generic horoscope language.
@@ -67,10 +71,10 @@ Every term keeps the classical vocabulary: English rendering, original translite
 HONEST BY DESIGN
 • No account, no sign-up, no email. Everything is computed on your device.
 • No analytics, no advertising, no tracking, no crash reporting.
-• The only third-party components are Google's Play Billing and Play In-App Review libraries. Nothing is sold on to anyone.
+• The only third-party components are Google's Play Billing and Play In-App Review libraries.
 
 PRIVACY
-Dao Fortune collects no personal data. It never asks for your name or your age. You may optionally give your birth day to anchor the reading — it stays on this phone, is excluded from backup and is never transmitted; your year sign is stored the same way. The dream you write is read and drawn here and erased when you close the sheet. A reading you share is an image you send yourself. Notifications are local and can be turned off.
+Dao Fortune collects no personal data. It never asks for your name or your age. You may optionally give your birth day to anchor the reading — it stays on this phone, is excluded from backup and is never transmitted; your year sign is stored the same way. The dream you write is read and drawn here and erased when you close the sheet. A reading you share is an image you send yourself. The two notifications are local — a morning line and a Sunday-evening look ahead — and one bell turns them off.
 
 A NOTE ON WHAT THIS IS
 Dao Fortune is a cultural and entertainment product built on classical Chinese divination — not financial, medical, legal, investment or psychological advice. It promises no outcome, and you remain responsible for your own choices.
@@ -78,7 +82,7 @@ Dao Fortune is a cultural and entertainment product built on classical Chinese d
 Today's Fortune is free every day, in full. Your first reading is free too. One payment unlocks everything, every day — no subscription.
 ```
 
-*(3945 characters. Play caps the full description at 4000 — keep it under. The count is checked by
+*(3952 characters. Play caps the full description at 4000 — keep it under. The count is checked by
 `tools/qa/check_listing_lengths.py`, which the release gate runs.)*
 
 The last two lines cover the paywall model in the listing itself. Keep them accurate: **Today's
@@ -127,17 +131,16 @@ Play's deceptive-behaviour policy is easier to defend when the listing says exac
 First release.
 
 • Five readings on the twenty-four mountain plate: fortune, windfall, love, career, body.
-• At a glance: lucky colour, best direction, best hour.
+• At a glance: the day's five-phase colour, best direction, best hour.
 • The Year Officer: your sign against the year.
 • Favourable Days, ranked for your plans.
 • Dream & Omens: write your dream, the plate reads it.
 • Sunday evening: your best day of the coming week.
-• Your year sign personalises every reading.
 • Today's Fortune free daily; your first reading free too.
 • One-off unlock, no subscription.
 ```
 
-*(497 characters. Play caps release notes at 500 — keep it under.)*
+*(release notes characters — Play caps them at 500; keep it under, and leave room.)*
 
 ---
 

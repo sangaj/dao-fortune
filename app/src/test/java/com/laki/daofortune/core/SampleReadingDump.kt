@@ -52,6 +52,7 @@ class SampleReadingDump {
             sb.append("      \"score\": ").append(day.score).append(",\n")
             sb.append("      \"verdict\": \"").append(day.verdict.label).append("\",\n")
             sb.append("      \"headline\": \"").append(esc(day.headline)).append("\",\n")
+            sb.append("      \"module\": \"").append(day.module.short).append("\",\n")
             sb.append("      \"dayPillar\": \"").append(day.dayPillar).append("\",\n")
             sb.append("      \"term\": \"").append(esc(day.term)).append("\",\n")
             sb.append("      \"isToday\": ").append(day.isToday).append("\n")
@@ -178,6 +179,8 @@ class SampleReadingDump {
         sb.append(pad).append("  \"officer\": \"").append(snapshot.officer.en).append("\",\n")
         sb.append(pad).append("  \"officerDeity\": \"").append(snapshot.officer.deity).append("\",\n")
         sb.append(pad).append("  \"year\": \"").append(snapshot.year).append("\",\n")
+        sb.append(pad).append("  \"yearNumber\": ").append(snapshot.yearNumber).append(",\n")
+        sb.append(pad).append("  \"yearAnimal\": \"").append(snapshot.year.branch.animal).append("\",\n")
         sb.append(pad).append("  \"month\": \"").append(snapshot.month).append("\",\n")
         sb.append(pad).append("  \"day\": \"").append(snapshot.day).append("\",\n")
         sb.append(pad).append("  \"hour\": \"").append(snapshot.hour).append("\",\n")
@@ -189,6 +192,17 @@ class SampleReadingDump {
         sb.append(pad).append("  \"avoidDirection\": \"").append(FortuneEngine.avoidDirectionLabel(snapshot)).append("\",\n")
         sb.append(pad).append("  \"strength\": \"").append(snapshot.strength.en).append("\",\n")
         sb.append(pad).append("  \"withHour\": ").append(withHour).append(",\n")
+        // The glance row the home screen shows: the same object the app draws,
+        // so the screenshot cannot show a glance the app never produces.
+        val glance = DayGlance.of(snapshot)
+        sb.append(pad).append("  \"glance\": {\n")
+        sb.append(pad).append("    \"colour\": \"").append(glance.colour).append("\",\n")
+        sb.append(pad).append("    \"colourNote\": \"").append(esc(glance.colourNote)).append("\",\n")
+        sb.append(pad).append("    \"direction\": \"").append(esc(glance.direction)).append("\",\n")
+        sb.append(pad).append("    \"directionNote\": \"").append(esc(glance.directionNote)).append("\",\n")
+        sb.append(pad).append("    \"bestHourRange\": \"").append(glance.bestHourRange).append("\",\n")
+        sb.append(pad).append("    \"bestHourLabel\": \"").append(esc(glance.bestHourLabel)).append("\"\n")
+        sb.append(pad).append("  },\n")
         sb.append(pad).append("  \"modules\": [\n")
         val readings = FortuneModule.entries.map { FortuneEngine.reading(snapshot, it) }
         readings.forEachIndexed { index, reading ->

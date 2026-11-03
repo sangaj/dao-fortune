@@ -6,9 +6,14 @@ import org.junit.Test
 import java.time.LocalDate
 
 /**
- * Locks the rule for the Play review ask: enough days with the app, an
- * exceptional day, and a full cooldown since the last ask. Each condition
- * alone must be able to keep the ask down, and the boundaries are exact.
+ * Locks the rule for the Play review ask: enough days with the app, proof
+ * that the reader has used it for real, and a full cooldown since the last
+ * ask. Each condition alone must be able to keep the ask down, and the
+ * boundaries are exact.
+ *
+ * The rule deliberately knows nothing about the day's score: an app that asks
+ * for a review because the reading happened to be excellent reads as trading
+ * a good day for a five-star rating.
  */
 class ReviewPromptTest {
 
@@ -19,7 +24,7 @@ class ReviewPromptTest {
         assertFalse(
             ReviewPrompt.shouldPrompt(
                 daysOpened = ReviewPrompt.MIN_DAYS_OPENED - 1,
-                todayScore = 100,
+                hasUnlocked = true,
                 lastPrompt = null,
                 today = today
             )
@@ -31,7 +36,7 @@ class ReviewPromptTest {
         assertTrue(
             ReviewPrompt.shouldPrompt(
                 daysOpened = ReviewPrompt.MIN_DAYS_OPENED,
-                todayScore = 90,
+                hasUnlocked = true,
                 lastPrompt = null,
                 today = today
             )
@@ -39,23 +44,11 @@ class ReviewPromptTest {
     }
 
     @Test
-    fun `a merely good day never prompts`() {
+    fun `a reader who never unlocked never prompts`() {
         assertFalse(
             ReviewPrompt.shouldPrompt(
-                daysOpened = 30,
-                todayScore = ReviewPrompt.MIN_SCORE - 1,
-                lastPrompt = null,
-                today = today
-            )
-        )
-    }
-
-    @Test
-    fun `the exact minimum score can prompt`() {
-        assertTrue(
-            ReviewPrompt.shouldPrompt(
-                daysOpened = 30,
-                todayScore = ReviewPrompt.MIN_SCORE,
+                daysOpened = 300,
+                hasUnlocked = false,
                 lastPrompt = null,
                 today = today
             )
@@ -67,7 +60,7 @@ class ReviewPromptTest {
         assertFalse(
             ReviewPrompt.shouldPrompt(
                 daysOpened = 30,
-                todayScore = 95,
+                hasUnlocked = true,
                 lastPrompt = today.minusDays(ReviewPrompt.COOLDOWN_DAYS - 1),
                 today = today
             )
@@ -79,7 +72,7 @@ class ReviewPromptTest {
         assertTrue(
             ReviewPrompt.shouldPrompt(
                 daysOpened = 30,
-                todayScore = 95,
+                hasUnlocked = true,
                 lastPrompt = today.minusDays(ReviewPrompt.COOLDOWN_DAYS),
                 today = today
             )
@@ -91,7 +84,7 @@ class ReviewPromptTest {
         assertTrue(
             ReviewPrompt.shouldPrompt(
                 daysOpened = ReviewPrompt.MIN_DAYS_OPENED,
-                todayScore = ReviewPrompt.MIN_SCORE,
+                hasUnlocked = true,
                 lastPrompt = null,
                 today = today
             )

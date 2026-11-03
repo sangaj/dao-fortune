@@ -33,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -176,6 +177,7 @@ fun HomeScreen(
                 YearOfficerCard(
                     yearSign = yearSign,
                     yearBranch = snapshot.year.branch,
+                    yearNumber = snapshot.yearNumber,
                     onSetYearSign = onSetYearSign,
                     onSetBirthDate = onSetBirthDate,
                     birthDate = birthDate
@@ -230,7 +232,11 @@ fun HomeScreen(
             }
 
             item {
-                DayGlanceCard(glance = com.laki.daofortune.core.DayGlance.of(snapshot))
+                DayGlanceCard(
+                    // Recomputed only when the plate changes, not on every
+                    // recomposition.
+                    glance = remember(snapshot) { com.laki.daofortune.core.DayGlance.of(snapshot) }
+                )
             }
 
             item {
@@ -316,7 +322,7 @@ private fun DayGlanceCard(glance: com.laki.daofortune.core.DayGlance) {
     ) {
         listOf(
             Triple("COLOUR", glance.colour, glance.colourNote),
-            Triple("FACE", glance.face, glance.faceNote),
+            Triple("DIRECTION", glance.direction, glance.directionNote),
             Triple("BEST HOUR", glance.bestHourRange, glance.bestHourLabel)
         ).forEach { (label, value, note) ->
             Column(
@@ -345,7 +351,10 @@ private fun DayGlanceCard(glance: com.laki.daofortune.core.DayGlance) {
                     note,
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2
+                    // Three lines: the note names the phase the colour and the
+                    // direction come from, and it must survive a narrow phone
+                    // with the largest system font.
+                    maxLines = 3
                 )
             }
         }

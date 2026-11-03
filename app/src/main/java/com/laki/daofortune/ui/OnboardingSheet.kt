@@ -217,16 +217,17 @@ private fun PageAnchor(yearSign: YearSign?, onSetYearSign: (YearSign?) -> Unit) 
 @Composable
 private fun PageBell(notifyEnabled: Boolean, onEnableNotify: () -> Unit) {
     Text(
-        "One line, every morning",
+        "Two small notes",
         style = MaterialTheme.typography.headlineMedium,
         color = MaterialTheme.colorScheme.primary,
         textAlign = TextAlign.Center
     )
     Spacer(Modifier.height(14.dp))
     Text(
-        "At eight each morning the app can post one silent notification — the day's " +
-            "score and its headline, computed on the device the night says nothing to " +
-            "anyone. No account, no server, and the bell turns it off again whenever " +
+        "The bell brings two: one line each morning at eight — the day's score and its " +
+            "headline — and a look at the coming week on Sunday evening, naming the best " +
+            "day in it. Both are computed on the device, so the night says nothing to " +
+            "anyone. No account, no server, and the bell turns them off again whenever " +
             "you like.",
         style = MaterialTheme.typography.bodyLarge,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -235,13 +236,13 @@ private fun PageBell(notifyEnabled: Boolean, onEnableNotify: () -> Unit) {
     Spacer(Modifier.height(22.dp))
     if (notifyEnabled) {
         Text(
-            "The morning bell is on.",
+            "The bell is on.",
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary
         )
     } else {
         OutlinedButton(onClick = onEnableNotify, modifier = Modifier.fillMaxWidth()) {
-            Text("Turn on the morning bell", color = Gold)
+            Text("Turn on the bell", color = Gold)
         }
     }
 }

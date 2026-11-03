@@ -25,6 +25,45 @@ data class ModuleReading(
 )
 
 /**
+ * The direction the plate points at for wealth, in parts.
+ *
+ * One source for three surfaces: the direction line of a full reading, the
+ * value of the glance, and the note under it. All three are built from this,
+ * so the ten-second version cannot drift away from the long one.
+ *
+ * [short] is *where to go*; [role] is *why that way*. The two never repeat
+ * each other — a glance that says the same thing twice is a glance the reader
+ * reads twice.
+ */
+data class WealthDirection(
+    /** The compass name of the bearing, e.g. "Due North". */
+    val compass: String,
+    /** The palace it points at, e.g. "Zi". */
+    val pinyin: String,
+    /** The phase that rules the palace. */
+    val element: WuXing,
+    /** Earth stands in the four corners, so earth also has the centre. */
+    val alsoCentre: Boolean
+) {
+    /** The value the glance shows: the compass name on its own.
+     *
+     * The palace name stays on the plate, where the reader can see all
+     * twenty-four of them. The glance has one line for the value, and a
+     * compass name is the only thing that fits it on a narrow phone with a
+     * large system font.
+     */
+    val short: String get() = compass
+
+    /** The note the glance shows under the value.
+     *
+     * It names the phase, and it says *of your wealth* — without that the
+     * reader could take it for the phase of the day itself, which is a
+     * different thing and often the opposite one.
+     */
+    val role: String get() = "the ${element.en} direction of your wealth"
+}
+
+/**
  * Turns the luopan snapshot into a scored reading. Every module reads the same
  * plate but weights it differently: overall fortune leans on the day's own
  * constitution, windfall leans on the wealth element and the sun's mountain,
@@ -268,10 +307,27 @@ object FortuneEngine {
         WuXing.EARTH -> Palace.CHEN
     }
 
-    fun wealthDirectionLabel(s: LuopanSnapshot): String {
+    /**
+     * The direction the plate points at for wealth, in parts.
+     *
+     * Built from the same palace as [primaryWealthPalace], so the glance and
+     * the full reading always name the same bearing.
+     */
+    fun wealthDirection(s: LuopanSnapshot): WealthDirection {
         val primary = primaryWealthPalace(s.wealthElement)
-        val extra = if (s.wealthElement == WuXing.EARTH) " and the centre" else ""
-        return "${Palace.directionName(primary.bearing)} — ${primary.pinyin}$extra (${s.wealthElement.en})"
+        return WealthDirection(
+            compass = Palace.directionName(primary.bearing),
+            pinyin = primary.pinyin,
+            element = s.wealthElement,
+            alsoCentre = s.wealthElement == WuXing.EARTH
+        )
+    }
+
+    /** The direction line the full readings carry. */
+    fun wealthDirectionLabel(s: LuopanSnapshot): String {
+        val d = wealthDirection(s)
+        val extra = if (d.alsoCentre) " and the centre" else ""
+        return "${d.compass} — ${d.pinyin}$extra (${d.element.en})"
     }
 
     fun avoidDirectionLabel(s: LuopanSnapshot): String =

@@ -33,6 +33,8 @@ SCRIPT = "tools/store_assets/build_screenshots.ps1"
 
 # The app's own wording lives in the UI layer; the module titles and the
 # verdicts come from the core model, because the screenshots draw those too.
+# The year officer's teaser and the activity labels live in core as well, and
+# the screenshots draw both of them.
 APP_FILES = [
     "app/src/main/java/com/laki/daofortune/ui/HomeScreen.kt",
     "app/src/main/java/com/laki/daofortune/ui/DateAndYearSign.kt",
@@ -42,6 +44,8 @@ APP_FILES = [
     "app/src/main/java/com/laki/daofortune/ui/AboutSheet.kt",
     "app/src/main/java/com/laki/daofortune/ui/share/ShareCard.kt",
     "app/src/main/java/com/laki/daofortune/core/Model.kt",
+    "app/src/main/java/com/laki/daofortune/core/YearReading.kt",
+    "app/src/main/java/com/laki/daofortune/core/FavourableDates.kt",
 ]
 
 # Phrases the script may draw that are not app copy, with the reason.

@@ -49,10 +49,9 @@ class WeekAheadWorker(
         val natal = profile.birthDate?.let { CalendarEngine.dayGanZhi(it.atTime(12, 0)).branch }
             ?: profile.yearSign?.branch
 
-        // The coming week as day plates: a day that has not happened yet has
-        // no hour, so it is read without one.
-        val days = (1..WeekAhead.LOOK_AHEAD_DAYS).map { offset ->
-            val date = today.plusDays(offset.toLong())
+        // The coming calendar week as day plates: a day that has not happened
+        // yet has no hour, so it is read without one.
+        val days = WeekAhead.weekDays(today).map { date ->
             val plate = LuopanEngine.dayPlate(date, zone)
             date to FortuneEngine.reading(plate, FortuneModule.OVERALL, natal).score
         }

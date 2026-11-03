@@ -5,12 +5,28 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-/** One day in the forward scan, with the reading it earns. */
+/**
+ * One day in the forward scan, with the reading it earns.
+ *
+ * The **score, the verdict and the headline all come from one module** — the
+ * one that speaks for the activity the reader picked. That is deliberate: the
+ * number on the list is the number the reader meets when they open the day,
+ * so the list and the reading can never disagree.
+ *
+ * The **rank** is a different thing: the activity's own score, the weighted
+ * mix of the modules that speak for it. It is what the list is *ordered* by,
+ * and it is not what the reader is shown.
+ */
 data class FavourableDay(
     val date: LocalDate,
+    /** The score of the module that speaks for the activity. */
     val score: Int,
     val verdict: Verdict,
     val headline: String,
+    /** The module the score belongs to. */
+    val module: FortuneModule,
+    /** The activity score the ranking uses. */
+    val rank: Int,
     val dayPillar: String,
     val term: String,
     val isToday: Boolean
@@ -67,6 +83,12 @@ object FavourableDates {
     /**
      * Scans [horizonDays] days from [start] and returns them ranked for
      * [activity], best first.
+     *
+     * The row carries the **lead module's** own score, verdict and headline —
+     * the numbers the reader will meet when they open that day — while the
+     * **order** comes from the activity score, the weighted mix of the modules
+     * that speak for it. The two are kept apart on purpose: a list that shows
+     * a score the reading does not show reads as a broken app.
      */
     fun scan(
         start: LocalDate,
@@ -76,25 +98,28 @@ object FavourableDates {
         horizonDays: Int = HORIZON_DAYS,
         shown: Int = SHOWN
     ): List<FavourableDay> {
+        val lead = activity.leadModule
         val scored = (0 until horizonDays).map { offset ->
             val date = start.plusDays(offset.toLong())
             val plate = LuopanEngine.dayPlate(date, zone)
             val readings = activity.weights.keys.associateWith {
                 FortuneEngine.reading(plate, it, natal)
             }
-            val score = weightedScore(readings, activity.weights)
+            val leadReading = readings.getValue(lead)
             FavourableDay(
                 date = date,
-                score = score,
-                verdict = Verdict.of(score),
-                headline = readings.getValue(activity.leadModule).headline,
+                score = leadReading.score,
+                verdict = leadReading.verdict,
+                headline = leadReading.headline,
+                module = lead,
+                rank = weightedScore(readings, activity.weights),
                 dayPillar = plate.day.toString(),
                 term = plate.term.term.en,
                 isToday = offset == 0
             )
         }
         return scored
-            .sortedWith(compareByDescending<FavourableDay> { it.score }.thenBy { it.date })
+            .sortedWith(compareByDescending<FavourableDay> { it.rank }.thenBy { it.date })
             .take(shown)
     }
 

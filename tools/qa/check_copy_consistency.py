@@ -219,6 +219,19 @@ RULES = [
             (SHOTS, r"medical, legal or psychological advice"),
         ],
     ),
+    (
+        "The colour is a phase, not a promise of luck",
+        "the five-phase colour of the day's wealth element is a phase; calling it a 'lucky colour' "
+        "is a promise the app never makes, and the app would then disagree with the store",
+        [
+            (LISTING, r"five-phase colour"),
+        ],
+        [
+            (LISTING, r"lucky\s+(colour|color)"),
+            (HOME, r"lucky\s+(colour|color)"),
+            (SHOTS, r"lucky\s+(colour|color)"),
+        ],
+    ),
 ]
 
 

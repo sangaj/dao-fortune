@@ -3,6 +3,7 @@ package com.laki.daofortune.data
 import android.content.Context
 import androidx.core.content.edit
 import com.laki.daofortune.core.Natal
+import com.laki.daofortune.core.PickActivity
 import com.laki.daofortune.core.YearSign
 import java.time.LocalDate
 
@@ -52,6 +53,30 @@ class ProfileState(context: Context) {
     /** Marks the first-run introduction as seen. */
     fun setOnboardingDone() {
         prefs.edit { putBoolean(KEY_ONBOARDING_DONE, true) }
+    }
+
+    /**
+     * The activity the forward scan was last ranked for.
+     *
+     * Remembered so the reader does not pick it again every morning: it is
+     * the question they are asking, and asking it once a day is enough. It is
+     * a category, not a preference about a person, and it lives in the same
+     * backup-excluded file as the year sign.
+     *
+     * Stored **by name**, not by position in the enum: a new activity added
+     * in the middle of the enum would otherwise shift every stored choice
+     * one place, and a reader who asked for a wedding date would quietly get
+     * their house move ranked instead.
+     */
+    val lastActivity: PickActivity
+        get() {
+            val name = prefs.getString(KEY_ACTIVITY, null) ?: return PickActivity.FINANCIAL_MOVE
+            return PickActivity.entries.firstOrNull { it.name == name } ?: PickActivity.FINANCIAL_MOVE
+        }
+
+    /** Remembers the activity the forward scan is ranked for. */
+    fun setActivity(activity: PickActivity) {
+        prefs.edit { putString(KEY_ACTIVITY, activity.name) }
     }
 
     /**
@@ -151,6 +176,7 @@ class ProfileState(context: Context) {
         private const val KEY_BIRTH_DATE = "birth_date"
         private const val KEY_REMINDED_DAYS = "reminded_days"
         private const val KEY_ONBOARDING_DONE = "onboarding_done"
+        private const val KEY_ACTIVITY = "last_activity"
         private const val KEY_DAYS_OPENED = "days_opened"
         private const val KEY_LAST_OPEN_DAY = "last_open_day"
         private const val KEY_LAST_REVIEW_PROMPT = "last_review_prompt_day"

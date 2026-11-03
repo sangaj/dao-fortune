@@ -18,6 +18,14 @@ data class LuopanSnapshot(
     val moment: LocalDateTime,
     val zone: ZoneId,
     val year: GanZhi,
+    /**
+     * The Chinese year the moment falls in — the number, not the pillar.
+     *
+     * It turns at Li Chun, so a day in early February still belongs to the
+     * year that began the previous February. The year officer card names it,
+     * so "the year of the Goat" is never ambiguous about which one.
+     */
+    val yearNumber: Int,
     val month: GanZhi,
     val day: GanZhi,
     val hour: GanZhi,
@@ -150,6 +158,7 @@ object LuopanEngine {
             moment = moment,
             zone = zone,
             year = year,
+            yearNumber = CalendarEngine.yearNumber(moment, zone),
             month = month,
             day = day,
             hour = hour,

@@ -432,6 +432,7 @@ private fun YearSignDialog(
 fun YearOfficerCard(
     yearSign: YearSign?,
     yearBranch: com.laki.daofortune.core.Branch,
+    yearNumber: Int,
     onSetYearSign: (YearSign?) -> Unit,
     onSetBirthDate: (LocalDate?) -> Unit,
     birthDate: LocalDate?,
@@ -458,7 +459,10 @@ fun YearOfficerCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                "Year of the ${yearBranch.animal}",
+                // The year is named, not just the animal: the card follows the
+                // plate on screen, so "the year of the Goat" must say which
+                // one it means.
+                "Year of the ${yearBranch.animal} · $yearNumber",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -630,12 +634,22 @@ fun FavourableDaysSection(
                     }
                 }
                 Spacer(Modifier.width(6.dp))
-                Text(
-                    "${day.score}",
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = verdictColor(day.verdict),
-                    fontWeight = FontWeight.Bold
-                )
+                // The score belongs to the module that speaks for the
+                // activity, and the module says so under the number: the
+                // reader sees the same score when they open the day.
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(
+                        "${day.score}",
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = verdictColor(day.verdict),
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        day.module.short,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         }
     }

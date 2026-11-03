@@ -24,6 +24,14 @@ LIMITS = {
     "Release notes": 500,
 }
 
+# Where to start worrying. Sitting a few characters under the cap is a trap:
+# the next edit crosses it, and Play rejects the upload. The warning line is
+# not a failure — it is a nudge to make room before it is needed.
+WARN_AT = {
+    "Full description": 3950,
+    "Release notes": 480,
+}
+
 
 def blocks(path: pathlib.Path) -> list[tuple[str, str]]:
     """Every fenced code block in the file, with the heading above it."""
@@ -67,6 +75,12 @@ def main() -> int:
             problems.append(f"{heading}: {length} characters, over the {limit} limit")
         else:
             print(f"[PASS] {heading}: {length}/{limit} characters")
+            warn_at = WARN_AT.get(heading)
+            if warn_at is not None and length >= warn_at:
+                print(
+                    f"[WARN] {heading}: {length} characters - only {limit - length} left, "
+                    f"make room before the next edit"
+                )
 
     for problem in problems:
         print(f"[FAIL] {problem}")

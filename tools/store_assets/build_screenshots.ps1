@@ -127,6 +127,44 @@ function Wealth-Bearings([string]$element) {
     }
 }
 
+function Draw-YearOfficer($g, [single]$y, [single]$x, [single]$w, $plate, $chipFont, $bodyFont, $smallFont) {
+    # The year officer card, exactly as the home screen draws it: the year is
+    # named, and with no sign set yet the card is the invitation to set one.
+    $h = 132
+    RoundRect $g $x $y $w $h 18 $Card $Outline
+    $g.DrawString('THE YEAR OFFICER', $chipFont, (Brush $Muted), ($x + 24), ($y + 14))
+    $yearLine = "Year of the $($plate.yearAnimal) $Dot $($plate.yearNumber)"
+    $yearFont = F 'Segoe UI' 19
+    $yearW = $g.MeasureString($yearLine, $yearFont).Width
+    $g.DrawString($yearLine, $yearFont, (Brush $Gold), (($x + $w - 24) - $yearW), ($y + 14))
+    $yearFont.Dispose()
+    $teaser = "The year of the $($plate.yearAnimal) is here. Set your sign and the plate will read the year against you."
+    $used = Wrap $g $teaser $bodyFont (Brush $Parchment) ($x + 24) ($y + 44) ($w - 48)
+    $g.DrawString('SET YOUR SIGN', $chipFont, (Brush $Gold), ($x + 24), ($y + 48 + $used))
+    return $h
+}
+
+function Draw-Glance($g, [single]$y, [single]$x, [single]$w, $glance, $chipFont, $valueFont, $noteFont) {
+    # The day at a glance: colour, direction and best hour in one row, the
+    # same three the app shows.
+    $h = 128
+    $gap = 12
+    $cw = ($w - 2 * $gap) / 3
+    $cells = @(
+        @('COLOUR', $glance.colour, $glance.colourNote),
+        @('DIRECTION', $glance.direction, $glance.directionNote),
+        @('BEST HOUR', $glance.bestHourRange, $glance.bestHourLabel)
+    )
+    for ($i = 0; $i -lt 3; $i++) {
+        $cx = $x + ($i * ($cw + $gap))
+        RoundRect $g $cx $y $cw $h 14 $Card $Outline
+        $g.DrawString($cells[$i][0], $chipFont, (Brush $Muted), ($cx + 16), ($y + 14))
+        $g.DrawString($cells[$i][1], $valueFont, (Brush $Gold), ($cx + 16), ($y + 44))
+        Wrap $g $cells[$i][2] $noteFont (Brush $Muted) ($cx + 16) ($y + 78) ($cw - 32) | Out-Null
+    }
+    return $h
+}
+
 function Draw-Dial($g, [single]$cx, [single]$cy, [single]$r, [string]$sunPalace, [string]$wealthElement, [string]$natalPalace) {
     $outer = New-Object System.Drawing.Pen($Gold, ($r * 0.026))
     $inner = New-Object System.Drawing.Pen([System.Drawing.Color]::FromArgb(110, 217, 179, 107), ($r * 0.011))
@@ -340,6 +378,13 @@ function Render-Home([string]$name, [string]$mode, [string]$natalPalace, [string
     $selFont.Dispose(); $selSmall.Dispose()
     $y += $anchorH + 16
 
+    # the year officer card, where the home screen puts it
+    $yearFont = F 'Segoe UI' 24
+    $yearSmall = F 'Segoe UI' 17
+    $yearH = Draw-YearOfficer $g $y $Margin ($W - 2 * $Margin) $plate $chipFont $yearFont $yearSmall
+    $yearFont.Dispose(); $yearSmall.Dispose()
+    $y += $yearH + 16
+
     # chips
     $chipW = 470
     $chipH = 92
@@ -365,33 +410,40 @@ function Render-Home([string]$name, [string]$mode, [string]$natalPalace, [string
     $y += $ph + 24
 
     # the plate card
-    $cardH = 760
+    $cardH = 700
     RoundRect $g $Margin $y ($W - 2 * $Margin) $cardH 28 $Card $Outline
     $g.DrawString('THE PLATE', $chipFont, (Brush $Muted), ($Margin + 26), ($y + 24))
     $g.DrawString("Sun in $($plate.sunPalace) $Dot $($plate.sunElement)", $chipFont, (Brush $Gold),
                   (($W - $Margin) - 300), ($y + 24))
     $cx = $W / 2
-    $cy = $y + 400
-    Draw-Dial $g $cx $cy 275 $plate.sunPalace $plate.wealthElement $natalPalace
+    $cy = $y + 370
+    Draw-Dial $g $cx $cy 250 $plate.sunPalace $plate.wealthElement $natalPalace
     $legendFont = F 'Segoe UI' 20
     $lx = $Margin + 34
-    $g.FillEllipse((Brush $Gold), $lx, ($y + 690), 13, 13)
-    $g.DrawString('Sun', $legendFont, (Brush $Muted), ($lx + 22), ($y + 683))
+    $g.FillEllipse((Brush $Gold), $lx, ($y + 630), 13, 13)
+    $g.DrawString('Sun', $legendFont, (Brush $Muted), ($lx + 22), ($y + 623))
     $lx = $Margin + 160
-    $g.FillEllipse((Brush $Jade), $lx, ($y + 690), 13, 13)
-    $g.DrawString("Wealth $Dot $($plate.wealthElement)", $legendFont, (Brush $Muted), ($lx + 22), ($y + 683))
+    $g.FillEllipse((Brush $Jade), $lx, ($y + 630), 13, 13)
+    $g.DrawString("Wealth $Dot $($plate.wealthElement)", $legendFont, (Brush $Muted), ($lx + 22), ($y + 623))
     $lx = $Margin + 430
-    $g.FillEllipse((Brush $Crimson), $lx, ($y + 690), 13, 13)
-    $g.DrawString('Avoid', $legendFont, (Brush $Muted), ($lx + 22), ($y + 683))
+    $g.FillEllipse((Brush $Crimson), $lx, ($y + 630), 13, 13)
+    $g.DrawString('Avoid', $legendFont, (Brush $Muted), ($lx + 22), ($y + 623))
     if ($natalPalace) {
         $lx = $Margin + 590
         $ringPen = New-Object System.Drawing.Pen($Parchment, 3)
-        $g.DrawEllipse($ringPen, $lx, ($y + 687), 19, 19)
+        $g.DrawEllipse($ringPen, $lx, ($y + 627), 19, 19)
         $ringPen.Dispose()
-        $g.DrawString('Your sign', $legendFont, (Brush $Muted), ($lx + 28), ($y + 683))
+        $g.DrawString('Your sign', $legendFont, (Brush $Muted), ($lx + 28), ($y + 623))
     }
     $legendFont.Dispose()
     $y += $cardH + 34
+
+    # the day at a glance, where the home screen puts it
+    $glanceValue = F 'Segoe UI' 21
+    $glanceNote = F 'Segoe UI' 15
+    $glanceH = Draw-Glance $g $y $Margin ($W - 2 * $Margin) $plate.glance $chipFont $glanceValue $glanceNote
+    $glanceValue.Dispose(); $glanceNote.Dispose()
+    $y += $glanceH + 16
 
     # the free-reading note, exactly as the app words it
     if ($mode -ne 'unlocked') {
@@ -512,12 +564,53 @@ $leadFont = F 'Segoe UI' 26
 $usedHeight = Wrap $g 'The next sixty days, ranked by the windfall reading. Tap a day to read its plate, the bell to be reminded on its morning.' $leadFont (Brush $Muted) $Margin $y ($W - 2 * $Margin)
 $y += $usedHeight + 26
 
+# what the reader is planning: the row of activities the scan is ranked for.
+# The app scrolls this row sideways; the shot clips it at the edge and fades
+# it out, so it reads as "there are more, scroll this" instead of a word cut
+# in half.
+$actFont = F 'Segoe UI' 19
+$actLabels = @('a financial move', 'signing & deals', 'love & weddings',
+               'moving & travel', 'body & new habits', 'launches & big purchases')
+$rowClip = New-Object System.Drawing.RectangleF($Margin, $y, ($W - 2 * $Margin), 46)
+$clipState = $g.Save()
+$g.SetClip($rowClip)
+$ax = $Margin
+foreach ($label in $actLabels) {
+    $selected = ($label -eq 'a financial move')
+    $tw = $g.MeasureString($label, $actFont).Width
+    $cw = $tw + 28
+    if ($selected) {
+        $sel = [System.Drawing.Color]::FromArgb(36, 217, 179, 107)
+        RoundRect $g $ax $y $cw 46 14 $sel $Gold
+    } else {
+        RoundRect $g $ax $y $cw 46 14 $Card $Outline
+    }
+    $brush = if ($selected) { Brush $Gold } else { Brush $Muted }
+    $g.DrawString($label, $actFont, $brush, ($ax + 14), ($y + 13))
+    $ax += $cw + 10
+}
+$g.Restore($clipState)
+# the fade at the right edge, in the colour the page is at this height
+$fadeW = 160
+$fadeX = $W - $Margin - $fadeW
+$pageAtRow = [System.Drawing.Color]::FromArgb(255, 17, 21, 29)
+$pageClear = [System.Drawing.Color]::FromArgb(0, 17, 21, 29)
+$fade = New-Object System.Drawing.Drawing2D.LinearGradientBrush(
+    (New-Object System.Drawing.PointF($fadeX, $y)), (New-Object System.Drawing.PointF(($fadeX + $fadeW), $y)),
+    $pageClear, $pageAtRow)
+$g.FillRectangle($fade, $fadeX, $y, $fadeW, 46)
+$fade.Dispose()
+$actFont.Dispose()
+$y += 46 + 26
+
 $dayFont = F 'Segoe UI' 34 ([System.Drawing.FontStyle]::Bold)
 $dayMetaFont = F 'Segoe UI' 21
 $dayScoreFont = F 'Georgia' 52 ([System.Drawing.FontStyle]::Bold)
+$dayModuleFont = F 'Segoe UI' 18
+$rowH = 156
 foreach ($d in $sample.favourableDays) {
     $accent = Verdict-Color $d.verdict
-    RoundRect $g $Margin $y ($W - 2 * $Margin) 148 18 $Card $Outline
+    RoundRect $g $Margin $y ($W - 2 * $Margin) $rowH 18 $Card $Outline
     $g.DrawString($d.date, $dayFont, (Brush $Parchment), ($Margin + 28), ($y + 24))
     if ($d.isToday) {
         $g.DrawString('TODAY', $chipFont, (Brush $Gold), ($Margin + 190), ($y + 34))
@@ -527,8 +620,16 @@ foreach ($d in $sample.favourableDays) {
         # the bell the app puts on every day but today
         Draw-Bell $g (($W - $Margin) - 205) ($y + 72) 44 $Muted
     }
-    $g.DrawString([string]$d.score, $dayScoreFont, (Brush $accent), (($W - $Margin) - 130), ($y + 48))
-    $y += 160
+    # the score, right-aligned, with the module it belongs to under it — the
+    # same two lines the app draws, so the row can never claim a number the
+    # reading does not carry.
+    $scoreText = [string]$d.score
+    $scoreX = ($W - $Margin) - 28 - $g.MeasureString($scoreText, $dayScoreFont).Width
+    $g.DrawString($scoreText, $dayScoreFont, (Brush $accent), $scoreX, ($y + 40))
+    $moduleText = [string]$d.module
+    $moduleX = ($W - $Margin) - 28 - $g.MeasureString($moduleText, $dayModuleFont).Width
+    $g.DrawString($moduleText, $dayModuleFont, (Brush $Muted), $moduleX, ($y + 104))
+    $y += $rowH + 12
 }
 $y += 14
 
@@ -539,7 +640,7 @@ RoundRect $g $Margin $y ($W - 2 * $Margin) 190 22 $Card $Outline
 $g.DrawString('DISCLAIMER', $chipFont, (Brush $Muted), ($Margin + 28), ($y + 24))
 Wrap $g $discText $discFont (Brush $Muted) ($Margin + 28) ($y + 58) ($W - 2 * $Margin - 56) | Out-Null
 
-$dayFont.Dispose(); $dayMetaFont.Dispose(); $dayScoreFont.Dispose(); $leadFont.Dispose()
+$dayFont.Dispose(); $dayMetaFont.Dispose(); $dayScoreFont.Dispose(); $dayModuleFont.Dispose(); $leadFont.Dispose()
 $discFont.Dispose()
 Save-Png $bmp $g '03_favourable_days.png'
 

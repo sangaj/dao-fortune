@@ -57,6 +57,32 @@ class PickActivityTest {
     }
 
     @Test
+    fun `the score on the row is the reading the reader will open`() {
+        // The row shows the lead module's own score, so the number on the
+        // list and the number in the reading are the same number.
+        val days = FavourableDates.scan(start, zone, null, PickActivity.SIGNING, horizonDays = 14, shown = 14)
+        days.forEach { day ->
+            val plate = LuopanEngine.dayPlate(day.date, zone)
+            val career = FortuneEngine.reading(plate, FortuneModule.CAREER, null)
+            assertEquals(career.score, day.score)
+            assertEquals(career.headline, day.headline)
+            assertEquals(career.verdict, day.verdict)
+            assertEquals(FortuneModule.CAREER, day.module)
+        }
+    }
+
+    @Test
+    fun `the order is the activity's own score, not the number on the row`() {
+        val days = FavourableDates.scan(start, zone, null, PickActivity.SIGNING, horizonDays = 30, shown = 30)
+        val ranks = days.map { it.rank }
+        assertEquals(ranks.sortedDescending(), ranks)
+        // The two numbers are different numbers - that is the whole point of
+        // the weighting: the order is the activity's judgement, the row shows
+        // the reading.
+        assertTrue("the rank and the row score are always the same", days.any { it.rank != it.score })
+    }
+
+    @Test
     fun `the scan is deterministic`() {
         val first = FavourableDates.scan(start, zone, null, PickActivity.LAUNCH)
         val second = FavourableDates.scan(start, zone, null, PickActivity.LAUNCH)

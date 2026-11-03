@@ -181,6 +181,32 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\qa\verify_release.ps1 
   it never spends the free reading. The four other modules and the dream stay behind the unlock. If the
   split changes, the listing, the paywall bullets, the home banner and the store screenshots change
   with it.
+- **The favourable-days list shows the lead module's own score.** The number on a row is the score of
+  the module that speaks for the activity the reader picked, and the module's name sits under it. The
+  **order** of the rows comes from the activity's weighted rank — a different number on purpose. The
+  list must never show a number the reader will not meet in the reading they open; that reads as a
+  broken app, and it is the one thing a screenshot cannot hide.
+- **The week ahead is a calendar week.** `WeekAhead.weekDays(today)` finds the coming Monday, so the
+  Sunday-evening note names a whole week rather than "the next seven days". A note that slipped past
+  Sunday still names the week it belongs to.
+- **The review ask depends on the reader using the app, never on the day's luck.** `ReviewPrompt`
+  needs five days opened **and** an unlock, with a 30-day cooldown. The day's score plays no part —
+  asking for a review on an exceptional day and never on an ordinary one would be asking the reader to
+  rate the plate.
+- **The activity the reader is planning is remembered.** It lives in the backup-excluded profile file
+  (`ProfileState.lastActivity`), so the list is ranked the same way tomorrow instead of asking again.
+- **The year turns at Li Chun, not on New Year's Day.** `CalendarEngine.yearNumber` is the single
+  source for the year on the plate and on the year-officer card, and it follows the solar year. The
+  card has to name the year — a card that says "the year of the Horse" without the number leaves the
+  reader guessing which one.
+- **A glance never says the same thing twice.** The value names the thing and the note says what it
+  is for; the direction's value and note come from one source (`FortuneEngine.wealthDirection`), so
+  the ten-second read can never drift from the long one. The value gets **one line** and the note
+  gets three: the chip is a third of a phone wide, and a value that only fits on a large screen is a
+  value some readers never read.
+- **The store page has to sell what the app does.** A new feature that is not in the listing copy and
+  not in a screenshot is a feature the store does not mention. The listing length is capped, so the
+  copy has to be re-cut, not appended to.
 
 ## Store material
 
