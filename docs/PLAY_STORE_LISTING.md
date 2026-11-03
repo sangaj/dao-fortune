@@ -126,17 +126,18 @@ Play's deceptive-behaviour policy is easier to defend when the listing says exac
 ```
 First release.
 
-• The twenty-four mountain plate, sun drawn for your time.
-• Five readings: fortune, windfall, love, career, body and balance.
-• Favourable Days: the next sixty days ranked.
-• Dream & Omens: write your dream, the plate reads it against the day.
+• Five readings on the twenty-four mountain plate: fortune, windfall, love, career, body.
+• At a glance: lucky colour, best direction, best hour.
+• The Year Officer: your sign against the year.
+• Favourable Days, ranked for your plans.
+• Dream & Omens: write your dream, the plate reads it.
+• Sunday evening: your best day of the coming week.
 • Your year sign personalises every reading.
-• Every double-hour scored, with the reason for each score.
-• Today's Fortune free every day; your first reading free too.
-• One-off unlock via Google Play. No subscription.
+• Today's Fortune free daily; your first reading free too.
+• One-off unlock, no subscription.
 ```
 
-*(479 characters. Play caps release notes at 500 — keep it under.)*
+*(497 characters. Play caps release notes at 500 — keep it under.)*
 
 ---
 
