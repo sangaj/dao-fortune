@@ -421,6 +421,90 @@ private fun YearSignDialog(
 }
 
 /**
+ * The year officer (tai sui) card: how the reader's sign stands against the
+ * year itself.
+ *
+ * Free and always on the home screen. With no sign set it is the invitation
+ * to set one — tapping it opens the same picker the anchor row uses.
+ */
+@Composable
+fun YearOfficerCard(
+    yearSign: YearSign?,
+    yearBranch: com.laki.daofortune.core.Branch,
+    onSetYearSign: (YearSign?) -> Unit,
+    onSetBirthDate: (LocalDate?) -> Unit,
+    birthDate: LocalDate?,
+    modifier: Modifier = Modifier
+) {
+    var showPicker by remember { mutableStateOf(false) }
+    val reading = yearSign?.let { com.laki.daofortune.core.YearReading.of(it, yearBranch) }
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(14.dp))
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(14.dp))
+            .clickable(enabled = reading == null) { showPicker = true }
+            .padding(horizontal = 14.dp, vertical = 10.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                "THE YEAR OFFICER",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                "Year of the ${yearBranch.animal}",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+        Spacer(Modifier.height(4.dp))
+        if (reading != null) {
+            Text(
+                reading.headline,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Spacer(Modifier.height(2.dp))
+            Text(
+                reading.body,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        } else {
+            Text(
+                com.laki.daofortune.core.YearReading.teaser(yearBranch),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(2.dp))
+            Text(
+                "SET YOUR SIGN",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+
+    if (showPicker) {
+        YearSignDialog(
+            current = yearSign,
+            birthDate = birthDate,
+            onPick = {
+                onSetYearSign(it)
+                showPicker = false
+            },
+            onPickBirthDate = onSetBirthDate,
+            onDismiss = { showPicker = false }
+        )
+    }
+}
+
+/**
  * The forward scan: the days ahead the plate favours, best first.
  *
  * The list itself is free — it is the answer to "when should I move?" — while

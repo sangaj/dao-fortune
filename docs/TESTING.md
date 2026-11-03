@@ -186,6 +186,9 @@ adb logcat -c            # clear the log before the run
 | 3 | Solar term | Matches an independent source for today |
 | 4 | Four pillars | Year / month / day / hour, non-empty, sensible |
 | 5 | Dial | Sun marker, wealth marker and "avoid" marker on the right mountains |
+| 5a | The glance row under the plate | Colour, face direction and best hour; the direction matches the full reading's "Turn towards" line, and the colour is the wealth element's five-phase colour |
+| 5b | The Year Officer card without a sign | A teaser naming the year's animal; tapping it opens the year-sign picker |
+| 5c | The Year Officer card with a sign set | One headline and body matching the relation — e.g. a Rat in a Horse year reads "Your sign clashes the year" |
 
 ### 2.2 The paywall path — the part that cannot be skipped
 

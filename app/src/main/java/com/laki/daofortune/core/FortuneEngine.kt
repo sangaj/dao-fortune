@@ -259,14 +259,17 @@ object FortuneEngine {
         return Math.min(raw, 360 - raw)
     }
 
+    /** The mountain the wealth element points at first — the face of the day. */
+    fun primaryWealthPalace(element: WuXing): Palace = when (element) {
+        WuXing.WOOD -> Palace.MAO
+        WuXing.FIRE -> Palace.WU
+        WuXing.METAL -> Palace.YOU
+        WuXing.WATER -> Palace.ZI
+        WuXing.EARTH -> Palace.CHEN
+    }
+
     fun wealthDirectionLabel(s: LuopanSnapshot): String {
-        val primary = when (s.wealthElement) {
-            WuXing.WOOD -> Palace.MAO
-            WuXing.FIRE -> Palace.WU
-            WuXing.METAL -> Palace.YOU
-            WuXing.WATER -> Palace.ZI
-            WuXing.EARTH -> Palace.CHEN
-        }
+        val primary = primaryWealthPalace(s.wealthElement)
         val extra = if (s.wealthElement == WuXing.EARTH) " and the centre" else ""
         return "${Palace.directionName(primary.bearing)} — ${primary.pinyin}$extra (${s.wealthElement.en})"
     }

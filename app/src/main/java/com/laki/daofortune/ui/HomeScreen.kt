@@ -171,6 +171,16 @@ fun HomeScreen(
             }
 
             item {
+                YearOfficerCard(
+                    yearSign = yearSign,
+                    yearBranch = snapshot.year.branch,
+                    onSetYearSign = onSetYearSign,
+                    onSetBirthDate = onSetBirthDate,
+                    birthDate = birthDate
+                )
+            }
+
+            item {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     FactChip("Solar term", snapshot.term.term.en, Modifier.weight(1f))
                     FactChip("Day officer", snapshot.officer.en, Modifier.weight(1f))
@@ -215,6 +225,10 @@ fun HomeScreen(
                     Spacer(Modifier.height(4.dp))
                     LegendRow(snapshot, yearSign)
                 }
+            }
+
+            item {
+                DayGlanceCard(glance = com.laki.daofortune.core.DayGlance.of(snapshot))
             }
 
             item {
@@ -278,6 +292,57 @@ fun HomeScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+            }
+        }
+    }
+}
+
+/**
+ * The day at a glance: colour, direction and best hour in one row.
+ *
+ * The ten-second read for the morning-tea open; the full reasoning stays in
+ * the readings below. The direction note is the same string the full reading
+ * uses, so the glance never disagrees with the detail.
+ */
+@Composable
+private fun DayGlanceCard(glance: com.laki.daofortune.core.DayGlance) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        listOf(
+            Triple("COLOUR", glance.colour, glance.colourNote),
+            Triple("FACE", glance.face, glance.faceNote),
+            Triple("BEST HOUR", glance.bestHourRange, glance.bestHourLabel)
+        ).forEach { (label, value, note) ->
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(12.dp))
+                    .border(
+                        1.dp,
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.25f),
+                        RoundedCornerShape(12.dp)
+                    )
+                    .padding(horizontal = 12.dp, vertical = 9.dp)
+            ) {
+                Text(
+                    label,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    value,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1
+                )
+                Text(
+                    note,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2
+                )
             }
         }
     }
