@@ -3,6 +3,7 @@ package com.laki.daofortune.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -515,6 +516,8 @@ fun FavourableDaysSection(
     days: List<FavourableDay>,
     selectedDate: LocalDate,
     remindedDays: Set<LocalDate>,
+    activity: com.laki.daofortune.core.PickActivity,
+    onSelectActivity: (com.laki.daofortune.core.PickActivity) -> Unit,
     onPick: (LocalDate) -> Unit,
     onToggleReminder: (LocalDate) -> Unit,
     modifier: Modifier = Modifier
@@ -524,12 +527,49 @@ fun FavourableDaysSection(
         SectionTitle("Favourable days ahead")
         Spacer(Modifier.height(6.dp))
         Text(
-            "The next sixty days, ranked by the windfall reading. Tap a day to read its plate, " +
-                "the bell to be reminded on its morning.",
+            if (activity == com.laki.daofortune.core.PickActivity.FINANCIAL_MOVE)
+                "The next sixty days, ranked by the windfall reading. Tap a day to read its plate, " +
+                    "the bell to be reminded on its morning."
+            else
+                "The next sixty days, ranked for ${activity.label}. Tap a day to read its plate, " +
+                    "the bell to be reminded on its morning.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(Modifier.height(10.dp))
+
+        // What the reader is planning: the ranking follows the activity.
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp)
+                .horizontalScroll(androidx.compose.foundation.rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            com.laki.daofortune.core.PickActivity.entries.forEach { option ->
+                val selected = option == activity
+                Text(
+                    option.label,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = if (selected) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier
+                        .background(
+                            if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.14f)
+                            else MaterialTheme.colorScheme.surface,
+                            RoundedCornerShape(14.dp)
+                        )
+                        .border(
+                            1.dp,
+                            if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                            else MaterialTheme.colorScheme.outlineVariant,
+                            RoundedCornerShape(14.dp)
+                        )
+                        .clickable { onSelectActivity(option) }
+                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                )
+            }
+        }
 
         days.forEach { day ->
             val selected = day.date == selectedDate

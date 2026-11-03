@@ -99,6 +99,8 @@ class MainActivity : ComponentActivity() {
                         yearSign = state.yearSign,
                         birthDate = state.birthDate,
                         favourableDays = state.favourableDays,
+                        activity = state.activity,
+                        onSelectActivity = viewModel::setActivity,
                         remindedDays = state.remindedDays,
                         freeReadingsLeft = state.freeReadingsLeft,
                         unlocked = state.unlocked,

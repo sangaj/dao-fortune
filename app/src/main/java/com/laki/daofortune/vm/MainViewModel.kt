@@ -18,6 +18,7 @@ import com.laki.daofortune.core.LuopanEngine
 import com.laki.daofortune.core.LuopanSnapshot
 import com.laki.daofortune.core.ModuleReading
 import com.laki.daofortune.core.Natal
+import com.laki.daofortune.core.PickActivity
 import com.laki.daofortune.core.ReadingKey
 import com.laki.daofortune.core.YearSign
 import com.laki.daofortune.data.AccessState
@@ -58,6 +59,8 @@ data class UiState(
     val birthDate: LocalDate? = null,
     /** The forward scan: the best days ahead, ranked. */
     val favourableDays: List<FavourableDay> = emptyList(),
+    /** What the forward scan is ranking for. */
+    val activity: PickActivity = PickActivity.FINANCIAL_MOVE,
     /** The days the reader asked to be reminded of. */
     val remindedDays: Set<LocalDate> = emptySet(),
     /** True when the daily reading notification is switched on. */
@@ -380,6 +383,18 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         selectDate(date)
     }
 
+    /**
+     * Ranks the forward scan for something the reader wants to do.
+     *
+     * The choice is kept in memory only: it is a question being asked, not a
+     * preference to store.
+     */
+    fun setActivity(activity: PickActivity) {
+        if (activity == _ui.value.activity) return
+        _ui.update { it.copy(activity = activity) }
+        rescanFavourableDays()
+    }
+
     // ---------------------------------------------------------------- the dream
 
     /**
@@ -557,11 +572,12 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
      */
     private fun rescanFavourableDays() {
         val natal = _ui.value.natalBranch
+        val activity = _ui.value.activity
         val today = LocalDate.now()
         scanJob?.cancel()
         scanJob = viewModelScope.launch {
             val days = withContext(Dispatchers.Default) {
-                FavourableDates.scan(today, zone, natal)
+                FavourableDates.scan(today, zone, natal, activity)
             }
             _ui.update { it.copy(favourableDays = days) }
         }

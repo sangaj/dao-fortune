@@ -60,6 +60,8 @@ fun HomeScreen(
     yearSign: YearSign?,
     birthDate: LocalDate?,
     favourableDays: List<FavourableDay>,
+    activity: com.laki.daofortune.core.PickActivity,
+    onSelectActivity: (com.laki.daofortune.core.PickActivity) -> Unit,
     remindedDays: Set<LocalDate>,
     freeReadingsLeft: Int,
     unlocked: Boolean,
@@ -270,6 +272,8 @@ fun HomeScreen(
                     days = favourableDays,
                     selectedDate = selectedDate,
                     remindedDays = remindedDays,
+                    activity = activity,
+                    onSelectActivity = onSelectActivity,
                     onPick = onSelectDate,
                     onToggleReminder = onToggleReminder
                 )

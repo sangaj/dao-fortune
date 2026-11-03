@@ -229,7 +229,9 @@ production.
 | 17 | Open the calendar | A date picker opens; picking any date loads that day's plate |
 | 18 | Tap a day in **Favourable Days** | That date is selected and its plate is drawn |
 | 19 | Check the list itself | Five days, ranked best first, each with its day pillar, solar term, score and one-line verdict |
-| 20 | Pick the top day | The date selector jumps to it; the windfall score on the plate matches the list |
+| 19a | Pick another activity (signing, love & weddings, moving, body, launches) | The list re-ranks for it; the lead line under the section title says what the days are ranked for; the day scores follow the weighted modules |
+| 19b | Return to "a financial move" | The ranking is exactly the windfall ranking again |
+| 20 | Pick the top day (with "a financial move" selected) | The date selector jumps to it; the windfall score on the plate matches the list |
 | 21 | Check the hour | On a chosen date the reading has **no hour** — no hour pillar, no hour-officers, no hour windows |
 
 ### 2.4a Notifications, the widget and reminders

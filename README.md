@@ -30,7 +30,7 @@ Every reading shows **the factors that produced its score**, so the number is ne
 
 | Feature | What it does |
 |---|---|
-| **Favourable Days** | The next sixty days are scored on the same day-plate rules and ranked by the windfall reading, so you can see *when* to move, not just whether today is good. |
+| **Favourable Days** | The next sixty days are scored on the same day-plate rules and ranked for the move you have in mind — a financial move, signing, love & weddings, moving, your body, or a launch — so you can see *when* to act, not just whether today is good. |
 | **Any date** | Step day by day or open the calendar. A day that is not today is read as a **day plate** — no hour is involved, because a day that has not happened yet has no hour. |
 | **Your year sign** | Choose your zodiac branch once and every reading is measured against your own position on the plate: harmony, three-harmony, clash or harm against the day's branch, and the element tone between your branch and the day's. |
 | **Your birth day (optional)** | For a deeper anchor, add the day you were born: every reading is then measured against that day's own pillar. A birth day is optional, lives only on your device, and is excluded from backup. |
