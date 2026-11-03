@@ -203,6 +203,16 @@ memory. Two traps in that script: PowerShell's comma operator binds tighter than
 concatenated array element needs its own parentheses; and `$h` clobbers `$H` because the shell is
 case-insensitive.
 
+**Two checks in the release gate keep the screenshots honest.**
+`tools/qa/check_screenshot_sync.py` reads the screenshot script and the app's own source and makes
+them agree **in both directions**: every phrase the script draws has to exist in the app, so the
+store can never show a sentence the app does not say, and the sentences the app leads with (the
+free-reading banner, the anchor row, the paywall's benefits) have to reach the script, so a changed
+banner cannot leave the old one in the store. And the gate draws the screenshots again into a
+scratch folder and compares the bytes — the render is byte-for-byte reproducible, so a PNG that the
+current script no longer produces is caught. When you change a visible string, change the script and
+regenerate in the same commit.
+
 `docs/store/screenshots/` must hold exactly the final PNGs — `01_home`, `02_home_unlocked`,
 `03_favourable_days`, `04_windfall_reading`, `05_unlock` and `06_dream` — that is the folder you upload
 to Play. Robolectric captures go to `build/screenshots/` instead, so a test run can never leave stray

@@ -138,6 +138,30 @@ not as a failure; a cancelled callback is not an error; and a purchase of some *
 unlocks anything. `BillingManager` uses the same function to decide whether it already owns the
 product, so the app has exactly one definition of "the reader owns it".
 
+### 1.9 The store screenshots
+
+The screenshots are drawn by `tools/store_assets/build_screenshots.ps1`, not captured from the app,
+so they do not follow it on their own. Two checks keep them honest, both inside the release gate:
+
+```powershell
+python tools\qa\check_screenshot_sync.py
+```
+
+* **script → app** — every phrase the script draws has to exist in the app's own source, so the store
+  can never show a sentence the app does not say.
+* **app → script** — the sentences the app leads with (the free-reading banner, the anchor row, the
+  paywall's benefits, the share buttons) have to reach the script.
+
+The gate also draws the screenshots again into a scratch folder and compares the bytes — the render
+is byte-for-byte reproducible, so a PNG that the current script no longer produces is caught:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\store_assets\build_screenshots.ps1 -OutDir build\_screens_check
+```
+
+Both directions were verified with a negative control: a script that draws `Save to gallery` instead
+of the app's `Save image` fails, and so does an app whose banner no longer matches the store.
+
 ---
 
 ## Layer 2 — On a real phone
@@ -323,6 +347,8 @@ Everything below must be true before an upload. If any line is unchecked, stop.
 | Signature present and valid | `keytool -printcert` | ☐ |
 | Source zip has no secrets | no `keystore.properties`, no `.jks` | ☐ |
 | Store folder is clean | `docs/store/screenshots/` holds exactly 6 PNGs | ☐ |
+| Store screenshots match the app | `python tools\qa\check_screenshot_sync.py` → SCREENSHOT SYNC OK | ☐ |
+| Store screenshots are current | the gate's byte comparison of a fresh render → all six match | ☐ |
 | Privacy policy page is current | `python tools\docs\make_privacy_html.py --check` | ☐ |
 | Copy matches the app | free previews / first free reading / one-off unlock / year sign / dream described the same way in the listing, the privacy policy and in-app | ☐ |
 | Real-device pass done | Layer 2 complete, including the purchase | ☐ |

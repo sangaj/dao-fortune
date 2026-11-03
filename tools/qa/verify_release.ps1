@@ -119,6 +119,29 @@ foreach ($name in $expected) {
     Check "screenshot $name" ($shots.Name -contains $name)
 }
 
+# The screenshots are drawn by a script, not captured from the app, so they do
+# not follow it on their own. The render is byte-for-byte reproducible, so the
+# gate draws them again into a scratch folder and compares: a PNG that does
+# not match is one the current script no longer produces, and the store would
+# be showing a product that has moved on.
+$scratch = 'build\_screens_check'
+& powershell -NoProfile -ExecutionPolicy Bypass -File 'tools\store_assets\build_screenshots.ps1' `
+    -OutDir $scratch 2>&1 | Out-Null
+$stale = @()
+foreach ($name in $expected) {
+    $fresh = Join-Path $scratch $name
+    $shipped = Join-Path 'docs\store\screenshots' $name
+    if (-not (Test-Path $fresh) -or -not (Test-Path $shipped)) {
+        $stale += $name
+        continue
+    }
+    $freshHash = (Get-FileHash $fresh -Algorithm SHA256).Hash
+    $shippedHash = (Get-FileHash $shipped -Algorithm SHA256).Hash
+    if ($freshHash -ne $shippedHash) { $stale += $name }
+}
+Check 'store screenshots are what the script draws today' ($stale.Count -eq 0) `
+    $(if ($stale.Count -eq 0) { 'all six match' } else { "stale: " + ($stale -join ', ') })
+
 # The year sign must never be able to leave the device, so its preferences
 # file must stay out of the backup allow-list. The rules are parsed as XML:
 # a comment that names the file is fine, an <include> that lists it is not.
@@ -166,6 +189,14 @@ Check 'store listing copy is within Play limits' ($LASTEXITCODE -eq 0) `
 $copyCheck = & python 'tools\qa\check_copy_consistency.py' 2>&1 | Out-String
 Check 'product copy agrees everywhere it is repeated' ($LASTEXITCODE -eq 0) `
     (($copyCheck.Trim() -split "`n" | Where-Object { $_ -match 'FAIL' }) -join ' ')
+
+# The store screenshots are drawn by a script, not captured from the app, so
+# they do not follow it on their own. This check makes them: every phrase the
+# script draws has to exist in the app, and the app's leading sentences have
+# to reach the script.
+$shotsCheck = & python 'tools\qa\check_screenshot_sync.py' 2>&1 | Out-String
+Check 'store screenshots still say what the app says' ($LASTEXITCODE -eq 0) `
+    (($shotsCheck.Trim() -split "`n" | Where-Object { $_ -match '^\[FAIL\]' }) -join ' ')
 
 # The signing key must never be in git, not even in a private repository.
 $gitExe = 'E:\Minimax\toolchain\git\cmd\git.exe'

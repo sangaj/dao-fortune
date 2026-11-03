@@ -5,12 +5,26 @@
 #
 # Usage:
 #   powershell -NoProfile -ExecutionPolicy Bypass -File tools\store_assets\build_screenshots.ps1
+#   powershell -NoProfile -ExecutionPolicy Bypass -File tools\store_assets\build_screenshots.ps1 `
+#       -OutDir build\_screens_check
+#
+# The render is byte-for-byte reproducible, so the release gate renders into a
+# scratch folder and compares: that is how "the script changed but the PNGs
+# were not regenerated" gets caught.
+
+param(
+    [string]$OutDir = ''
+)
 
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
 
 $Root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-$OutDir = Join-Path $Root 'docs\store\screenshots'
+if ([string]::IsNullOrWhiteSpace($OutDir)) {
+    $OutDir = Join-Path $Root 'docs\store\screenshots'
+} elseif (-not [System.IO.Path]::IsPathRooted($OutDir)) {
+    $OutDir = Join-Path $Root $OutDir
+}
 $SamplePath = Join-Path $Root 'docs\store\reading_sample.json'
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
 if (-not (Test-Path $SamplePath)) {
@@ -833,7 +847,7 @@ function Draw-DreamPlate($g, [single]$cx, [single]$cy, [single]$r, $dream, [stri
 $dream = $sample.dream
 $canvas = New-Canvas
 $bmp = $canvas[0]; $g = $canvas[1]
-$y = 84
+$y = 70
 
 # the header of the sheet
 $g.DrawString('DREAM & OMENS', $chipFont, (Brush $Gold), $Margin, $y)
@@ -843,10 +857,14 @@ $g.DrawString($mengZhan, $cjkTitle, (Brush $Gold), ($W - $Margin - 56), ($y - 4)
 $cjkTitle.Dispose()
 $y += 46
 
-$dreamTitle = F 'Georgia' 46 ([System.Drawing.FontStyle]::Bold)
-$g.DrawString('Your dream, read against the day', $dreamTitle, (Brush $Parchment), $Margin, $y)
+$dreamTitle = F 'Georgia' 38 ([System.Drawing.FontStyle]::Bold)
+# The app's own title for the sheet. The store must not show a headline the
+# app does not use, so the wording is the app's - it just wraps over two
+# lines here.
+$usedHeight = Wrap $g 'Write what you remember, and the plate will read it against the day.' `
+    $dreamTitle (Brush $Parchment) $Margin $y ($W - 2 * $Margin)
 $dreamTitle.Dispose()
-$y += 72
+$y += $usedHeight + 12
 
 # what the reader wrote
 $dreamCardH = 120
@@ -873,16 +891,16 @@ $g.DrawString($dreamVerdict.ToUpper(), (F 'Segoe UI' 19), (Brush $Muted), ($Marg
 $dreamHead = F 'Georgia' 42 ([System.Drawing.FontStyle]::Bold)
 Wrap $g $dream.headline $dreamHead (Brush (Verdict-Color $dreamVerdict)) ($Margin + 230) ($y + 22) 760 | Out-Null
 $dreamHead.Dispose()
-$y += 200
+$y += 186
 
 # what the dream said
 $summaryFont = F 'Segoe UI' 25
 $usedHeight = Wrap $g $dream.summary $summaryFont $body $Margin $y ($W - 2 * $Margin)
 $summaryFont.Dispose()
-$y += $usedHeight + 90
+$y += $usedHeight + 76
 
 # the plate. The images sit outside the ring, so the plate needs room above it.
-$plateSize = 600
+$plateSize = 580
 $plateCx = $W / 2
 $plateCy = $y + ($plateSize / 2)
 Draw-DreamPlate $g $plateCx $plateCy ($plateSize / 2 - 30) $dream $dream.sunPalace $dream.wealthElement $dream.natalPalace
@@ -925,7 +943,7 @@ $shareFmt.Alignment = [System.Drawing.StringAlignment]::Center
 $shareFmt.LineAlignment = [System.Drawing.StringAlignment]::Center
 $g.DrawString('Share as image', $shareFont, (Brush $Gold),
               (New-Object System.Drawing.RectangleF($Margin, $y, $shareW, $shareH)), $shareFmt)
-$g.DrawString('Save to gallery', $shareFont, (Brush $Gold),
+$g.DrawString('Save image', $shareFont, (Brush $Gold),
               (New-Object System.Drawing.RectangleF(($Margin + $shareW + 16), $y, $shareW, $shareH)), $shareFmt)
 $shareFmt.Dispose(); $shareFont.Dispose()
 $y += $shareH + 26
